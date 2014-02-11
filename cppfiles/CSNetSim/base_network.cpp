@@ -40,7 +40,7 @@ BaseNetwork::BaseNetwork(double* x, double* y)
 BaseNetwork::~BaseNetwork()
 {
 	//release nodes
-	for(int i = 0; i < BaseNetwork::NODE_NUM; i ++){
+	for(int i = 0; i < BaseNetwork::NODE_NUM; i++){
 		delete this->nodes[i];
 	}
 	delete this->nodes;
