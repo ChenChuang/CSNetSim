@@ -31,7 +31,7 @@ BaseNetwork::BaseNetwork(double* x, double* y)
 	//this->monitor->record_AdjG("max_radius_G.mat", "max_radius_G", max_radius_G);
 	
 #ifdef _CR_
-	for(int i = 0; i < BaseNetwork::NODE_NUM; i ++){
+	for(int i = 0; i < BaseNetwork::NODE_NUM; i++){
 		this->nodes[i]->cr->init();
 	}
 #endif
