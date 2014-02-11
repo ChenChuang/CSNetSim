@@ -92,7 +92,7 @@ void BaseNetwork::run()
 int BaseNetwork::communicate()
 {
 #ifdef _print_
-	printf("----------------------------commicating...------------------------------\n");
+	printf("----------------------------communicating...------------------------------\n");
 #endif
 	int t_i;
 	int k;
