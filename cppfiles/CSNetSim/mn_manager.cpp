@@ -2,11 +2,13 @@
 
 MnManager::MnManager(BaseNode* anode): node(anode), members(NULL)
 {
+	this->mn_iter = new MnIterator(this->members);
 }
 
 MnManager::~MnManager()
 {
 	this->clear();
+	delete this->mn_iter;
 }
 
 void MnManager::remove(int addr)
@@ -84,4 +86,10 @@ MnNode* MnManager::find(int addr)
 		p = p->next;
 	}
 	return p;
+}
+
+MnIterator* MnManager::mn_iter()
+{
+	this->mn_iter->seek(this->members);
+	return this->mn_iter;
 }

@@ -88,9 +88,11 @@ int BaseNetwork::communicate()
 	int t_i;
 	int k;
 	double d;
-	struct MsgIterator* msg_iter;
-	struct Msg* msg;
-	struct Adjv* vp;
+	MsgIterator* msg_iter;
+	Msg* msg;
+	MnIterator* mn_iter;
+	int mn_addr;
+	Adjv* vp;
 	//process every node's t_msg_buf
 	for(t_i = 0; t_i < BaseNetwork::NODE_NUM; t_i ++){
 		//the node is dead
@@ -150,12 +152,13 @@ int BaseNetwork::communicate()
 			//INCLUSTERCAST
 			else if(msg->type == BaseCommProxy::MSG_TYPE_INCLUSTERCAST){
 				d = 0;
-				struct MEMBER* p = this->nodes[t_i]->members;
-				while( p != NULL ){
-					d = max( d, sqrt( pow( this->nodes[t_i]->x - this->nodes[p->addr]->x, 2 ) + pow( this->nodes[t_i]->y - this->nodes[p->addr]->y, 2 ) ) );
+				MnIterator* mn_iter = this->nodes[t_i]->get_mnmanager()->mn_iter();
+				while(mn_iter->has_more()){
+					mn_addr = mn_iter->next_addr();
+					d = max( d, sqrt( pow( this->nodes[t_i]->x - this->nodes[mn_addr]->x, 2 ) + pow( this->nodes[t_i]->y - this->nodes[mn_addr]->y, 2 ) ) );
 					if(this->nodes[msg->toaddr]->is_alive()){
-						this->nodes[p->addr]->get_commproxy()->receive(msg);
-						this->nodes[p->addr]->energy -= EnergyModel::calReceive(k);
+						this->nodes[mn_addr]->get_commproxy()->receive(msg);
+						this->nodes[mn_addr]->energy -= EnergyModel::calReceive(k);
 						if(msg->cmd != BaseNode::CMD_SENSE_DATA_FUSED && msg->cmd != BaseNode::CMD_SENSE_DATA_UNFUSED){
 							this->monitor->rotate_overhead += EnergyModel::calReceive(k);
 						}
