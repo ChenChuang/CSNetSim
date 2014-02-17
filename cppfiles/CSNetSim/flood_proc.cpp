@@ -24,7 +24,7 @@ void Flood_Proc::procMsg(struct msg* mp, double* min_d)
 			this->proc_state = Flood_Proc::PROC_COMPLETED;
 			this->commproxy->broadcast(this->node->addr, BaseNode::MAX_RADIUS, BaseNode::CTRL_PACKET_SIZE, Flood_Proc::CMD_SINK, 0, NULL);
 		}else{
-			struct adjv* p = this->max_adjv->next;
+			struct Adjv* p = this->max_Adjv->next;
 			while(p != NULL){
 				if(p->addr == mp->fromaddr){
 					break;
@@ -78,7 +78,7 @@ void Flood_Proc::onTimeOut()
 #endif
 }
 
-void Flood_Proc::set_max_adjv(struct adjv* a)
+void Flood_Proc::set_max_Adjv(struct Adjv* a)
 {
-	this->max_adjv = a;
+	this->max_Adjv = a;
 }

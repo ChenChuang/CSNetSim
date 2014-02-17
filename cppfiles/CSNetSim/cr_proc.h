@@ -2,7 +2,7 @@
 #define CR_PROC_H
 
 #include "base_node.h"
-#include "adjv.h"
+#include "Adjv.h"
 #include <cmath>
 
 struct NEIGHBOR
@@ -30,8 +30,8 @@ class CR_Proc
 public:
 	CR_Proc(BaseNode* node, BaseCommProxy* commproxy);
 	~CR_Proc();
-	void set_cluster_adjv(struct adjv* a);
-	void set_max_adjv(struct adjv* a);
+	void set_cluster_Adjv(struct Adjv* a);
+	void set_max_Adjv(struct Adjv* a);
 
 public:
 	void onTimeOut();
@@ -119,8 +119,8 @@ public:
 	BaseNode* node;
 	BaseCommProxy* commproxy;
 	
-	struct adjv* cluster_adjv;
-	struct adjv* max_adjv;
+	struct Adjv* cluster_Adjv;
+	struct Adjv* max_Adjv;
 	
 	struct NEIGHBOR* neighbors;
 	

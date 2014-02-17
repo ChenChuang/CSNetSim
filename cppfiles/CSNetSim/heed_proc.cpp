@@ -95,7 +95,7 @@ int HEED_Proc::procClustering()
 {
 #ifdef _test_
 	double k;
-	struct adjv* p = this->cluster_adjv->next;
+	struct Adjv* p = this->cluster_Adjv->next;
 	while(p != NULL){
 		k = rand() / (RAND_MAX + 1.0);
 		//int toaddr;
@@ -198,14 +198,14 @@ int HEED_Proc::procClustering()
 	return 1;
 }
 
-void HEED_Proc::set_cluster_adjv(struct adjv* a)
+void HEED_Proc::set_cluster_Adjv(struct Adjv* a)
 {
-	this->cluster_adjv = a;
+	this->cluster_Adjv = a;
 }
 
-void HEED_Proc::set_max_adjv(struct adjv* a)
+void HEED_Proc::set_max_Adjv(struct Adjv* a)
 {
-	this->max_adjv = a;
+	this->max_Adjv = a;
 }
 
 void HEED_Proc::cluster_head_msg()
@@ -367,7 +367,7 @@ void HEED_Proc::add_scost(int addr, double cost)
 	c->cost = cost;
 	//-----------use distance as cost
 	/*
-	struct adjv* pp = this->cluster_adjv;
+	struct Adjv* pp = this->cluster_Adjv;
 	while(pp != NULL){
 		if(pp->addr == addr){
 			c->cost = pp->d;
@@ -412,7 +412,7 @@ double HEED_Proc::calAMRP()
 {
 	double sum = 0;
 	int count = 0;
-	struct adjv* p = this->cluster_adjv;
+	struct Adjv* p = this->cluster_Adjv;
 	if(p == NULL){
 		return 0;
 	}

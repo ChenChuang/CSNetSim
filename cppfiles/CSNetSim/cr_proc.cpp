@@ -7,8 +7,8 @@ CR_Proc::CR_Proc(BaseNode* node, BaseCommProxy* commproxy)
 	this->scost = NULL;
 	this->scost_param = NULL;
 	this->neighbors = NULL;
-	this->cluster_adjv = NULL;
-	this->max_adjv = NULL;
+	this->cluster_Adjv = NULL;
+	this->max_Adjv = NULL;
 	this->proc_state = this->PROC_INIT;
 	this->life_state = this->LIFE_BABY;
 	this->old_timer = 0;
@@ -54,27 +54,27 @@ void CR_Proc::clear_scost_param()
 	this->scost_param = NULL;
 }
 
-void CR_Proc::set_cluster_adjv(struct adjv* a)
+void CR_Proc::set_cluster_Adjv(struct Adjv* a)
 {
-	this->cluster_adjv = a;
+	this->cluster_Adjv = a;
 }
 
-void CR_Proc::set_max_adjv(struct adjv* a)
+void CR_Proc::set_max_Adjv(struct Adjv* a)
 {
-	this->max_adjv = a;
+	this->max_Adjv = a;
 }
 
 void CR_Proc::init()
 {
 	this->neighbors = NULL;
-	struct adjv* p_adjv = this->max_adjv;
+	struct Adjv* p_Adjv = this->max_Adjv;
 	struct NEIGHBOR* p_ng = NULL;
 	struct NEIGHBOR* pre_ng = NULL;
-	while(p_adjv != NULL){
+	while(p_Adjv != NULL){
 		p_ng = new NEIGHBOR();
-		p_ng->addr = p_adjv->addr;
-		p_ng->d = p_adjv->d;
-		p_ng->d_tosink = this->network->nodes[p_adjv->addr]->d_tosink;
+		p_ng->addr = p_Adjv->addr;
+		p_ng->d = p_Adjv->d;
+		p_ng->d_tosink = this->network->nodes[p_Adjv->addr]->d_tosink;
 		//p_ng->announce_time = HEED_Proc::HEED_PERIOD + Flood_Proc::FLOOD_PERIOD;
 		p_ng->announce_time = 0;
 		p_ng->is_youth = false;
@@ -84,7 +84,7 @@ void CR_Proc::init()
 			pre_ng->next = p_ng;
 		}
 		pre_ng = p_ng;
-		p_adjv = p_adjv->next;
+		p_Adjv = p_Adjv->next;
 	}
 }
 
@@ -874,7 +874,7 @@ void CR_Proc::become_youth()
 
 bool CR_Proc::check_ch_alive()
 {
-	struct adjv* p = this->cluster_adjv;
+	struct Adjv* p = this->cluster_Adjv;
 	while( p != NULL ){
 		if( p->addr == this->node->CH_addr ){
 			return true;
@@ -888,10 +888,10 @@ void CR_Proc::sync_neighbor_adj()
 {
 	struct NEIGHBOR* np = this->neighbors;
 	struct NEIGHBOR* np_pre = NULL;
-	struct adjv* ap = this->cluster_adjv;
+	struct Adjv* ap = this->cluster_Adjv;
 	bool f;
 	while( np != NULL ){
-		ap = this->cluster_adjv;
+		ap = this->cluster_Adjv;
 		f = false;
 		while( ap != NULL && !f){
 			if( ap->addr == np->addr ){

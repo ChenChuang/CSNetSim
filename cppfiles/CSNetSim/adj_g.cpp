@@ -5,17 +5,14 @@ AdjG::AdjG(double* x, double* y, double r, int n)
 	this->radius = r;
 	this->v_num = n;
 	//allocate
-	this->v = new struct adjv*[n];
+	this->v = new struct Adjv*[n];
 	int i, j;
 	double d2;
 	double r2 = pow(r, 2);
-	//temp link-list array of type adjv
-	struct adjv** t = new struct adjv*[n];
+	//temp link-list array of type Adjv
+	struct Adjv** t = new struct Adjv*[n];
 	for(i = 0; i < n; i ++){
-		this->v[i] = new struct adjv();
-		this->v[i]->addr = i;
-		this->v[i]->d = 0;
-		this->v[i]->next = NULL;
+		this->v[i] = new struct Adjv(i, 0, NULL);
 		t[i] = this->v[i];
 	}
 	//check all pairs of nodes whether they are in each other's radius
@@ -24,45 +21,37 @@ AdjG::AdjG(double* x, double* y, double r, int n)
 			d2 = pow(x[i] - x[j], 2) + pow(y[i] - y[j], 2);
 			if(d2 <= r2){
 				//node i and j are in each other's radius
-				//add new adjv to i's link-list
-				t[i]->next = new struct adjv();
+				//add new Adjv to i's link-list
+				t[i]->next = new struct Adjv(j, sqrt(d2), NULL);
 				t[i] = t[i]->next;
-				t[i]->addr = j;
-				t[i]->d = sqrt(d2);
-				t[i]->next = NULL;
-				//add new adjv to j's link-list
-				t[j]->next = new struct adjv();
+				//add new Adjv to j's link-list
+				t[j]->next = new struct Adjv(i, sqrt(d2), NULL);
 				t[j] = t[j]->next;
-				t[j]->addr = i;
-				t[j]->d = sqrt(d2);
-				t[j]->next = NULL;
 			}
 		}
 	}
-	delete t;
+	delete[] t;
 }
 
-//do not forget to release all adjv in destructor!
 AdjG::~AdjG()
 {
 	int i;
-	struct adjv* p1;
-	struct adjv* p2;
+	struct Adjv* p, np;
 	for(i = 0; i < this->v_num; i ++){
-		p2 = this->v[i];
-		while(p2 != NULL){
-			p1 = p2->next;
-			delete p2;
-			p2 = p1;
+		p = this->v[i];
+		while(p != NULL){
+			np = p->next;
+			delete p;
+			p = np;
 		}
 	}
-	delete this->v;
+	delete[] this->v;
 }
 
-void AdjG::printStr()
+void AdjG::print()
 {
 	int i;
-	struct adjv* p;
+	struct Adjv* p;
 	for(i = 0; i < this->v_num; i ++){
 		p = this->v[i];
 		while(p != NULL){
@@ -73,36 +62,48 @@ void AdjG::printStr()
 	}
 }
 
-void AdjG::deleteNode(int addr)
+void AdjG::delete_node(int addr)
 {
 	int i;
-	struct adjv* p1;
-	struct adjv* p2;
+	struct Adjv* p, np;
 	for(i = 0; i < this->v_num; i ++){
 		if(i == addr){
 			//delete the whole link-list of node with addr
-			p2 = this->v[addr]->next;
-			while(p2 != NULL){
-				p1 = p2->next;
-				delete p2;
-				p2 = p1;	
+			p = this->v[addr]->next;
+			while(p != NULL){
+				np = p->next;
+				delete p;
+				p = np;	
 			}
 			this->v[addr]->next = NULL;
 		}else{
-			//delete all adjv with addr in other nodes' link-list
-			p2 = this->v[i];
-			p1 = p2->next;
-			while(p1 != NULL){
-				if(p1->addr == addr){
-					p2->next = p1->next;
-					delete p1;
-					p1 = p2->next;
-				}else{
-					p2 = p1;
-					p1 = p2->next;
+			//delete all Adjv with addr in other nodes' link-list
+			p = this->v[i];
+			np = p->next;
+			while(p != NULL && p->next != NULL){
+				np = p->next;
+				if(np->addr == addr){
+					p->next = np->next;
+					delete np;
 				}
+				p = p->next;
 			}
 		}
 	}
+}
+
+Adjv* AdjG::neighbors_of(int addr){
+	return this->v[addr];
+}
+
+bool AdjG::is_neighbor(int addr_a, int addr_b){
+	struct Adjv* p = this->v[addr_a]->next;
+	while(p != NULL){
+		if(p->addr == addr_b){
+			return true;
+		}
+		p = p->next;
+	}
+	return false;
 }
 

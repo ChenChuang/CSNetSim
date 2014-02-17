@@ -18,18 +18,18 @@ void SinkNode::startFloodRoute()
 	for(int i = 0; i < BaseNetwork::NODE_NUM; i ++){
 		d = sqrt( pow( this->network->nodes[i]->x - SinkNode::SINK_X, 2 ) + pow( this->network->nodes[i]->y - SinkNode::SINK_Y, 2 ) );
 		if(d <= BaseNode::MAX_RADIUS){
-			struct msg* mp = new msg();
-			mp->cmd = Flood_Proc::CMD_SINK;
-			mp->fromaddr = SinkNode::SINK_ADDR;
-			mp->toaddr = this->network->nodes[i]->addr;
-			mp->type = BaseCommProxy::MSG_TYPE_BROADCAST;
-			mp->radius = BaseNode::MAX_RADIUS;
-			mp->data_l = 0;
-			mp->size = BaseNode::CTRL_PACKET_SIZE;
-			mp->data = NULL;
-			mp->next = NULL;
-			this->network->nodes[i]->commproxy->receive(mp);
-			delete mp;
+			struct Msg* msg = new msg();
+			msg->cmd = Flood_Proc::CMD_SINK;
+			msg->fromaddr = SinkNode::SINK_ADDR;
+			msg->toaddr = this->network->nodes[i]->addr;
+			msg->type = BaseCommProxy::MSG_TYPE_BROADCAST;
+			msg->radius = BaseNode::MAX_RADIUS;
+			msg->data_l = 0;
+			msg->size = BaseNode::CTRL_PACKET_SIZE;
+			msg->data = NULL;
+			msg->next = NULL;
+			this->network->nodes[i]->commproxy->receive(msg);
+			delete msg;
 		}
 	}
 }

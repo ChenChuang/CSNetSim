@@ -5,7 +5,7 @@
 #include "base_network.h"
 #include "base_node.h"
 #include "energy_model.h"
-#include "adjv.h"
+#include "Adjv.h"
 #include "cr_proc.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,8 +40,8 @@ public:
 	int procMsg(struct msg* mp);
 	int procClustering();
 	
-	void set_cluster_adjv(struct adjv* a);
-	void set_max_adjv(struct adjv* a);
+	void set_cluster_Adjv(struct Adjv* a);
+	void set_max_Adjv(struct Adjv* a);
 	
 	void compute_broadcast_cost();
 	void receive_cost_msg(struct msg* mp);
@@ -85,8 +85,8 @@ public:
 	BaseNode* node;
 	BaseCommProxy* commproxy;
 	
-	struct adjv* cluster_adjv;
-	struct adjv* max_adjv;
+	struct Adjv* cluster_Adjv;
+	struct Adjv* max_Adjv;
 	
 	double cost;
 	char proc_state;

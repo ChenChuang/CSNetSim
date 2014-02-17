@@ -40,7 +40,6 @@ public:
 	static double RECORD_PERIOD;
 	
 public:
-
 	double *energy_sum;
 	double *alive_sum;
 	double *output_track;

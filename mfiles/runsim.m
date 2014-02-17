@@ -12,4 +12,4 @@ create_nodes;
 crunsim(params, nodes_x, nodes_y);
 
 % run analysis.m
-% analysis;
+analysis;

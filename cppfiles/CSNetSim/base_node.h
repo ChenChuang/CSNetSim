@@ -13,16 +13,20 @@
 #include <stdlib.h>
 #include <cmath>
 
-struct MEMBER
-{
-	int addr;
-	struct MEMBER* next;
-};
-
 class HEED_Proc;
 class Flood_Proc;
 class CR_Proc;
 class EDCR_Proc;
+
+struct ProcNode
+{
+	Processor* proc;
+	struct ProcNode* next;
+	ProcNode(Processor* aproc): proc(aproc), next(NULL) {}
+	~ProcNode() {
+		delete this->proc;
+	}
+}
 
 class BaseNode
 {
@@ -32,14 +36,22 @@ public:
 
 public:
 	//implement virtual
-	void onTimeOut();
+	void on_time_out();
 	//implement virtual
-	void printStr();
-	//check if sensor's data is ready for transmitting
-	void checkSensor();
-	
-	void remove_member(int addr);
-	void clear_member();
+	void print();
+	void add_proc(Processor* proc);
+	void init_procs();
+	void clear_procs();
+public:
+	BaseCommProxy* get_commproxy() {return this->commproxy;}
+	BaseNetwork* get_network() {return this->network;}
+	MnManager* get_mnmanager() {return this->mnmanager;}
+	int get_addr() {return this->addr;}
+	int get_ch_addr() {return this->ch_addr;}
+	void set_ch_addr(int addr) {this->ch_addr = addr;}
+	int get_next_hop() {return this->next_hop;}
+	void set_next_hop(int addr) {this->next_hop = addr;}
+	bool is_alive() {return this->energy <= 0;}
 	
 public:
 	static double CLUSTER_RADIUS;   //metre
@@ -49,9 +61,6 @@ public:
 	static double DATA_PACKET_SIZE;    //byte
 	static double CTRL_PACKET_SIZE;   //byte
 	static double DATA_CTRL_PACKET_SIZE;  //byte
-	
-	static const char CMD_SENSE_DATA_FUSED = 0x91;
-	static const char CMD_SENSE_DATA_UNFUSED = 0x92;
 
 	double energy;
 	//address(or ID) of this node
@@ -59,33 +68,17 @@ public:
 	//coordinate
 	double x;
 	double y;
-	//is this node out of energy?
-	bool isAlive;
 	
 	//every node use its own communication proxy to communicate with other nodes. one node, one proxy!
-	BaseCommProxy *commproxy;
-
-	//processor of HEED
-	HEED_Proc* heed;
-	//processor of Flooding route
-	Flood_Proc* flood;
-	//processor of rotation
-	CR_Proc* cr;
-	//processor of EDCR
-	EDCR_Proc* edcr;
+	BaseCommProxy* commproxy;
+	BaseNetwork* network;
+	MnManager* mnmanager;
+	ProcNode* procs;
 	
-	int CH_addr;
-	struct MEMBER* members;
-	int next_hop_addr;
+	int ch_addr;
+	int next_hop;
 	double d_tosink;
 	
-	int rotate_timer;
-	int heed_timer;
-	int flood_timer;
-	int edcr_timer;
-	bool is_sense_ready;
-	double pre_sense_time;
-
 friend class BaseNetwork;
 friend class Monitor;
 };

@@ -1,10 +1,8 @@
-load([dir,'node_snapshot']);
-load([dir,'energy_snapshot']);
+load 'node_snapshot';
+load 'energy_snapshot';
 %ch_count = zeros(1, MAX_PERIOD_COUNT);
 index = ones(MAX_PERIOD_COUNT, 1) * (0 : NODE_NUM - 1);
 ch_count = sum((node_snapshot == index) .* (energy_snapshot > 0), 2);
-ch_count = ch_count(1:sampling:end);
-%figure;
-hold on;
-plot(time, ch_count, style);
-%title('time - num of CH');
+figure;
+plot(time, ch_count);
+title('time - num of CH');

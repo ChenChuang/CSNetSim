@@ -36,7 +36,7 @@ void Monitor::record_AdjG(string file_path, string var_name, AdjG* G)
 	
 	//write data to the normal array pointed by pr
 	int i, j, s;
-	struct adjv* p;
+	struct Adjv* p;
 	for(i = 0; i < n; i ++){
 		s = G->v[i]->addr;
 		for(j = 0; j < n; j++){

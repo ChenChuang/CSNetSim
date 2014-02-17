@@ -16,7 +16,7 @@ public:
 
 	void finalize();
 	void init();
-	void set_cluster_adjv(struct adjv* a);
+	void set_cluster_Adjv(struct Adjv* a);
 	
 	void onTimeOut();
 	int procMsg(struct msg* mp);
@@ -80,7 +80,7 @@ public:
 	int wait_time;
 	struct SCOST* scost;
 	
-	struct adjv* cluster_adjv;
+	struct Adjv* cluster_Adjv;
 	
 	double maxenergy_3R;
 	double maxenergy_cluster;

@@ -42,9 +42,9 @@ void EDCR_Proc::init()
 	EDCR_Proc::istimetorotate = -1;
 }
 
-void EDCR_Proc::set_cluster_adjv(struct adjv* a)
+void EDCR_Proc::set_cluster_Adjv(struct Adjv* a)
 {
-	this->cluster_adjv = a;
+	this->cluster_Adjv = a;
 }
 
 void EDCR_Proc::onTimeOut()
@@ -281,7 +281,7 @@ double EDCR_Proc::calWaitTime()
 
 double EDCR_Proc::calCost(int ch_addr, double energy)
 {
-	struct adjv* p = this->cluster_adjv;
+	struct Adjv* p = this->cluster_Adjv;
 	while(p != NULL){
 		if(p->addr == ch_addr){
 			return pow(p->d, 2) / (this->node->energy + 1.0);

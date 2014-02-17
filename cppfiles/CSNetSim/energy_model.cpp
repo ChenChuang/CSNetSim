@@ -15,9 +15,9 @@ EnergyModel::~EnergyModel()
 {
 }
 
-double EnergyModel::calFusion(int k, int s)
+double EnergyModel::calFusion(int k)
 {
-	return EnergyModel::E_FUSION * k * s;
+	return EnergyModel::E_FUSION * k;
 }
 
 double EnergyModel::calReceive(int k)

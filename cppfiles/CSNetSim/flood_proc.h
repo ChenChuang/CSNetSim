@@ -3,7 +3,7 @@
 
 #include "base_node.h"
 #include "base_comm_proxy.h"
-#include "adjv.h"
+#include "Adjv.h"
 
 class BaseNode;
 
@@ -17,13 +17,13 @@ public:
 	void init();
 	void onTimeOut();
 	void procMsg(struct msg* mp, double* min_d);
-	void set_max_adjv(struct adjv* a);
+	void set_max_Adjv(struct Adjv* a);
 
 public:
 	BaseNode* node;
 	BaseCommProxy* commproxy;
 	
-	struct adjv* max_adjv;
+	struct Adjv* max_Adjv;
 	
 	char proc_state;
 
