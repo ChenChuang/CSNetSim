@@ -35,21 +35,23 @@ private:
 private:
 	ClusteringNetwork* network;
 	
+	double *time;
 	double *energy_sum;
 	double *alive_sum;
-	double *output_track;
 	double *energy_snapshot;
-	double *node_snapshot;
+	double *ch_snapshot;
+	double *hop_snapshot;
+	double output;
+	double *output_track;
+	int rotate_times;
 	double *rotate_times_track;
+	double rotate_overhead;
 	double *rotate_overhead_track;
 	
-	double output;
-	
 	int record_count;
-	int record_needed;
-	
-	int rotate_times;
-	double rotate_overhead;
+	int max_records;	
+	double min_step;
+	Timer* timer;
 };
 
 #endif // CLUSTERINGMONITOR_H

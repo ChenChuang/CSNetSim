@@ -8,12 +8,15 @@ class ClusteringNetwork : public Network
 public:
 	ClusteringNetwork(double* x, double* y, int num);
 	~ClusteringNetwork();
-
+	
 private:
+	int sensor_nodes_num;
 	Channel* max_radius_channel;
 	Channel* cluster_radius_channel;
 	Channel* unicast_channel;
 	Channel* incluster_channel;
+	
+friend class ClusteringMonitor;
 };
 
 #endif // CLUSTERINGNETWORK_H
