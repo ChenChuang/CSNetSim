@@ -5,7 +5,7 @@ double Monitor::RECORD_PERIOD;
 Monitor::Monitor()
 {
 	this->record_count = -1;
-	this->record_needed = floor(BaseNetwork::MAX_SIM_TIME / this->RECORD_PERIOD) + 1;
+	this->record_needed = floor(Network::MAX_SIM_TIME / this->RECORD_PERIOD) + 1;
 	
 	this->rotate_times = 0;
 	this->rotate_overhead = 0;
@@ -59,7 +59,7 @@ void Monitor::record_AdjG(string file_path, string var_name, AdjG* G)
 }
 
 //periodically record the network's conditions
-void Monitor::record_periodically(BaseNode** nodes)
+void Monitor::record_periodically(Node** nodes)
 {
 #ifdef _vc_
 	//record the residential energy of WSN in this->energy_sum before main loop ends
@@ -76,9 +76,9 @@ void Monitor::record_periodically(BaseNode** nodes)
 		//init alive node sum recorder
 		this->alive_sum = new double[this->record_needed];
 		//init energy snapshot recorder
-		this->energy_snapshot = new double[this->record_needed * BaseNetwork::NODE_NUM];
+		this->energy_snapshot = new double[this->record_needed * Network::NODE_NUM];
 		//init node snapshot recorder
-		this->node_snapshot = new double[this->record_needed * BaseNetwork::NODE_NUM];
+		this->node_snapshot = new double[this->record_needed * Network::NODE_NUM];
 		//init output recorder
 		this->output_track = new double[this->record_needed];
 		this->output = 0;
@@ -92,7 +92,7 @@ void Monitor::record_periodically(BaseNode** nodes)
 	}
 	
 	//check whether it is time to record
-	int current_period = floor(BaseNetwork::sim_timer / this->RECORD_PERIOD) < (this->record_needed - 1) ? floor(BaseNetwork::sim_timer / this->RECORD_PERIOD) : (this->record_needed - 1);
+	int current_period = floor(Network::sim_timer / this->RECORD_PERIOD) < (this->record_needed - 1) ? floor(Network::sim_timer / this->RECORD_PERIOD) : (this->record_needed - 1);
 	
 	if(this->record_count == current_period){
 		return;
@@ -103,7 +103,7 @@ void Monitor::record_periodically(BaseNode** nodes)
 	//cal energy sum and alive node sum
 	double e_sum = 0;
 	int al_sum = 0;
-	for(int i = 0; i < BaseNetwork::NODE_NUM; i ++){
+	for(int i = 0; i < Network::NODE_NUM; i ++){
 		if(nodes[i]->isAlive){
 			e_sum += nodes[i]->energy;
 			al_sum ++;
@@ -112,12 +112,12 @@ void Monitor::record_periodically(BaseNode** nodes)
 	
 	////////////////////////////////// add your record code here ///////////////////////////////////
 	for(this->record_count += 1; this->record_count <= current_period; this->record_count ++){
-		for(int i = 0; i < BaseNetwork::NODE_NUM; i ++){
+		for(int i = 0; i < Network::NODE_NUM; i ++){
 			if(nodes[i]->isAlive){
-				this->energy_snapshot[ this->record_count * BaseNetwork::NODE_NUM + i ] = nodes[i]->energy;
-				this->node_snapshot[ this->record_count * BaseNetwork::NODE_NUM + i ] = nodes[i]->CH_addr;
+				this->energy_snapshot[ this->record_count * Network::NODE_NUM + i ] = nodes[i]->energy;
+				this->node_snapshot[ this->record_count * Network::NODE_NUM + i ] = nodes[i]->CH_addr;
 			}else{
-				this->node_snapshot[ this->record_count * BaseNetwork::NODE_NUM + i ] = nodes[i]->addr;
+				this->node_snapshot[ this->record_count * Network::NODE_NUM + i ] = nodes[i]->addr;
 			}
 		}
 		this->energy_sum[this->record_count] = e_sum;
@@ -136,8 +136,8 @@ void Monitor::record_periodically(BaseNode** nodes)
 	/////////////////////////////// main loop ends, write the result to *.mat //////////////////////////////////
 	this->wirte_to_mat("energy_sum.mat","energy_sum", this->energy_sum, 1, this->record_needed);
 	this->wirte_to_mat("alive_sum.mat","alive_sum", this->alive_sum, 1, this->record_needed);
-	this->wirte_to_mat("energy_snapshot.mat","energy_snapshot", this->energy_snapshot, this->record_needed, BaseNetwork::NODE_NUM);
-	this->wirte_to_mat("node_snapshot.mat","node_snapshot", this->node_snapshot, this->record_needed, BaseNetwork::NODE_NUM);
+	this->wirte_to_mat("energy_snapshot.mat","energy_snapshot", this->energy_snapshot, this->record_needed, Network::NODE_NUM);
+	this->wirte_to_mat("node_snapshot.mat","node_snapshot", this->node_snapshot, this->record_needed, Network::NODE_NUM);
 	this->wirte_to_mat("output_track.mat","output_track", this->output_track, 1, this->record_needed);
 	this->wirte_to_mat("rotate_overhead_track.mat","rotate_overhead_track", this->rotate_overhead_track, 1, this->record_needed);
 	this->wirte_to_mat("rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_needed);
@@ -145,10 +145,10 @@ void Monitor::record_periodically(BaseNode** nodes)
 #endif	
 }
 
-void Monitor::record_CH(BaseNode** nodes)
+void Monitor::record_CH(Node** nodes)
 {
 #ifdef _vc_
-	int node_n = BaseNetwork::NODE_NUM;
+	int node_n = Network::NODE_NUM;
 
 	string file_path = "heed_ch.mat";
 	string var_name = "heed_ch";
@@ -183,10 +183,10 @@ void Monitor::record_CH(BaseNode** nodes)
 #endif
 }
 
-void Monitor::record_CH_ROUTE(BaseNode** nodes)
+void Monitor::record_CH_ROUTE(Node** nodes)
 {
 #ifdef _vc_
-	int node_n = BaseNetwork::NODE_NUM;
+	int node_n = Network::NODE_NUM;
 
 	string file_path = "ch_route.mat";
 	string var_name = "ch_route";

@@ -1,9 +1,5 @@
 #include "sink_node.h"
 
-double SinkNode::SINK_X;
-double SinkNode::SINK_Y;
-int SinkNode::SINK_ADDR;
-
 SinkNode::SinkNode()
 {
 }
@@ -15,17 +11,17 @@ SinkNode::~SinkNode()
 void SinkNode::startFloodRoute()
 {
 	double d;
-	for(int i = 0; i < BaseNetwork::NODE_NUM; i ++){
+	for(int i = 0; i < Network::NODE_NUM; i ++){
 		d = sqrt( pow( this->network->nodes[i]->x - SinkNode::SINK_X, 2 ) + pow( this->network->nodes[i]->y - SinkNode::SINK_Y, 2 ) );
-		if(d <= BaseNode::MAX_RADIUS){
+		if(d <= Node::MAX_RADIUS){
 			struct Msg* msg = new msg();
 			msg->cmd = Flood_Proc::CMD_SINK;
 			msg->fromaddr = SinkNode::SINK_ADDR;
 			msg->toaddr = this->network->nodes[i]->addr;
-			msg->type = BaseCommProxy::MSG_TYPE_BROADCAST;
-			msg->radius = BaseNode::MAX_RADIUS;
+			msg->type = CommProxy::MSG_TYPE_BROADCAST;
+			msg->radius = Node::MAX_RADIUS;
 			msg->data_l = 0;
-			msg->size = BaseNode::CTRL_PACKET_SIZE;
+			msg->size = Node::CTRL_PACKET_SIZE;
 			msg->data = NULL;
 			msg->next = NULL;
 			this->network->nodes[i]->commproxy->receive(msg);
@@ -60,7 +56,7 @@ void SinkNode::onTimeOut()
 		//printf("EDCR start rotate at %f\n", this->network->sim_timer);
 		this->network->monitor->rotate_times ++;
 			
-		for(int node_index = 0; node_index < BaseNetwork::NODE_NUM; node_index ++){
+		for(int node_index = 0; node_index < Network::NODE_NUM; node_index ++){
 			this->network->nodes[node_index]->flood_timer = 0;
 			this->network->nodes[node_index]->edcr_timer = 0;
 		}

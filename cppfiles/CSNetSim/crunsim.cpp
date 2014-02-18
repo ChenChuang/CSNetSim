@@ -8,9 +8,9 @@
 #include "mex.h"
 #include "mat.h"
 #include "energy_model.cpp"
-#include "base_comm_proxy.cpp"
-#include "base_node.cpp"
-#include "base_network.cpp"
+#include "comm_proxy.cpp"
+#include "node.cpp"
+#include "network.cpp"
 #include "monitor.cpp"
 #include <stdio.h>
 
@@ -20,7 +20,7 @@ int crunsim(double* x, double* y)
 	
 	Monitor* monitor = new Monitor();
 	
-	BaseNetwork* network = new BaseNetwork(x, y);
+	Network* network = new Network(x, y);
 	network->monitor = monitor;
 	//start main loop
 	network->run();
@@ -124,13 +124,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	nodes_y = mxGetPr(prhs[2]);
 	
 	//params delivered
-	BaseNode::CLUSTER_RADIUS = CLUSTER_RADIUS;
-	BaseNode::MAX_RADIUS = MAX_RADIUS;
-	BaseNode::SENSE_DATA_PERIOD = SENSE_DATA_PERIOD;
+	Node::CLUSTER_RADIUS = CLUSTER_RADIUS;
+	Node::MAX_RADIUS = MAX_RADIUS;
+	Node::SENSE_DATA_PERIOD = SENSE_DATA_PERIOD;
 	
-	BaseNode::DATA_PACKET_SIZE = DATA_PACKET_SIZE;
-	BaseNode::CTRL_PACKET_SIZE = CTRL_PACKET_SIZE;
-	BaseNode::DATA_CTRL_PACKET_SIZE = DATA_CTRL_PACKET_SIZE;
+	Node::DATA_PACKET_SIZE = DATA_PACKET_SIZE;
+	Node::CTRL_PACKET_SIZE = CTRL_PACKET_SIZE;
+	Node::DATA_CTRL_PACKET_SIZE = DATA_CTRL_PACKET_SIZE;
 	
 	EnergyModel::E_INIT = E_INIT;
 	EnergyModel::E_ELEC = E_ELEC;
@@ -139,11 +139,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	EnergyModel::E_AMP_MULTIPATH = E_AMP_MULTIPATH;
 	EnergyModel::D_THRESHOLD = D_THRESHOLD;
 	
-	BaseNetwork::NODE_NUM = NODE_NUM;
+	Network::NODE_NUM = NODE_NUM;
 	SinkNode::SINK_X = SINK_X;
 	SinkNode::SINK_Y = SINK_Y;
 	SinkNode::SINK_ADDR = SINK_ADDR;
-	BaseNetwork::MAX_SIM_TIME = MAX_SIM_TIME;
+	Network::MAX_SIM_TIME = MAX_SIM_TIME;
 	
 	Monitor::RECORD_PERIOD = RECORD_PERIOD;
 	

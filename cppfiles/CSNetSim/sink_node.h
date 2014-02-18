@@ -4,15 +4,15 @@
 #include "compile_config.h"
 
 #include "energy_model.h"
-#include "base_network.h"
-#include "base_comm_proxy.h"
-#include "base_node.h"
+#include "network.h"
+#include "comm_proxy.h"
+#include "node.h"
 #include "msg.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmath>
 
-class BaseNetwork;
+class Network;
 
 class SinkNode
 {
@@ -24,7 +24,7 @@ public:
 	void startFloodRoute();
 
 public:
-	BaseNetwork* network;
+	Network* network;
 
 public:
 	//coordinate of sink

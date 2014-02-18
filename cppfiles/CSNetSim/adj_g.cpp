@@ -4,15 +4,14 @@ AdjG::AdjG(double* x, double* y, double r, int n)
 {
 	this->radius = r;
 	this->v_num = n;
-	//allocate
-	this->v = new struct Adjv*[n];
+	this->v = new Adjv*[n];
 	int i, j;
 	double d2;
 	double r2 = pow(r, 2);
 	//temp link-list array of type Adjv
-	struct Adjv** t = new struct Adjv*[n];
+	Adjv** t = new Adjv*[n];
 	for(i = 0; i < n; i ++){
-		this->v[i] = new struct Adjv(i, 0, NULL);
+		this->v[i] = new Adjv(i, 0, NULL);
 		t[i] = this->v[i];
 	}
 	//check all pairs of nodes whether they are in each other's radius
@@ -22,10 +21,44 @@ AdjG::AdjG(double* x, double* y, double r, int n)
 			if(d2 <= r2){
 				//node i and j are in each other's radius
 				//add new Adjv to i's link-list
-				t[i]->next = new struct Adjv(j, sqrt(d2), NULL);
+				t[i]->next = new Adjv(j, sqrt(d2), NULL);
 				t[i] = t[i]->next;
 				//add new Adjv to j's link-list
-				t[j]->next = new struct Adjv(i, sqrt(d2), NULL);
+				t[j]->next = new Adjv(i, sqrt(d2), NULL);
+				t[j] = t[j]->next;
+			}
+		}
+	}
+	delete[] t;
+}
+
+AdjG::AdjG(Network* anetwork, double r, int n)
+{
+	this->radius = r;
+	this->v_num = n;
+	//allocate
+	this->v = new Adjv*[n];
+	int i, j;
+	double d2;
+	double r2 = pow(r, 2);
+	//temp link-list array of type Adjv
+	Adjv** t = new Adjv*[n];
+	for(i = 0; i < n; i ++){
+		this->v[i] = new Adjv(i, 0, NULL);
+		t[i] = this->v[i];
+	}
+	//check all pairs of nodes whether they are in each other's radius
+	for(i = 0; i < n; i ++){
+		for(j = i+1; j < n; j++){
+			d2 = pow(anetwork->get_node(i)->x - anetwork->get_node(j)->x, 2) + 
+				 pow(anetwork->get_node(i)->y - anetwork->get_node(j)->y, 2);
+			if(d2 <= r2){
+				//node i and j are in each other's radius
+				//add new Adjv to i's link-list
+				t[i]->next = new Adjv(j, sqrt(d2), NULL);
+				t[i] = t[i]->next;
+				//add new Adjv to j's link-list
+				t[j]->next = new Adjv(i, sqrt(d2), NULL);
 				t[j] = t[j]->next;
 			}
 		}
@@ -36,7 +69,7 @@ AdjG::AdjG(double* x, double* y, double r, int n)
 AdjG::~AdjG()
 {
 	int i;
-	struct Adjv* p, np;
+	Adjv* p, np;
 	for(i = 0; i < this->v_num; i ++){
 		p = this->v[i];
 		while(p != NULL){
@@ -51,7 +84,7 @@ AdjG::~AdjG()
 void AdjG::print()
 {
 	int i;
-	struct Adjv* p;
+	Adjv* p;
 	for(i = 0; i < this->v_num; i ++){
 		p = this->v[i];
 		while(p != NULL){
@@ -65,7 +98,7 @@ void AdjG::print()
 void AdjG::delete_node(int addr)
 {
 	int i;
-	struct Adjv* p, np;
+	Adjv* p, np;
 	for(i = 0; i < this->v_num; i ++){
 		if(i == addr){
 			//delete the whole link-list of node with addr
@@ -97,7 +130,7 @@ Adjv* AdjG::neighbors_of(int addr){
 }
 
 bool AdjG::is_neighbor(int addr_a, int addr_b){
-	struct Adjv* p = this->v[addr_a]->next;
+	Adjv* p = this->v[addr_a]->next;
 	while(p != NULL){
 		if(p->addr == addr_b){
 			return true;

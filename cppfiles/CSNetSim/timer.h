@@ -1,17 +1,17 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include "base_network.h"
+#include "network.h"
 
 class Timer
 {
 public:
-	Timer(BaseNetwork* anetwork);
+	Timer(Network* anetwork);
 	~Timer();
 	void set_after(double after);
 	bool is_timeout();
 private:
-	BaseNetwork* network;
+	Network* network;
 	double time;
 };
 

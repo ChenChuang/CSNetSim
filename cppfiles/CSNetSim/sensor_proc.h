@@ -7,7 +7,7 @@
 class Sensor_Proc : public Processor
 {
 public:
-	Sensor_Proc(BaseNode* anode);
+	Sensor_Proc(Node* anode);
 	~Sensor_Proc();
 public:
 	virtual int process(Msg* msg);
@@ -22,7 +22,7 @@ public:
 	static const char CMD_SENSE_DATA_UNFUSED = 0x92;
 private:
 	double data_l;
-	BaseNode* node;
+	Node* node;
 	Timer* sense_timer;
 	Timer* wait_timer;
 };

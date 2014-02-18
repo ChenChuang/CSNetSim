@@ -1,13 +1,13 @@
 #include "sensor_proc.h"
 
-Sensor_Proc::Sensor_Proc(BaseNode* anode, double aperiod, double aunit_l, double abuf_l): 
+Sensor_Proc::Sensor_Proc(Node* anode, double aperiod, double aunit_l, double abuf_l): 
 	period(aperiod), 
 	unit_l(aunit_l),
 	buf_l(abuf_l),
 	data_l(0),
 	node(anode),
-	sense_timer(new Timer(anode->get_network())),
-	wait_timer(new Timer(anode->get_network()))
+	sense_timer(new Timer(anode->network())),
+	wait_timer(new Timer(anode->network()))
 {
 }
 
@@ -20,7 +20,7 @@ Sensor_Proc::~Sensor_Proc()
 int Sensor_Proc::process(Msg* msg)
 {
 	if(msg->cmd == Sensor_Proc::CMD_SENSE_DATA_FUSED){
-		this->node->get_commproxy()->repost(msg, this->node->get_next_hop());
+		this->node->commproxy()->repost(msg, this->node->get_next_hop());
 	}else if(msg->cmd == Sensor_Proc::CMD_SENSE_DATA_UNFUSED){
 		this->data_l += *(int*)msg->data;
 	}
@@ -43,7 +43,7 @@ void Sensor_Proc::ticktock(double time)
 void Sensor_Proc::send(char cmd){
 	int* data = new int[1];
 	data[0] = this->data_l;
-	this->node->get_commproxy()->unicast(
+	this->node->commproxy()->unicast(
 		this->node->get_addr(), 
 		this->node->get_next_hop(), 
 		Sensor_Proc::DATA_PACKET_SIZE, 

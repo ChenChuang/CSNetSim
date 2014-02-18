@@ -4,7 +4,7 @@
 //nodes in WSN use this struct to communicate with each other
 struct Msg
 {
-	//3 types of transmission provided: BaseCommProxy::MSG_TYPE_BROADCAST/UNICAST/MULTICAST
+	//3 types of transmission provided: CommProxy::MSG_TYPE_BROADCAST/UNICAST/MULTICAST
 	//Noted that MULTICAST hasn't been developed
 	char type;
 	//addr of sender

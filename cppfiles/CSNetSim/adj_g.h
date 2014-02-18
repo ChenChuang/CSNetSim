@@ -13,6 +13,7 @@ class AdjG
 public:
 	//create AdjG using x, y coordiate array and r as connect-radius of node. n is the number of nodes
 	AdjG(double* x, double* y, double r, int n);
+	AdjG(Network* anetwork, double r, int n);
 	~AdjG();
 public:
 	//print the AdjG as link-list array

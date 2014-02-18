@@ -1,6 +1,6 @@
 #include "mn_manager.h"
 
-MnManager::MnManager(BaseNode* anode): node(anode), members(NULL)
+MnManager::MnManager(Node* anode): node(anode), members(NULL)
 {
 	this->mn_iter = new MnIterator(this->members);
 }
@@ -46,7 +46,7 @@ void MnManager::clear_dead()
 	struct MnNode* p = this->members;
 	struct MnNode* pp = NULL;
 	while(p != NULL){
-		if(!this->node->get_network()->is_alive(p->addr)){
+		if(!this->node->network()->is_alive(p->addr)){
 			if(pp != NULL){
 				pp->next = p->next;
 			}else{
@@ -74,18 +74,18 @@ void MnManager::add(int addr)
 	pp->next = p;
 }
 
-MnNode* MnManager::find(int addr)
+bool MnManager::has(int addr)
 {
 	struct MnNode* p = this->members;
 	struct MnNode* pp = NULL;
 	while(p != NULL){
 		if(p->addr == addr){
-			break;
+			return true;
 		}
 		pp = p;
 		p = p->next;
 	}
-	return p;
+	return false;
 }
 
 MnIterator* MnManager::mn_iter()

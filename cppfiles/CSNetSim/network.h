@@ -8,7 +8,7 @@
 	#include "adj_g.h"
 #endif
 
-#include "base_node.h"
+#include "node.h"
 #include "sink_node.h"
 #include "energy_model.h"
 #include "time_manager.h"
@@ -17,18 +17,20 @@
 #include <stdio.h>
 #include <cmath>
 
-class BaseNode;
+class Node;
 class Monitor;
 class SinkNode;
 
-class BaseNetwork
+class Network
 {
 public:
-	BaseNetwork(double* x, double* y);
-	~BaseNetwork();
+	Network(double* x, double* y);
+	~Network();
 public:
 	void run();
 	int communicate();
+	Node* get_node(int addr);
+	Monitor* get_monitor() {return this->monitor;}
 	bool is_alive(int addr);
 	double get_time();
 	void try_set_tick(double tick);
@@ -39,8 +41,7 @@ public:
 	
 	TimeManager* clock;
 
-	BaseNode** nodes;
-	SinkNode* sink;
+	Node** nodes;
 
 	AdjG* cluster_radius_G;
 	AdjG* max_radius_G;

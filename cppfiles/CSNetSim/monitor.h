@@ -8,12 +8,12 @@
 #endif
 #include <string>
 #include "adj_g.h"
-#include "base_node.h"
-#include "base_network.h"
+#include "node.h"
+#include "network.h"
 #include <cmath>
 using namespace std;
 
-class BaseNode;
+class Node;
 
 /**
  * write results of simulation to *.mat
@@ -28,11 +28,11 @@ public:
 	//record G
 	void record_AdjG(string file_path, string var_name, AdjG* G);
 	//record the WSN's residential energy on the end of each main loop
-	void record_periodically(BaseNode** nodes);
+	void record_periodically(Node** nodes);
 	//record the clustering result
-	void record_CH(BaseNode** nodes);
+	void record_CH(Node** nodes);
 	//record the routing result
-	void record_CH_ROUTE(BaseNode** nodes);
+	void record_CH_ROUTE(Node** nodes);
 	//write the recorded data in array to .mat
 	bool wirte_to_mat(string file_path, string var_name, double* array, int row_num, int col_num);
 

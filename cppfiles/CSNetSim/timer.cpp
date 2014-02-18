@@ -1,6 +1,6 @@
 #include "timer.h"
 
-Timer::Timer(BaseNetwork* anetwork): network(anetwork), time(0)
+Timer::Timer(Network* anetwork): network(anetwork), time(0)
 {
 }
 

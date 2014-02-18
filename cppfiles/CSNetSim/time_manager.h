@@ -22,7 +22,7 @@ private:
 	double tick;
 	double default_tick;
 
-friend class BaseNetwork;
+friend class Network;
 };
 
 #endif // TIMEMANAGER_H

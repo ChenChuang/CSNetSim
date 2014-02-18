@@ -33,18 +33,18 @@ private:
 class MnManager
 {
 public:
-	MnManager(BaseNode* anode);
+	MnManager(Node* anode);
 	~MnManager();
 public:
 	void remove(int addr);
 	void clear();
 	void add(int addr);
-	MnNode* find(int addr);
+	bool has(int addr);
 	void clear_dead();
 	MnIterator* mn_iter();
 	
 public:
-	BaseNode* node;
+	Node* node;
 	MnNode* members;
 	MnIterator* mn_iter;
 };
