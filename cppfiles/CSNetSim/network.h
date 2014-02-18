@@ -1,5 +1,5 @@
-#ifndef BASENETWORK_H
-#define BASENETWORK_H
+#ifndef NETWORK_H
+#define NETWORK_H
 
 #include "compile_config.h"
 #ifdef _vc_
@@ -11,44 +11,32 @@
 #include "node.h"
 #include "sink_node.h"
 #include "energy_model.h"
-#include "time_manager.h"
+#include "clock.h"
 #include "monitor.h"
 #include "msg.h"
 #include <stdio.h>
 #include <cmath>
 
-class Node;
-class Monitor;
-class SinkNode;
-
 class Network
 {
 public:
-	Network(double* x, double* y);
-	~Network();
+	Network(double* x, double* y, int num);
+	virtual ~Network();
 public:
-	void run();
-	int communicate();
-	Node* get_node(int addr);
-	Monitor* get_monitor() {return this->monitor;}
-	bool is_alive(int addr);
-	double get_time();
-	void try_set_tick(double tick);
+	virtual void run();
+	virtual void communicate();
+	Node* node(int addr) {return this->nodes[addr];}
+	Monitor* monitor() {return this->monitor;}
+	Clock* clock() {return this->clock;}
 	
 public:
-	static double MAX_SIM_TIME;
-	static int NODE_NUM;
-	
-	TimeManager* clock;
-
+	Clock* clock;
 	Node** nodes;
-
-	AdjG* cluster_radius_G;
-	AdjG* max_radius_G;
-
+	int nodes_num;
+	ChannelsManager* channels;
 	Monitor* monitor;
 		
 friend class Monitor;
 };
 
-#endif // BASENETWORK_H
+#endif // NETWORK_H

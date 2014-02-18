@@ -42,7 +42,7 @@ void Node::on_time_out()
 	proc_iter = this->procs_manager->proc_iter();
 	while(proc_iter->has_more()){
 		proc = proc_iter->next();
-		proc->ticktock(this->network->get_time());
+		proc->ticktock(this->network->clock()->get_time());
 	}
 }
 

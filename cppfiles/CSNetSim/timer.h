@@ -6,12 +6,12 @@
 class Timer
 {
 public:
-	Timer(Network* anetwork);
+	Timer(Clock* aclock);
 	~Timer();
 	void set_after(double after);
 	bool is_timeout();
 private:
-	Network* network;
+	Clock* clock;
 	double time;
 };
 

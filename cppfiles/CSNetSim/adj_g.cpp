@@ -50,8 +50,8 @@ AdjG::AdjG(Network* anetwork, double r, int n)
 	//check all pairs of nodes whether they are in each other's radius
 	for(i = 0; i < n; i ++){
 		for(j = i+1; j < n; j++){
-			d2 = pow(anetwork->get_node(i)->x - anetwork->get_node(j)->x, 2) + 
-				 pow(anetwork->get_node(i)->y - anetwork->get_node(j)->y, 2);
+			d2 = pow(anetwork->node(i)->x - anetwork->node(j)->x, 2) + 
+				 pow(anetwork->node(i)->y - anetwork->node(j)->y, 2);
 			if(d2 <= r2){
 				//node i and j are in each other's radius
 				//add new Adjv to i's link-list

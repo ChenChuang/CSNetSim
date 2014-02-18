@@ -1,55 +1,28 @@
 #include "network.h"
 
-Network::Network(double* x, double* y)
+Network::Network(double* x, double* y, int num): nodes_num(num)
 {
-	// clock
-	this->clock = new TimeManager(0, 1);
+	this->clock = new Clock(0, 1);
 	
-	// nodes
-	this->nodes = new Node* [Network::NODE_NUM];
-	this->nodes[0] = new SinkNode(this, 0, 0, 0, 1);
-	for(int i = 1; i < Network::NODE_NUM; i ++){
-		this->nodes[i] = new SensorNode(this, i, x[i], y[i], EnergyModel::E_INIT);
+	this->nodes = new Node* [num];
+	for(int i = 0; i < num; i ++){
+		this->nodes[i] = NULL;
 	}
 	
-	// create AdjG
-	this->cluster_radius_G = new AdjG(x, y, Node::CLUSTER_RADIUS, Network::NODE_NUM);
-	this->max_radius_G = new AdjG(x, y, Node::MAX_RADIUS, Network::NODE_NUM);
-
-	// initialize nodes
-	for(int i = 0; i < Network::NODE_NUM; i ++){
-		this->nodes[i]->init_procs();
-	}
+	this->monitor = new Monitor(this);
+	
+	this->channels = new ChannelsManager(this);
 }
 
 Network::~Network()
 {
 	delete this->clock;
-	for(int i = 0; i < Network::NODE_NUM; i ++){
+	for(int i = 0; i < this->nodes_num; i ++){
 		delete this->nodes[i];
 	}
 	delete[] this->nodes;
-	delete this->cluster_radius_G;
-	delete this->max_radius_G;
-}
-
-double Network::get_time()
-{
-	return this->clock->get_time();
-}
-
-void Network::try_set_tick(double tick)
-{
-	this->clock->try_set_tick(tick);
-}
-
-Node* Network::get_node(int addr)
-{
-	return this->nodes[addr];
-}
-
-bool Network::is_alive(int addr){
-	return this->nodes[addr]->is_alive();
+	delete this->monitor;
+	delete this->channels;
 }
 
 void Network::run()
@@ -61,7 +34,7 @@ void Network::run()
 		printf("----------------------------------time: %f----------------------------------\n", this->clock->get_time());
 		
 		this->clock->tick_setter_init();
-		for(addr = 0; addr < Network::NODE_NUM; addr ++){
+		for(addr = 0; addr < this->nodes_num; addr ++){
 			if(this->nodes[addr]->is_alive()){
 				this->nodes[addr]->on_time_out();
 			}
@@ -69,11 +42,8 @@ void Network::run()
 		this->communicate();		
 		this->clock->tick_setter_exit();
 		
-		this->monitor->record_periodically(this->nodes);
-		this->monitor->record_periodically(this->nodes);
-		this->monitor->record_CH(this->nodes);
-		this->monitor->record_CH_ROUTE(this->nodes);
-		
+		this->monitor->record();
+
 		this->clock->ticktock();
 	}
 	// main loop ends
@@ -82,7 +52,7 @@ void Network::run()
 	printf("rotate overhead: %f\n", this->monitor->rotate_overhead);
 }
 
-int Network::communicate()
+void Network::communicate()
 {
 #ifdef _print_
 	printf("----------------------------commicating...------------------------------\n");
@@ -92,24 +62,27 @@ int Network::communicate()
 	double d;
 	MsgIterator* msg_iter;
 	Msg* msg;
-	MnIterator* mn_iter;
-	int mn_addr;
-	Adjv* vp;
+	ChannelIterator* channel_iter;
+	Channel* channel;
+	int done;
 	//process every node's t_msg_buf
-	for(t_i = 0; t_i < Network::NODE_NUM; t_i ++){
+	for(t_i = 0; t_i < this->nodes_num; t_i ++){
 		//the node is dead
-		if(!this->nodes[t_i]->is_alive()){
-			continue;
-		}
-		//process every msg in the node's t_msg_buf
-		msg_iter = this->nodes[t_i]->commproxy()->t_msg_iter();
-		while(msg_iter->has_more()){
-			msg = msg_iter->next();
-
+		if(this->nodes[t_i]->is_alive()){
+			//process every msg in the node's t_msg_buf
+			msg_iter = this->nodes[t_i]->commproxy()->t_msg_iter();
+			while(msg_iter->has_more()){
+				msg = msg_iter->next();
+				done = -1;
+				channel_iter = this->channels->channel_iter();
+				while(done < 0 && channel_iter->has_more()){
+					channel = channel_iter->next();
+					done = channel->communicate(msg);
+				}
+			}
 		}
 		//end processing current node
 	}
-	return 1;
 }
 
 

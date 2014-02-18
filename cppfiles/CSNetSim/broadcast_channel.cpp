@@ -16,13 +16,13 @@ int BroadcastChannel::communicate(Msg* msg)
 		double d = msg->radius;
 		double k = msg->size;
 		Adjv* vp = this->adjg->v[msg->fromaddr]->next;
-		Node* t = this->network->get_node(msg->fromaddr);
+		Node* t = this->network->node(msg->fromaddr);
 		Node* r;
 		double t_energy = EnergyModel::calTransmit(k, d);
 		double r_energy = EnergyModel::calReceive(k);
 		int r_count = 0;
 		while(vp != NULL){
-			r = this->network->get_node(msg->toaddr);
+			r = this->network->node(msg->toaddr);
 			if(r->is_alive()){
 				r->commproxy()->receive(msg);
 				r->consume(r_energy);
@@ -32,7 +32,7 @@ int BroadcastChannel::communicate(Msg* msg)
 		}
 		t->consume(t_energy);
 		if(msg->cmd != Node::CMD_SENSE_DATA_FUSED && msg->cmd != Node::CMD_SENSE_DATA_UNFUSED){
-			this->network->get_monitor()->rotate_overhead += (t_energy + r_energy * r_count);
+			this->network->monitor()->rotate_overhead += (t_energy + r_energy * r_count);
 		}
 		return 1;
 	}else{

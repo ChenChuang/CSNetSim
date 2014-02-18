@@ -5,15 +5,9 @@ class Channel
 {
 public:
 	Channel();
-	~Channel();
+	virtual ~Channel();
 public:
 	virtual int communicate(Msg* msg) {return -1;}
 };
-
-struct ChannelNode
-{
-	Channel* channel;
-	ChannelNode* next;
-}
 
 #endif // CHANNEL_H

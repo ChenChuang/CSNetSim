@@ -6,8 +6,8 @@ Sensor_Proc::Sensor_Proc(Node* anode, double aperiod, double aunit_l, double abu
 	buf_l(abuf_l),
 	data_l(0),
 	node(anode),
-	sense_timer(new Timer(anode->network())),
-	wait_timer(new Timer(anode->network()))
+	sense_timer(new Timer(anode->network()->clock())),
+	wait_timer(new Timer(anode->network()->clock()))
 {
 }
 

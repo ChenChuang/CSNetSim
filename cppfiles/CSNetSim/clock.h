@@ -1,11 +1,11 @@
-#ifndef TIMEMANAGER_H
-#define TIMEMANAGER_H
+#ifndef CLOCK_H
+#define CLOCK_H
 
-class TimeManager
+class Clock
 {
 public:
-	TimeManager(double atime, double atick);
-	~TimeManager();
+	Clock(double atime, double atick);
+	~Clock();
 public:
 	double get_time() {return this->time;}
 	double get_tick() {return this->tick;}
@@ -25,4 +25,4 @@ private:
 friend class Network;
 };
 
-#endif // TIMEMANAGER_H
+#endif // CLOCK_H

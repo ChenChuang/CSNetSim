@@ -8,7 +8,7 @@ ProcsManager::ProcsManager(Node* anode): node(anode), procs(NULL)
 ProcsManager::~ProcsManager()
 {
 	delete this->proc_iter;
-	this->clear_procs();
+	this->clear();
 }
 
 void ProcsManager::add(Processor* proc)

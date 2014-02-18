@@ -46,7 +46,7 @@ void MnManager::clear_dead()
 	struct MnNode* p = this->members;
 	struct MnNode* pp = NULL;
 	while(p != NULL){
-		if(!this->node->network()->is_alive(p->addr)){
+		if(!this->node->network()->node(p->addr)->is_alive()){
 			if(pp != NULL){
 				pp->next = p->next;
 			}else{
