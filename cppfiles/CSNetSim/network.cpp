@@ -9,7 +9,7 @@ Network::Network(double* x, double* y, int num): nodes_num(num)
 		this->nodes[i] = NULL;
 	}
 	
-	this->monitor = new Monitor(this);
+	this->monitor = NULL;
 	
 	this->channels = new ChannelsManager(this);
 }
@@ -17,19 +17,43 @@ Network::Network(double* x, double* y, int num): nodes_num(num)
 Network::~Network()
 {
 	delete this->clock;
-	for(int i = 0; i < this->nodes_num; i ++){
-		delete this->nodes[i];
-	}
 	delete[] this->nodes;
 	delete this->monitor;
 	delete this->channels;
 }
 
+bool Network::check()
+{
+	for(int i=0; i < this->nodes_num; i++){
+		if(this->nodes[i] == NULL){
+			printf("some nodes are NULL\n");
+			return false;
+		}
+	}
+	if(this->monitor == NULL){
+		printf("no monitor\n");
+		return false;
+	}
+	if(this->clock == NULL){
+		printf("no clock\n");
+		return false;
+	}
+	if(this->channels == NULL || !this->channels->channel_iter()->has_more()){
+		printf("no channel\n");
+		return false;
+	}
+	return true;
+}
+
 void Network::run()
 {
+	if(!this->check()){
+		return;
+	}
+	this->monitor->record_before_run();
 	printf("WSN simulation running...\n");
-	int addr;
 	// main loop starts
+	int addr;
 	while(this->clock->get_time() < Network::MAX_SIM_TIME){
 		printf("----------------------------------time: %f----------------------------------\n", this->clock->get_time());
 		
@@ -42,14 +66,13 @@ void Network::run()
 		this->communicate();		
 		this->clock->tick_setter_exit();
 		
-		this->monitor->record();
+		this->monitor->record_in_run();
 
 		this->clock->ticktock();
 	}
 	// main loop ends
 	printf("WSN simulation ends\n");
-	printf("rotate times: %d\n", this->monitor->rotate_times);
-	printf("rotate overhead: %f\n", this->monitor->rotate_overhead);
+	this->monitor->record_after_run();
 }
 
 void Network::communicate()

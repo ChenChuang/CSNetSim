@@ -28,11 +28,10 @@ int InclusterChannel::communicate(Msg* msg)
 				r_count++;
 			}
 		}
+		msg->radius = d;
 		t_energy = EnergyModel::calTransmit(k, d);
 		t->consume(t_energy);
-		if(msg->cmd != Node::CMD_SENSE_DATA_FUSED && msg->cmd != Node::CMD_SENSE_DATA_UNFUSED){
-			this->network->monitor()->rotate_overhead += (t_energy + r_energy * r_count);
-		}
+		dynamic_cast<IMonitor_Channel*>(this->network->monitor())->record_communicate(msg, t_energy + r_energy*r_count);
 		return 1;
 	}else{
 		return -1;

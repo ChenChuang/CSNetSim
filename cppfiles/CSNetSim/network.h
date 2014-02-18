@@ -23,8 +23,10 @@ public:
 	Network(double* x, double* y, int num);
 	virtual ~Network();
 public:
+	virtual bool check();
 	virtual void run();
 	virtual void communicate();
+public:
 	Node* node(int addr) {return this->nodes[addr];}
 	Monitor* monitor() {return this->monitor;}
 	Clock* clock() {return this->clock;}

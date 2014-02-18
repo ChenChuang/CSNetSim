@@ -15,6 +15,8 @@ private:
 	Network* network;
 	double radius;
 	AdjG* adjg;
+
+friend class Monitor;
 };
 
 #endif // BROADCASTCHANNEL_H
