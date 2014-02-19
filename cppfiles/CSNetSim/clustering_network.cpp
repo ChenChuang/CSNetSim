@@ -1,16 +1,16 @@
 #include "clustering_network.h"
 
-ClusteringNetwork::ClusteringNetwork(double* x, double* y, int num): 
-	Network(x, y, num)
+ClusteringNetwork::ClusteringNetwork(double* x, double* y): 
+	Network(x, y, ClusteringSimModel::NODE_NUM, ClusteringSimModel::MAX_SIM_TIME)
 {
 	this->sensor_nodes_num = num - 1;
-	this->nodes[0] = new SinkNode(this, 0, 0, 0, 1);
+	this->nodes[0] = new SinkNode(this, 0, ClusteringSimModel::SINK_X, ClusteringSimModel::SINK_Y);
 	for(int i = 1; i < num; i ++){
-		this->nodes[i] = new SensorNode(this, i, x[i], y[i], EnergyModel::E_INIT);
+		this->nodes[i] = new SensorNode(this, i, x[i], y[i], ClusteringSimModel::E_INIT);
 	}
 	
-	this->max_radius_channel = new BroadcastChannel(this, 50);
-	this->cluster_radius_channel = new BroadcastChannel(this, 30);
+	this->max_radius_channel = new BroadcastChannel(this, ClusteringSimModel::MAX_RADIUS);
+	this->cluster_radius_channel = new BroadcastChannel(this, ClusteringSimModel::CLUSTER_RADIUS);
 	this->unicast_channel = new UnicastChannel(this);
 	this->incluster_channel = new InclusterChannel(this);
 	

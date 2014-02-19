@@ -1,6 +1,6 @@
 #include "network.h"
 
-Network::Network(double* x, double* y, int num): nodes_num(num)
+Network::Network(double* x, double* y, int num, double amax_time): nodes_num(num), max_time(amax_time)
 {
 	this->clock = new Clock(0, 1);
 	
@@ -48,13 +48,14 @@ bool Network::check()
 void Network::run()
 {
 	if(!this->check()){
+		printf("WSN simulation exits\n");
 		return;
 	}
 	this->monitor->record_before_run();
 	printf("WSN simulation running...\n");
 	// main loop starts
 	int addr;
-	while(this->clock->get_time() < Network::MAX_SIM_TIME){
+	while(this->clock->get_time() < this->max_time){
 		printf("----------------------------------time: %f----------------------------------\n", this->clock->get_time());
 		
 		this->clock->tick_setter_init();

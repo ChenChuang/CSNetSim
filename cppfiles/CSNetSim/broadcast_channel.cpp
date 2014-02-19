@@ -2,7 +2,7 @@
 
 BroadcastChannel::BroadcastChannel(Network* anetwork, double aradius): network(anetwork), radius(aradius)
 {
-	this->adjg = new AdjG(anetwork, aradius, Network::NODE_NUM);
+	this->adjg = new AdjG(anetwork, aradius, anetwork->nodes_num);
 }
 
 BroadcastChannel::~BroadcastChannel()

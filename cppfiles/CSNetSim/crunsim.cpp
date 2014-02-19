@@ -15,20 +15,11 @@
 #include <stdio.h>
 
 
-int crunsim(double* x, double* y)
+void crunsim(double* x, double* y)
 {
-	
-	Monitor* monitor = new Monitor();
-	
-	Network* network = new Network(x, y);
-	network->monitor = monitor;
-	//start main loop
+	ClusteringNetwork* network = new ClusteringNetwork(x, y);
 	network->run();
 	delete network;
-	
-	delete monitor;
-	return 1;
-
 }
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -36,38 +27,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	int param_num;
 	double* params;
 	
-	//all params of WSN
-	double AREA_SIZE_X;
-	double AREA_SIZE_Y;
-	double NODE_NUM;
-	double SINK_X;  //metre
-	double SINK_Y;
-	int SINK_ADDR;
-
-	double CLUSTER_RADIUS;   //metre
-	double MAX_RADIUS;    //metre
-	double SENSE_DATA_PERIOD;   //unit time
-
-	double DATA_PACKET_SIZE;    //byte
-	double CTRL_PACKET_SIZE;   //byte
-	double DATA_CTRL_PACKET_SIZE;  //byte
-
-	double E_INIT;  //J
-	double E_ELEC;    //J/byte
-	double E_FUSION ;    //J/byte/source
-	double E_AMP_FREESPACE;    //J/byte/m^2
-	double E_AMP_MULTIPATH ;   //J/byte/m^4
-	double D_THRESHOLD;   //metre
-
-	double MAX_SIM_TIME;    //second
-	double RECORD_PERIOD;   //second
-	
-	double* nodes_x;
-	double* nodes_y;
-	
-	double* result;
-	
-	//check params
+	// check params
 	if (nrhs != 3){
 		mexErrMsgTxt("3 input required.");
 		return;
@@ -88,71 +48,66 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	
 	printf("received param num = %d\n", param_num);
 	
-	//receive params
-	AREA_SIZE_X = params[0];
-	AREA_SIZE_Y = params[1];
-	NODE_NUM = params[2];
-	SINK_X = params[3];  //metre
-	SINK_Y = params[4];
-	SINK_ADDR = params[5];
+	// receive params
+	double area_size_x = params[0];
+	double area_size_y = params[1];
+	double node_num = params[2];
+	double sink_x = params[3];  //metre
+	double sink_y = params[4];
+	double sink_addr = params[5];
 
-	CLUSTER_RADIUS = params[6];   //metre
-	MAX_RADIUS = params[7];    //metre
-	SENSE_DATA_PERIOD = params[8];   //unit time
+	double cluster_radius = params[6];   //metre
+	double max_radius = params[7];    //metre
+	double sense_data_period = params[8];   //unit time
 
-	DATA_PACKET_SIZE = params[9];    //byte
-	CTRL_PACKET_SIZE = params[10];   //byte
-	DATA_CTRL_PACKET_SIZE = params[11];  //byte
+	double data_packet_size = params[9];    //byte
+	double ctrl_packet_size = params[10];   //byte
+	double data_ctrl_packet_size = params[11];  //byte
 
-	E_INIT = params[12];  //J
-	E_ELEC = params[13];    //J/byte
-	E_FUSION = params[14];    //J/byte/source
-	E_AMP_FREESPACE = params[15];    //J/byte/m^2
-	E_AMP_MULTIPATH = params[16];   //J/byte/m^4
-	D_THRESHOLD = params[17];   //metre
+	double e_init = params[12];  //J
+	double e_elec = params[13];    //J/byte
+	double e_fusion = params[14];    //J/byte/source
+	double e_amp_freespace = params[15];    //J/byte/m^2
+	double e_amp_multipath = params[16];   //J/byte/m^4
+	double d_threshold = params[17];   //metre
 
-	MAX_SIM_TIME = params[18];    //second
-	RECORD_PERIOD = params[19];    //second
+	double max_sim_time = params[18];    //second
+	double record_period = params[19];    //second
 
-	/*if( max( mxGetM(prhs[1]), mxGetN(prhs[1]) ) != NODE_NUM || min( mxGetM(prhs[1]), mxGetN(prhs[1]) ) != 1 ||
-		max( mxGetM(prhs[2]), mxGetN(prhs[2]) ) != NODE_NUM || min( mxGetM(prhs[2]), mxGetN(prhs[2]) ) != 1 ){
-		mexErrMsgTxt("nodes x matrix and y matrix should be 1*NODE_NUM or NODE_NUM*1.");
+	double nodes_x = mxGetPr(prhs[1]);
+	double nodes_y = mxGetPr(prhs[2]);
+	
+	// check model
+	if(sink_addr != 0){
+		mexErrMsgTxt("sinknode's address should be 0");
 		return;
-	}*/
+	}
+	
 
-	nodes_x = mxGetPr(prhs[1]);
-	nodes_y = mxGetPr(prhs[2]);
+	ClusteringSimModel::CLUSTER_RADIUS = cluster_radius;
+	ClusteringSimModel::MAX_RADIUS = max_radius;
+	ClusteringSimModel::SENSE_DATA_PERIOD = sense_data_period;	
+	ClusteringSimModel::DATA_PACKET_SIZE = data_packet_size;
+	ClusteringSimModel::CTRL_PACKET_SIZE = ctrl_packet_size;
+	ClusteringSimModel::DATA_CTRL_PACKET_SIZE = data_ctrl_packet_size;	
+	ClusteringSimModel::E_INIT = e_init;	
+	ClusteringSimModel::NODE_NUM = node_num;
+	ClusteringSimModel::SINK_X = sink_x;
+	ClusteringSimModel::SINK_Y = sink_y;
+	ClusteringSimModel::SINK_ADDR = sink_addr;
+	ClusteringSimModel::MAX_SIM_TIME = max_sim_time;
+	ClusteringSimModel::RECORD_PERIOD = record_period;
 	
-	//params delivered
-	Node::CLUSTER_RADIUS = CLUSTER_RADIUS;
-	Node::MAX_RADIUS = MAX_RADIUS;
-	Node::SENSE_DATA_PERIOD = SENSE_DATA_PERIOD;
-	
-	Node::DATA_PACKET_SIZE = DATA_PACKET_SIZE;
-	Node::CTRL_PACKET_SIZE = CTRL_PACKET_SIZE;
-	Node::DATA_CTRL_PACKET_SIZE = DATA_CTRL_PACKET_SIZE;
-	
-	EnergyModel::E_INIT = E_INIT;
-	EnergyModel::E_ELEC = E_ELEC;
-	EnergyModel::E_FUSION = E_FUSION;
-	EnergyModel::E_AMP_FREESPACE = E_AMP_FREESPACE;
-	EnergyModel::E_AMP_MULTIPATH = E_AMP_MULTIPATH;
-	EnergyModel::D_THRESHOLD = D_THRESHOLD;
-	
-	Network::NODE_NUM = NODE_NUM;
-	SinkNode::SINK_X = SINK_X;
-	SinkNode::SINK_Y = SINK_Y;
-	SinkNode::SINK_ADDR = SINK_ADDR;
-	Network::MAX_SIM_TIME = MAX_SIM_TIME;
-	
-	Monitor::RECORD_PERIOD = RECORD_PERIOD;
+	EnergyModel::E_ELEC e_elec;
+	EnergyModel::E_FUSION = e_fusion;
+	EnergyModel::E_AMP_FREESPACE = e_amp_freespace;
+	EnergyModel::E_AMP_MULTIPATH = e_amp_multipath;
+	EnergyModel::D_THRESHOLD = d_threshold;
 	
 	printf("params passed\n");
 	
-	//call crunsim
+	// call crunsim
 	crunsim(nodes_x, nodes_y);
-
-
 }
 
 

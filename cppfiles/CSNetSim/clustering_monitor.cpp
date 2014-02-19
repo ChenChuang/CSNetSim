@@ -4,7 +4,7 @@ ClusteringMonitor::ClusteringMonitor(ClusteringNetwork* anetwork): network(anetw
 {
 	this->min_step = 10;
 	this->record_count = 0;
-	this->max_records = floor(Network::MAX_SIM_TIME / this->min_step) + 1;
+	this->max_records = floor(anetwork->max_time / this->min_step) + 1;
 	this->timer = new Timer(this->network->clock());
 }
 
@@ -54,7 +54,7 @@ ClusteringMonitor::record_after_run()
 
 ClusteringMonitor::record_communicate(Msg* msg, double energy)
 {
-	if(msg->cmd != Node::CMD_SENSE_DATA_FUSED && msg->cmd != Node::CMD_SENSE_DATA_UNFUSED){
+	if(msg->cmd != Sensor_Proc::CMD_SENSE_DATA_FUSED && msg->cmd != Sensor_Proc::CMD_SENSE_DATA_UNFUSED){
 		this->rotate_overhead += energy;
 	}
 }
@@ -91,6 +91,7 @@ void ClusteringMonitor::record_periodically(Node** nodes)
 #endif	
 }
 
+/** deprecated **/
 void ClusteringMonitor::record_adjg(string file_path, string var_name, AdjG* G)
 {
 #ifdef _vc_

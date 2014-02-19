@@ -20,7 +20,7 @@
 class Network
 {
 public:
-	Network(double* x, double* y, int num);
+	Network(double* x, double* y, int num, double max_time);
 	virtual ~Network();
 public:
 	virtual bool check();
@@ -37,6 +37,7 @@ public:
 	int nodes_num;
 	ChannelsManager* channels;
 	Monitor* monitor;
+	double max_time;
 		
 friend class Monitor;
 };

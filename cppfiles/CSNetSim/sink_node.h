@@ -1,37 +1,19 @@
 #ifndef SINKNODE_H
 #define SINKNODE_H
 
-#include "compile_config.h"
+#include "node.h" // Base class: Node
 
-#include "energy_model.h"
-#include "network.h"
-#include "comm_proxy.h"
-#include "node.h"
-#include "msg.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <cmath>
-
-class Network;
-
-class SinkNode
+class SinkNode : public Node
 {
 public:
-	SinkNode();
+	SinkNode(Network* anetwork, int aaddr, double ax, double ay);
 	~SinkNode();
-	
-	void onTimeOut();
-	void startFloodRoute();
 
 public:
-	Network* network;
-
-public:
-	//coordinate of sink
-	static double SINK_X;
-	static double SINK_Y;
-	static int SINK_ADDR;
-
+	void consume(double e) {}
+	bool is_alive() {return true;}
+	void on_time_out();
+	void print();
 };
 
 #endif // SINKNODE_H

@@ -31,6 +31,7 @@ void Sensor_Proc::ticktock(double time)
 	this->sense();
 	if(this->node->is_ch()){
 		if(this->data_l >= this->buf_l){
+			this->node->consume(EnergyModel::calFusion(this->data_l));
 			this->send(Sensor_Proc::CMD_SENSE_DATA_FUSED);
 		}
 	}else{
@@ -46,7 +47,7 @@ void Sensor_Proc::send(char cmd){
 	this->node->commproxy()->unicast(
 		this->node->get_addr(), 
 		this->node->get_next_hop(), 
-		Sensor_Proc::DATA_PACKET_SIZE, 
+		ClusteringSimModel::DATA_PACKET_SIZE, 
 		cmd, 
 		sizeof(int), (char*)data);
 	delete[] data;

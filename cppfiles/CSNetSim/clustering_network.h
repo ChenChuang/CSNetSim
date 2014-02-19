@@ -6,7 +6,7 @@
 class ClusteringNetwork : public Network
 {
 public:
-	ClusteringNetwork(double* x, double* y, int num);
+	ClusteringNetwork(double* x, double* y);
 	~ClusteringNetwork();
 	
 private:
