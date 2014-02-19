@@ -10,7 +10,7 @@ Monitor::~Monitor()
 
 bool Monitor::wirte_to_mat(string file_path, string var_name, double* array, int row_num, int col_num)
 {
-#ifdef _VC_
+#ifdef _MATLAB_
 	mxArray *pa = NULL;
 	pa = mxCreateDoubleMatrix(row_num, col_num, mxREAL);
 	MATFile *pmatfile = NULL;

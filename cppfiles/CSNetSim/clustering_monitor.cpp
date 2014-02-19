@@ -63,7 +63,7 @@ void ClusteringMonitor::record_communicate(Msg* msg, double energy)
 
 void ClusteringMonitor::record_periodically(Node** nodes)
 {
-#ifdef _VC_	
+#ifdef _MATLAB_	
 	if(!this->timer->is_timeout() || this->record_count >= this->max_records){
 		return;
 	}
@@ -96,7 +96,7 @@ void ClusteringMonitor::record_periodically(Node** nodes)
 /** deprecated **/
 void ClusteringMonitor::record_adjg(string file_path, string var_name, AdjG* G)
 {
-#ifdef _VC_
+#ifdef _MATLAB_
 	int n = G->v_num;
 	//declare the mxArray
 	mxArray *pa = NULL;

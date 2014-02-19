@@ -1,6 +1,6 @@
 #include "compile_config.h"
 
-#ifdef _VC_
+#ifdef _MATLAB_
 
 #include "csnetsim.h"
 #include "clustering_network.h"

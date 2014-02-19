@@ -17,7 +17,7 @@
 
 // #include "energy_model.h"
 
-#ifdef _VC_
+#ifdef _MATLAB_
 	#include "mex.h"
 	#include "mat.h"
 #endif
