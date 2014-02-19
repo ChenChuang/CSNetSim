@@ -15,7 +15,7 @@
 #include "comm_proxy.h"
 #include "adj_g.h"
 
-// #include "energy_model.h"
+#include "energy_model.h"
 
 #ifdef _MATLAB_
 	#include "mex.h"
