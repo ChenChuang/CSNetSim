@@ -1,10 +1,13 @@
 #ifndef SENSORNODE_H
 #define SENSORNODE_H
 
-#include "node.h" // Base class: Node
+#include "csnetsim.h"
 #include "incluster_channel.h" // Base class: INode_InclusterChannel
+#include "clustering_member.h"
+#include "clustering_sim_model.h"
+#include "sensor_proc.h"
 
-class SensorNode : public Node, public INode_InclusterChannel
+class SensorNode : public Node, public INode_InclusterChannel, public INode_SensorProc
 {
 public:
 	SensorNode(Network* anetwork, int aaddr, double ax, double ay, double aenergy);
@@ -12,11 +15,12 @@ public:
 public:
 	void print();
 public:
-	MnManager* mnmanager() {return this->mnmanager;}
+	MnManager* get_mnmanager() {return this->mnmanager;}
 	int get_ch_addr() {return this->ch_addr;}
 	void set_ch_addr(int addr) {this->ch_addr = addr;}
 	int get_next_hop() {return this->next_hop;}
 	void set_next_hop(int addr) {this->next_hop = addr;}
+	bool is_ch() {return this->ch_addr == this->addr;}
 	
 public:
 	MnManager* mnmanager;	
@@ -25,6 +29,7 @@ public:
 	double d_tosink;
 	
 friend class Monitor;
+friend class ClusteringMonitor;
 };
 
 #endif // SENSORNODE_H

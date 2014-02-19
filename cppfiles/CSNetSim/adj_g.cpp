@@ -1,5 +1,7 @@
 #include "adj_g.h"
 
+#include "network.h"
+
 AdjG::AdjG(double* x, double* y, double r, int n)
 {
 	this->radius = r;
@@ -69,7 +71,8 @@ AdjG::AdjG(Network* anetwork, double r, int n)
 AdjG::~AdjG()
 {
 	int i;
-	Adjv* p, np;
+	Adjv* p;
+	Adjv* np;
 	for(i = 0; i < this->v_num; i ++){
 		p = this->v[i];
 		while(p != NULL){
@@ -98,7 +101,8 @@ void AdjG::print()
 void AdjG::delete_node(int addr)
 {
 	int i;
-	Adjv* p, np;
+	Adjv* p;
+	Adjv* np;
 	for(i = 0; i < this->v_num; i ++){
 		if(i == addr){
 			//delete the whole link-list of node with addr

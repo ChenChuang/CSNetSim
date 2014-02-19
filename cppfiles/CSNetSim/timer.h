@@ -1,7 +1,8 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include "network.h"
+#include "compile_config.h"
+#include "clock.h"
 
 class Timer
 {

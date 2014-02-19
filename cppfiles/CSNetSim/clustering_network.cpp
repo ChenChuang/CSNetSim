@@ -3,9 +3,9 @@
 ClusteringNetwork::ClusteringNetwork(double* x, double* y): 
 	Network(x, y, ClusteringSimModel::NODE_NUM, ClusteringSimModel::MAX_SIM_TIME)
 {
-	this->sensor_nodes_num = num - 1;
+	this->sensor_nodes_num = ClusteringSimModel::NODE_NUM - 1;
 	this->nodes[0] = new SinkNode(this, 0, ClusteringSimModel::SINK_X, ClusteringSimModel::SINK_Y);
-	for(int i = 1; i < num; i ++){
+	for(int i = 1; i < ClusteringSimModel::NODE_NUM; i ++){
 		this->nodes[i] = new SensorNode(this, i, x[i], y[i], ClusteringSimModel::E_INIT);
 	}
 	

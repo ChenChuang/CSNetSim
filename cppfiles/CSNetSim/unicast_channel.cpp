@@ -17,12 +17,12 @@ int UnicastChannel::communicate(Msg* msg)
 		msg->radius = d;
 		double k = msg->size;
 		if(r->is_alive()){
-			r->commproxy()->receive(msg);
+			r->get_commproxy()->receive(msg);
 			double t_energy = EnergyModel::calTransmit(k, d);
 			double r_energy = EnergyModel::calReceive(k);
 			t->consume(t_energy);
 			r->consume(r_energy);
-			dynamic_cast<IMonitor_Channel*>(this->network->monitor())->record_communicate(msg, t_energy + r_energy);
+			dynamic_cast<IMonitor_Channel*>(this->network->get_monitor())->record_communicate(msg, t_energy + r_energy);
 		}
 		return 1;
 	}else{

@@ -3,15 +3,15 @@
 
 #include "compile_config.h"
 
-#include "energy_model.h"
-#include "network.h"
 #include "comm_proxy.h"
-#include "heed_proc.h"
-#include "edcr_proc.h"
+#include "processor.h"
 #include "msg.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmath>
+
+class Network;
 
 class Node
 {
@@ -23,22 +23,22 @@ public:
 	virtual void on_time_out();
 	virtual void print();
 public:
-	virtual CommProxy* commproxy() {return this->commproxy;}
-	virtual Network* network() {return this->network;}
+	virtual CommProxy* get_commproxy() {return this->commproxy;}
+	virtual Network* get_network() {return this->network;}
 
 	virtual int get_addr() {return this->addr;}
 	virtual bool is_alive() {return this->energy <= 0;}
 	virtual void consume(double e) {this->energy -= e;}
 	
 public:
-	double energy;
+	Network* network;
+	CommProxy* commproxy;
+	ProcsManager* procs_manager;
+	
 	int addr;
 	double x;
 	double y;
-
-	CommProxy* commproxy;
-	Network* network;
-	ProcsManager* procs_manager;
+	double energy;
 
 friend class Monitor;
 };

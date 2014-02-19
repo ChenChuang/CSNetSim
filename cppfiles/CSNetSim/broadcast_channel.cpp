@@ -24,14 +24,14 @@ int BroadcastChannel::communicate(Msg* msg)
 		while(vp != NULL){
 			r = this->network->node(msg->toaddr);
 			if(r->is_alive()){
-				r->commproxy()->receive(msg);
+				r->get_commproxy()->receive(msg);
 				r->consume(r_energy);
 				r_count++;
 			}
 			vp = vp->next;
 		}
 		t->consume(t_energy);
-		dynamic_cast<IMonitor_Channel*>(this->network->monitor())->record_communicate(msg, t_energy + r_energy*r_count);
+		dynamic_cast<IMonitor_Channel*>(this->network->get_monitor())->record_communicate(msg, t_energy + r_energy*r_count);
 		return 1;
 	}else{
 		return -1;

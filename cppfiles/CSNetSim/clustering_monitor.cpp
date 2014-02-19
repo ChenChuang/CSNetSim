@@ -1,18 +1,20 @@
 #include "clustering_monitor.h"
 
+#include "clustering_network.h"
+
 ClusteringMonitor::ClusteringMonitor(ClusteringNetwork* anetwork): network(anetwork)
 {
 	this->min_step = 10;
 	this->record_count = 0;
 	this->max_records = floor(anetwork->max_time / this->min_step) + 1;
-	this->timer = new Timer(this->network->clock());
+	this->timer = new Timer(this->network->get_clock());
 }
 
 ClusteringMonitor::~ClusteringMonitor()
 {
 }
 
-ClusteringMonitor::record_before_run()
+void ClusteringMonitor::record_before_run()
 {
 	this->record_adjg("cluster_radius_G.mat", "cluster_radius_G", 
 		dynamic_cast<BroadcastChannel*>(this->network->cluster_radius_channel)->adjg);
@@ -35,12 +37,12 @@ ClusteringMonitor::record_before_run()
 	this->timer->set_after(0);
 }
 
-ClusteringMonitor::record_in_run()
+void ClusteringMonitor::record_in_run()
 {
 	this->record_periodically(this->network->nodes);
 }
 
-ClusteringMonitor::record_after_run()
+void ClusteringMonitor::record_after_run()
 {
 	this->wirte_to_mat("energy_sum.mat","energy_sum", this->energy_sum, 1, this->record_count);
 	this->wirte_to_mat("alive_sum.mat","alive_sum", this->alive_sum, 1, this->record_count);
@@ -52,7 +54,7 @@ ClusteringMonitor::record_after_run()
 	this->wirte_to_mat("rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_count);
 }
 
-ClusteringMonitor::record_communicate(Msg* msg, double energy)
+void ClusteringMonitor::record_communicate(Msg* msg, double energy)
 {
 	if(msg->cmd != Sensor_Proc::CMD_SENSE_DATA_FUSED && msg->cmd != Sensor_Proc::CMD_SENSE_DATA_UNFUSED){
 		this->rotate_overhead += energy;
@@ -61,12 +63,12 @@ ClusteringMonitor::record_communicate(Msg* msg, double energy)
 
 void ClusteringMonitor::record_periodically(Node** nodes)
 {
-#ifdef _vc_	
+#ifdef _VC_	
 	if(!this->timer->is_timeout() || this->record_count >= this->max_records){
 		return;
 	}
 	this->timer->set_after(this->min_step);
-	this->time[this->record_count] = this->network->clock()->get_time();
+	this->time[this->record_count] = this->network->get_clock()->get_time();
 	
 	double e_sum = 0;
 	int al_sum = 0;
@@ -94,7 +96,7 @@ void ClusteringMonitor::record_periodically(Node** nodes)
 /** deprecated **/
 void ClusteringMonitor::record_adjg(string file_path, string var_name, AdjG* G)
 {
-#ifdef _vc_
+#ifdef _VC_
 	int n = G->v_num;
 	//declare the mxArray
 	mxArray *pa = NULL;
@@ -134,6 +136,3 @@ void ClusteringMonitor::record_adjg(string file_path, string var_name, AdjG* G)
 	mxDestroyArray(pa);
 #endif
 }
-
-
-

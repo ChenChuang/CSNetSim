@@ -1,11 +1,11 @@
-#include "snesor_node.h"
+#include "sensor_node.h"
 
 SensorNode::SensorNode(Network* anetwork, int aaddr, double ax, double ay, double energy): 
 	Node(anetwork, aaddr, ax, ay, energy), 
 	mnmanager(new MnManager(this)),
-	d_tosink(sqrt(pow(ax - ClusteringSimModel::SINK_X, 2) + pow(ay - ClusteringSimModel::SINK_Y, 2))),
 	ch_addr(-1),
-	next_hop(-1)
+	next_hop(-1),
+	d_tosink(sqrt(pow(ax - ClusteringSimModel::SINK_X, 2) + pow(ay - ClusteringSimModel::SINK_Y, 2)))
 {
 }
 

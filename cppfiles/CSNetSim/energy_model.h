@@ -3,30 +3,21 @@
 
 #include <math.h>
 
-class EnergyModel
+namespace EnergyModel
 {
-public:
 	//params of energy model
-	static double E_ELEC;    //J/byte
-	static double E_FUSION;    //J/byte/source
-	static double E_AMP_FREESPACE;    //J/byte/m^2
-	static double E_AMP_MULTIPATH;   //J/byte/m^4
-	static double D_THRESHOLD;   //metre
+	extern double E_ELEC;    //J/byte
+	extern double E_FUSION;    //J/byte/source
+	extern double E_AMP_FREESPACE;    //J/byte/m^2
+	extern double E_AMP_MULTIPATH;   //J/byte/m^4
+	extern double D_THRESHOLD;   //metre
 	
-public:
 	//energy consumed in transmitting msg, k is the size of msg, d is the transmission distance
-	static double calTransmit(double k, double d)
-	{
-		if(d <= EnergyModel::D_THRESHOLD){
-			return (EnergyModel::E_ELEC + EnergyModel::E_AMP_FREESPACE * pow(d, 2)) * k;
-		}else{
-			return (EnergyModel::E_ELEC + EnergyModel::E_AMP_MULTIPATH * pow(d, 4)) * k;
-		}
-	}
+	extern double calTransmit(double k, double d);
 	//energy consumed in receiving msg size of k
-	static double calReceive(double k) {return EnergyModel::E_ELEC * k;}
+	extern double calReceive(double k);
 	//energy consumed in fusing data size of k
-	static double calFusion(double k) {return EnergyModel::E_FUSION * k;}
-};
+	extern double calFusion(double k);
+}
 
 #endif // ENERGYMODEL_H

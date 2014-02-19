@@ -1,24 +1,25 @@
 #ifndef CLUSTERINGSIMMODEL_H
 #define CLUSTERINGSIMMODEL_H
 
-class ClusteringSimModel
+#include "csnetsim.h"
+
+namespace ClusteringSimModel
 {
-public:
-	static double AREA_SIZE_X;
-	static double AREA_SIZE_Y;
-	static double NODE_NUM;
-	static double SINK_X;  //metre
-	static double SINK_Y;
-	static int SINK_ADDR;
-	static double CLUSTER_RADIUS;   //metre
-	static double MAX_RADIUS;    //metre
-	static double SENSE_DATA_PERIOD;   //unit time
-	static double DATA_PACKET_SIZE;    //byte
-	static double CTRL_PACKET_SIZE;   //byte
-	static double DATA_CTRL_PACKET_SIZE;  //byte
-	static double MAX_SIM_TIME;    //second
-	static double RECORD_PERIOD;   //second	
-	static double E_INIT;  //J
+	extern double AREA_SIZE_X;
+	extern double AREA_SIZE_Y;
+	extern double NODE_NUM;
+	extern double SINK_X;  //metre
+	extern double SINK_Y;
+	extern int SINK_ADDR;
+	extern double CLUSTER_RADIUS;   //metre
+	extern double MAX_RADIUS;    //metre
+	extern double SENSE_DATA_PERIOD;   //unit time
+	extern double DATA_PACKET_SIZE;    //byte
+	extern double CTRL_PACKET_SIZE;   //byte
+	extern double DATA_CTRL_PACKET_SIZE;  //byte
+	extern double MAX_SIM_TIME;    //second
+	extern double RECORD_PERIOD;   //second	
+	extern double E_INIT;  //J
 };
 
 #endif // CLUSTERINGSIMMODEL_H

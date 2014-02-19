@@ -1,13 +1,13 @@
 #ifndef SENSOR_PROC_H
 #define SENSOR_PROC_H
 
-#include "processor.h" // Base class: Processor
-#include "timer.h"
+#include "csnetsim.h"
+#include "clustering_sim_model.h"
 
 class Sensor_Proc : public Processor
 {
 public:
-	Sensor_Proc(Node* anode);
+	Sensor_Proc(Node* anode, double aperiod, double aunit_l, double abuf_l);
 	~Sensor_Proc();
 public:
 	virtual int process(Msg* msg);
@@ -25,6 +25,14 @@ private:
 	Node* node;
 	Timer* sense_timer;
 	Timer* wait_timer;
+};
+
+class INode_SensorProc
+{
+public:
+	virtual int get_next_hop() = 0;
+	virtual void set_next_hop(int addr) = 0;
+	virtual bool is_ch() = 0;
 };
 
 #endif // SENSOR_PROC_H

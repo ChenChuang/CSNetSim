@@ -1,6 +1,8 @@
 #ifndef CLOCK_H
 #define CLOCK_H
 
+#include "compile_config.h"
+
 class Clock
 {
 public:

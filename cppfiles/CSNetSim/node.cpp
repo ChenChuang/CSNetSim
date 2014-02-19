@@ -1,5 +1,7 @@
 #include "node.h"
 
+#include "network.h"
+
 Node::Node(Network* anetwork, int aaddr, double ax, double ay, double aenergy):
 	network(anetwork),
 	commproxy(new CommProxy()),
@@ -14,7 +16,7 @@ Node::Node(Network* anetwork, int aaddr, double ax, double ay, double aenergy):
 Node::~Node()
 {
 	delete this->commproxy;
-	delete this->procs;
+	delete this->procs_manager;
 }
 
 void Node::print()
@@ -24,8 +26,7 @@ void Node::print()
 
 void Node::on_time_out()
 {
-	ProcNode* p;
-	MsgIterator* msg_iter = this->commproxy->r_msg_iter();
+	MsgIterator* msg_iter = this->commproxy->get_r_msg_iter();
 	Msg* msg;
 	ProcIterator* proc_iter;
 	Processor* proc;
@@ -33,16 +34,16 @@ void Node::on_time_out()
 	while(msg_iter->has_more()){
 		msg = msg_iter->next();
 		result = -1;
-		proc_iter = this->procs_manager->proc_iter();
+		proc_iter = this->procs_manager->get_proc_iter();
 		while(proc_iter->has_more() && result <= 0){
 			proc = proc_iter->next();
 			result = proc->process(msg);
 		}
 	}
-	proc_iter = this->procs_manager->proc_iter();
+	proc_iter = this->procs_manager->get_proc_iter();
 	while(proc_iter->has_more()){
 		proc = proc_iter->next();
-		proc->ticktock(this->network->clock()->get_time());
+		proc->ticktock(this->network->get_clock()->get_time());
 	}
 }
 

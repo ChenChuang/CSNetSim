@@ -10,12 +10,12 @@ Timer::~Timer()
 
 void Timer::set_after(double after)
 {
-	this->time = this->network->clock()->get_time() + after;
+	this->time = this->clock->get_time() + after;
 }
 
-void Timer::is_timeout()
+bool Timer::is_timeout()
 {
-	result = (this->time >= 0 && this->time <= this->network->clock()->get_time());
+	bool result = (this->time >= 0 && this->time <= this->clock->get_time());
 	this->time = -1;
 	return result;
 }

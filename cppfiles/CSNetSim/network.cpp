@@ -38,7 +38,7 @@ bool Network::check()
 		printf("no clock\n");
 		return false;
 	}
-	if(this->channels == NULL || !this->channels->channel_iter()->has_more()){
+	if(this->channels == NULL || !this->channels->get_channel_iter()->has_more()){
 		printf("no channel\n");
 		return false;
 	}
@@ -78,12 +78,10 @@ void Network::run()
 
 void Network::communicate()
 {
-#ifdef _print_
+#ifdef _DEBUG_
 	printf("----------------------------commicating...------------------------------\n");
 #endif
 	int t_i;
-	int k;
-	double d;
 	MsgIterator* msg_iter;
 	Msg* msg;
 	ChannelIterator* channel_iter;
@@ -94,11 +92,11 @@ void Network::communicate()
 		//the node is dead
 		if(this->nodes[t_i]->is_alive()){
 			//process every msg in the node's t_msg_buf
-			msg_iter = this->nodes[t_i]->commproxy()->t_msg_iter();
+			msg_iter = this->nodes[t_i]->get_commproxy()->get_t_msg_iter();
 			while(msg_iter->has_more()){
 				msg = msg_iter->next();
 				done = -1;
-				channel_iter = this->channels->channel_iter();
+				channel_iter = this->channels->get_channel_iter();
 				while(done < 0 && channel_iter->has_more()){
 					channel = channel_iter->next();
 					done = channel->communicate(msg);

@@ -1,7 +1,14 @@
 #ifndef CLUSTERINGNETWORK_H
 #define CLUSTERINGNETWORK_H
 
-#include "network.h" // Base class: Network
+#include "csnetsim.h"
+#include "clustering_sim_model.h"
+#include "sink_node.h"
+#include "sensor_node.h"
+#include "clustering_monitor.h"
+#include "broadcast_channel.h"
+#include "unicast_channel.h"
+#include "incluster_channel.h"
 
 class ClusteringNetwork : public Network
 {
@@ -16,6 +23,7 @@ private:
 	Channel* unicast_channel;
 	Channel* incluster_channel;
 	
+friend class Monitor;
 friend class ClusteringMonitor;
 };
 

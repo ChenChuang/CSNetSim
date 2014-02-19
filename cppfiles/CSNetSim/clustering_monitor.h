@@ -1,25 +1,19 @@
 #ifndef CLUSTERINGMONITOR_H
 #define CLUSTERINGMONITOR_H
 
-#include "monitor.h" // Base class: Monitor
+#include "csnetsim.h"
+#include "clustering_sim_model.h"
 
-#include "compile_config.h"
-#ifdef _vc_
-	#include "mex.h"
-	#include "mat.h"
-#endif
 #include <string>
-#include "adj_g.h"
-#include "node.h"
-#include "network.h"
 #include <cmath>
 using namespace std;
 
+class ClusteringNetwork;
 
 class ClusteringMonitor : public Monitor, public IMonitor_Channel
 {
 public:
-	ClusteringMonitor(Network* anetwork);
+	ClusteringMonitor(ClusteringNetwork* anetwork);
 	~ClusteringMonitor();
 public:
 	void record_before_run();

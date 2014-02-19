@@ -1,4 +1,4 @@
-#include "mn_manager.h"
+#include "clustering_member.h"
 
 MnManager::MnManager(Node* anode): node(anode), members(NULL)
 {
@@ -46,7 +46,7 @@ void MnManager::clear_dead()
 	struct MnNode* p = this->members;
 	struct MnNode* pp = NULL;
 	while(p != NULL){
-		if(!this->node->network()->node(p->addr)->is_alive()){
+		if(!this->node->get_network()->node(p->addr)->is_alive()){
 			if(pp != NULL){
 				pp->next = p->next;
 			}else{
@@ -77,18 +77,16 @@ void MnManager::add(int addr)
 bool MnManager::has(int addr)
 {
 	struct MnNode* p = this->members;
-	struct MnNode* pp = NULL;
 	while(p != NULL){
 		if(p->addr == addr){
 			return true;
 		}
-		pp = p;
 		p = p->next;
 	}
 	return false;
 }
 
-MnIterator* MnManager::mn_iter()
+MnIterator* MnManager::get_mn_iter()
 {
 	this->mn_iter->seek(this->members);
 	return this->mn_iter;

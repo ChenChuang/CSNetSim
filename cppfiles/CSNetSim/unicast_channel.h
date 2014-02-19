@@ -1,7 +1,7 @@
 #ifndef UNICASTCHANNEL_H
 #define UNICASTCHANNEL_H
 
-#include "channel.h" // Base class: Channel
+#include "csnetsim.h"
 
 class UnicastChannel : public Channel
 {

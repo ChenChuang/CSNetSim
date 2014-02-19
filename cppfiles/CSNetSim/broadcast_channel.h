@@ -1,7 +1,7 @@
 #ifndef BROADCASTCHANNEL_H
 #define BROADCASTCHANNEL_H
 
-#include "channel.h" // Base class: Channel
+#include "csnetsim.h"
 
 class BroadcastChannel : public Channel
 {
@@ -11,7 +11,7 @@ public:
 public:
 	virtual int communicate(Msg* msg);
 
-private:
+public:
 	Network* network;
 	double radius;
 	AdjG* adjg;

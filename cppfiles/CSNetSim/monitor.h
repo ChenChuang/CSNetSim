@@ -1,6 +1,11 @@
 #ifndef MONITOR_H
 #define MONITOR_H
 
+#include "compile_config.h"
+
+#include <string>
+using namespace std;
+
 class Monitor
 {
 public:

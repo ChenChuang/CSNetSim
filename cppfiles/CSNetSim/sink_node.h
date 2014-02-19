@@ -1,7 +1,8 @@
 #ifndef SINKNODE_H
 #define SINKNODE_H
 
-#include "node.h" // Base class: Node
+#include "csnetsim.h"
+#include "clustering_sim_model.h"
 
 class SinkNode : public Node
 {

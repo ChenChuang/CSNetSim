@@ -1,7 +1,16 @@
 #include "monitor.h"
 
+Monitor::Monitor()
+{
+}
+
+Monitor::~Monitor()
+{
+}
+
 bool Monitor::wirte_to_mat(string file_path, string var_name, double* array, int row_num, int col_num)
 {
+#ifdef _VC_
 	mxArray *pa = NULL;
 	pa = mxCreateDoubleMatrix(row_num, col_num, mxREAL);
 	MATFile *pmatfile = NULL;
@@ -25,5 +34,7 @@ bool Monitor::wirte_to_mat(string file_path, string var_name, double* array, int
 	delete array;
 	
 	return true;
+#endif
+	return false;
 }
 

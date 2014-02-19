@@ -6,8 +6,8 @@ Sensor_Proc::Sensor_Proc(Node* anode, double aperiod, double aunit_l, double abu
 	buf_l(abuf_l),
 	data_l(0),
 	node(anode),
-	sense_timer(new Timer(anode->network()->clock())),
-	wait_timer(new Timer(anode->network()->clock()))
+	sense_timer(new Timer(anode->get_network()->get_clock())),
+	wait_timer(new Timer(anode->get_network()->get_clock()))
 {
 }
 
@@ -20,16 +20,19 @@ Sensor_Proc::~Sensor_Proc()
 int Sensor_Proc::process(Msg* msg)
 {
 	if(msg->cmd == Sensor_Proc::CMD_SENSE_DATA_FUSED){
-		this->node->commproxy()->repost(msg, this->node->get_next_hop());
+		this->node->get_commproxy()->repost(msg, dynamic_cast<INode_SensorProc*>(this->node)->get_next_hop());
+		return 1;
 	}else if(msg->cmd == Sensor_Proc::CMD_SENSE_DATA_UNFUSED){
 		this->data_l += *(int*)msg->data;
+		return 1;
 	}
+	return -1;
 }
 
 void Sensor_Proc::ticktock(double time)
 {
 	this->sense();
-	if(this->node->is_ch()){
+	if(dynamic_cast<INode_SensorProc*>(this->node)->is_ch()){
 		if(this->data_l >= this->buf_l){
 			this->node->consume(EnergyModel::calFusion(this->data_l));
 			this->send(Sensor_Proc::CMD_SENSE_DATA_FUSED);
@@ -44,9 +47,9 @@ void Sensor_Proc::ticktock(double time)
 void Sensor_Proc::send(char cmd){
 	int* data = new int[1];
 	data[0] = this->data_l;
-	this->node->commproxy()->unicast(
+	this->node->get_commproxy()->unicast(
 		this->node->get_addr(), 
-		this->node->get_next_hop(), 
+		dynamic_cast<INode_SensorProc*>(this->node)->get_next_hop(), 
 		ClusteringSimModel::DATA_PACKET_SIZE, 
 		cmd, 
 		sizeof(int), (char*)data);

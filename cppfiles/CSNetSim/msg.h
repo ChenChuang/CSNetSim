@@ -1,6 +1,8 @@
 #ifndef MSG_H
 #define MSG_H
 
+#include "compile_config.h"
+
 //nodes in WSN use this struct to communicate with each other
 struct Msg
 {
@@ -42,28 +44,15 @@ struct Msg
 		radius(aradius),
 		size(asize),
 		cmd(acmd),
-		rc(1),
-		data_l(adata_l) {
+		data_l(adata_l), 
+		rc(1) 
+	{
 		if (adata_l > 0) {
 			this->data = new char[adata_l];
 			memcpy(this->data, adata, adata_l);	
 		}
 	}
-		
-	Msg(const Msg& amsg)
-		type(msg->type),
-		fromaddr(amsg->fromaddr),
-		toaddr(amsg->toaddr),
-		radius(amsg->radius),
-		size(amsg->size),
-		cmd(amsg->cmd),
-		rc(1),
-		data_l(amsg->data_l) {
-		if (amsg->data_l > 0) {
-			this->data = new char[amsg->data_l];
-			memcpy(this->data, amsg->data, amsg->data_l);	
-		}
-	}
+
 	
 	~Msg() {
 		if(--this->rc <= 0 && this->data != NULL) {
@@ -76,13 +65,14 @@ struct MsgNode
 {
 	struct Msg* body;
 	struct MsgNode* next;
-	MsgNode(const Msg* amsg, const MsgNode* anext): body(amsg), next(anext) {
+	MsgNode(Msg* amsg, MsgNode* anext): body(amsg), next(anext) {
 		this->body->rc++;
 	}
-	~Msg() {
+	MsgNode(): body(NULL), next(NULL) {}
+	~MsgNode() {
 		delete body;
 	}
-}
+};
 
 class MsgIterator
 {
@@ -110,5 +100,6 @@ public:
 
 private:
 	MsgNode* ptr;
-}
+};
+
 #endif

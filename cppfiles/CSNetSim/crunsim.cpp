@@ -1,19 +1,11 @@
 #include "compile_config.h"
 
-#ifdef _vc_
-	#define CRUNSIM
-#endif
-#ifdef CRUNSIM
+#ifdef _VC_
 
-#include "mex.h"
-#include "mat.h"
-#include "energy_model.cpp"
-#include "comm_proxy.cpp"
-#include "node.cpp"
-#include "network.cpp"
-#include "monitor.cpp"
-#include <stdio.h>
-
+#include "csnetsim.h"
+#include "clustering_network.h"
+#include "clustering_sim_model.h"
+#include "energy_model.h"
 
 void crunsim(double* x, double* y)
 {
@@ -109,7 +101,5 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// call crunsim
 	crunsim(nodes_x, nodes_y);
 }
-
-
 
 #endif

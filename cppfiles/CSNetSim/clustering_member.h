@@ -1,5 +1,8 @@
-#ifndef MNMANAGER_H
-#define MNMANAGER_H
+#ifndef CLUSTERINGMEMBER_H
+#define CLUSTERINGMEMBER_H
+
+#include "csnetsim.h"
+#include "clustering_sim_model.h"
 
 struct MnNode
 {
@@ -28,7 +31,7 @@ public:
 
 private:
 	MnNode* ptr;
-}
+};
 
 class MnManager
 {
@@ -41,7 +44,7 @@ public:
 	void add(int addr);
 	bool has(int addr);
 	void clear_dead();
-	MnIterator* mn_iter();
+	MnIterator* get_mn_iter();
 	
 public:
 	Node* node;
@@ -49,4 +52,4 @@ public:
 	MnIterator* mn_iter;
 };
 
-#endif // MNMANAGER_H
+#endif // CLUSTERINGMEMBER_H
