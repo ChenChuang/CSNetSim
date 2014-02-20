@@ -32,10 +32,10 @@ int UnicastChannel::communicate(Msg* msg)
 
 int ECommProxy_UnicastChannel::unicast(int fromaddr, int toaddr, int size, char cmd, int data_l, char* data)
 {
-	return this->push_msg(UnicastChannel::MSG_TYPE_UNICAST, fromaddr, toaddr, -1, size, cmd, data_l, data);
+	return this->send(UnicastChannel::MSG_TYPE_UNICAST, fromaddr, toaddr, -1, size, cmd, data_l, data);
 }
 
 int ECommProxy_UnicastChannel::repost(Msg* msg, int toaddr)
 {
-	return this->push_msg(UnicastChannel::MSG_TYPE_UNICAST, msg->toaddr, toaddr, -1, msg->size, msg->cmd, msg->data_l, msg->data);
+	return this->send(UnicastChannel::MSG_TYPE_UNICAST, msg->toaddr, toaddr, -1, msg->size, msg->cmd, msg->data_l, msg->data);
 }

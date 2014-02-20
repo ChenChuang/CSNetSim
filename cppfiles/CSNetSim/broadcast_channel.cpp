@@ -40,5 +40,5 @@ int BroadcastChannel::communicate(Msg* msg)
 
 int ECommProxy_BroadcastChannel::broadcast(int fromaddr, double radius, int size, char cmd, int data_l, char* data)
 {
-	return this->push_msg(BroadcastChannel::MSG_TYPE_BROADCAST, fromaddr, -1, radius, size, cmd, data_l, data);
+	return this->send(BroadcastChannel::MSG_TYPE_BROADCAST, fromaddr, -1, radius, size, cmd, data_l, data);
 }

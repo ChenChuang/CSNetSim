@@ -40,5 +40,5 @@ int InclusterChannel::communicate(Msg* msg)
 
 int ECommProxy_InclusterChannel::inclustercast(int fromaddr, int size, char cmd, int data_l, char* data)
 {
-	return this->push_msg(InclusterChannel::MSG_TYPE_INCLUSTERCAST, fromaddr, -1, -1, size, cmd, data_l, data);
+	return this->send(InclusterChannel::MSG_TYPE_INCLUSTERCAST, fromaddr, -1, -1, size, cmd, data_l, data);
 }

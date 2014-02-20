@@ -16,7 +16,7 @@ public:
 	void clear_r_buf();
 	MsgIterator* get_t_msg_iter();
 	MsgIterator* get_r_msg_iter();
-	int push_msg(char type, int fromaddr, int toaddr, double radius, int size, char cmd, int data_l, char* data);
+	int send(char type, int fromaddr, int toaddr, double radius, int size, char cmd, int data_l, char* data);
 	void clear_buf(MsgNode* buf);
 	
 private:

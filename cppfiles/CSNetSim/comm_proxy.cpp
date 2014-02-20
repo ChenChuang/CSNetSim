@@ -49,7 +49,7 @@ void CommProxy::clear_buf(MsgNode* buf)
 	buf = NULL;
 }
 
-int CommProxy::push_msg(char type, int fromaddr, int toaddr, double radius, int size, char cmd, int data_l, char* data){
+int CommProxy::send(char type, int fromaddr, int toaddr, double radius, int size, char cmd, int data_l, char* data){
 	Msg* t_msg = new Msg(type, fromaddr, toaddr, radius, size, cmd, data_l, data);
 	MsgNode* t_msg_node = new MsgNode(t_msg, NULL);
 	MsgNode* p = this->t_msg_buf;
