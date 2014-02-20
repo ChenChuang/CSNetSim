@@ -8,9 +8,9 @@ Monitor::~Monitor()
 {
 }
 
-bool Monitor::wirte_to_mat(string file_path, string var_name, double* array, int row_num, int col_num)
-{
 #ifdef _MATLAB_
+bool Monitor::wirte_to_mat(const string& file_path, const string& var_name, const double* array, int row_num, int col_num)
+{
 	mxArray *pa = NULL;
 	pa = mxCreateDoubleMatrix(row_num, col_num, mxREAL);
 	MATFile *pmatfile = NULL;
@@ -34,7 +34,17 @@ bool Monitor::wirte_to_mat(string file_path, string var_name, double* array, int
 	delete array;
 	
 	return true;
-#endif
-	return false;
 }
+#endif
+
+#ifndef _MATLAB_
+
+bool Monitor::wirte_to_mat(const string& file_path, const string& var_name, const double* array, int row_num, int col_num)
+{
+	MatFile* matfile = new MatFile(file_path);
+	bool result = matfile->WriteMatrix(var_name, col_num, row_num, array);
+	delete matfile;
+	return result;
+}
+#endif
 

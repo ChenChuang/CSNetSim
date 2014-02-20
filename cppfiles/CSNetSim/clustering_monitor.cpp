@@ -96,24 +96,8 @@ void ClusteringMonitor::record_periodically(Node** nodes)
 /** deprecated **/
 void ClusteringMonitor::record_adjg(string file_path, string var_name, AdjG* G)
 {
-#ifdef _MATLAB_
-	int n = G->v_num;
-	//declare the mxArray
-	mxArray *pa = NULL;
-	//allocate memory for the mxArray, Note:declaration and allocation should be separated, I don't know why.
-	pa = mxCreateDoubleMatrix(n, n, mxREAL);
-	if(pa == NULL){
-		printf("error when allocating mxArray");
-		return;
-	}
-	//declare the MATFile
-	MATFile *pmatfile = NULL;
-	//use matOpen to create a new *.mat file if it doesn't exist, Note:declaration and creation should be separated, I don't know why too.
-	pmatfile= matOpen(file_path.c_str(),"w");
-	//use pr to access the mxArray
-	double *pr = mxGetPr(pa);
-	
-	//write data to the normal array pointed by pr
+	int n = this->network->sensor_nodes_num;
+	double* pr = new double[n*n];
 	int i, j, s;
 	struct Adjv* p;
 	for(i = 0; i < n; i ++){
@@ -126,13 +110,5 @@ void ClusteringMonitor::record_adjg(string file_path, string var_name, AdjG* G)
 			pr[p->addr * n + s] = 1;
 			p = p->next;
 		}
-	}	
-	
-	//put mxArray to *.mat, using variable name indicated by the second param
-	matPutVariable(pmatfile, var_name.c_str(), pa);
-	//close the *.mat
-	matClose(pmatfile);
-	//release the memory allocated for mxArray
-	mxDestroyArray(pa);
-#endif
+	}
 }

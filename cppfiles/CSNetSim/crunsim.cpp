@@ -1,6 +1,9 @@
 #include "compile_config.h"
 
 #ifdef _MATLAB_
+	#include "mex.h"
+	#include "mat.h"
+#endif
 
 #include "csnetsim.h"
 #include "clustering_network.h"
@@ -14,6 +17,7 @@ void crunsim(double* x, double* y)
 	delete network;
 }
 
+#ifdef _MATLAB_
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	int param_num;
@@ -66,8 +70,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	double max_sim_time = params[18];    //second
 	double record_period = params[19];    //second
 
-	double nodes_x = mxGetPr(prhs[1]);
-	double nodes_y = mxGetPr(prhs[2]);
+	double* nodes_x = mxGetPr(prhs[1]);
+	double* nodes_y = mxGetPr(prhs[2]);
 	
 	// check model
 	if(sink_addr != 0){
@@ -75,7 +79,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		return;
 	}
 	
-
+	ClusteringSimModel::AREA_SIZE_X = area_size_x;
+	ClusteringSimModel::AREA_SIZE_Y = area_size_y;
 	ClusteringSimModel::CLUSTER_RADIUS = cluster_radius;
 	ClusteringSimModel::MAX_RADIUS = max_radius;
 	ClusteringSimModel::SENSE_DATA_PERIOD = sense_data_period;	
@@ -90,7 +95,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	ClusteringSimModel::MAX_SIM_TIME = max_sim_time;
 	ClusteringSimModel::RECORD_PERIOD = record_period;
 	
-	EnergyModel::E_ELEC e_elec;
+	EnergyModel::E_ELEC = e_elec;
 	EnergyModel::E_FUSION = e_fusion;
 	EnergyModel::E_AMP_FREESPACE = e_amp_freespace;
 	EnergyModel::E_AMP_MULTIPATH = e_amp_multipath;
@@ -101,5 +106,4 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// call crunsim
 	crunsim(nodes_x, nodes_y);
 }
-
 #endif

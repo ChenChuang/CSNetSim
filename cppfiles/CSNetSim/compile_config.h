@@ -6,6 +6,4 @@
 	// #define _DEBUG_
 #endif
 
-#ifndef _MATLAB_
-	#include <cstring>
-#endif
+#include <cstring>
