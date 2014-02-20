@@ -15,22 +15,3 @@ Monitor is applied to record the every aspects of the simulation and write them 
 Iterators and manager are provided to manage channels in network, messages in communication-proxy' buffer and processors in node, which make it easy to scale-out these components.  
 A common used energy model is implemented as a standard model.  
 The simulator can be called from MatLab and outputs results automatically after simulation ends.  
-  
-   +-----------------------------------------------+     +--------+  
-   |      +--------------+  +--------------------+ |     |        |  
-   | Node | Processors[] |==| CommunicationProxy | |s[]  | Models |  
-   |      +--------------+  +---------++---------+ |     |        |  
-   +--------------------------------||-------------+     +--------+  
-                                  Message  
-   +--------------------------------||--------------+  +--------------------------------+  
-   | +---------+  +-------+                         |  | SugarComponent: Timer, AdjG... |  
-   | | Monitor |  | Clock |       Network           |  +--------------------------------+  
-   | +---------+  +-------+                         |  
-   +--------------------------------||--------------+  
-                                  Message            
-   +--------------------------------||--------------+  
-   |                                                |  
-   |    Channels[]: braodcast, unicast ...          |  
-   |                                                |  
-   +------------------------------------------------+  
-    
