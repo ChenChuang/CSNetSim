@@ -32,9 +32,10 @@
  *    1) http://www.hdfgroup.org/ftp/HDF5/current/bin/windows/hdf5-1.8.12-win32-vs10shared.zip 
  *    or 
  *    2) http://www.hdfgroup.org/HDF5/release/obtain5.html;
- * 3. Put "hdf5root/bin" into your project's library paths. Mine is "D:/Program Files/HDF_Group/HDF5/1.8.12/bin"
- * 4. Put "hdf5root\include" into your project's include paths. Mine is "D:\Program Files\HDF_Group\HDF5\1.8.12\include"
- * 5. It's should be OK now.
+ * 3. Put "hdf5root/bin" into your project's library paths. Mine is "D:/Program Files/HDF_Group/HDF5/1.8.12/bin";
+ * 4. Put "hdf5;hdf5_hl" into your project's library lists;
+ * 5. Put "hdf5root\include" into your project's include paths. Mine is "D:\Program Files\HDF_Group\HDF5\1.8.12\include";
+ * 6. It's should be OK now.
  **/ 
 
 #ifndef MATFILE_H

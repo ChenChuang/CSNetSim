@@ -32,6 +32,8 @@
 
 cppfiles/CSNetSim/Debug/
 cppfiles/CSNetSim/Release/
+cppfiles/CSNetSim/.codelite/
+cppfiles/CSNetSim/Makefile
 
 # Matlab
 *.mat
