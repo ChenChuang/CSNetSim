@@ -10,11 +10,32 @@
 #include "clustering_sim_model.h"
 #include "energy_model.h"
 
+#include <cmath>
+
 void crunsim(double* x, double* y)
 {
 	ClusteringNetwork* network = new ClusteringNetwork(x, y);
 	network->run();
 	delete network;
+}
+
+void crunsim()
+{
+	int n = ClusteringSimModel::NODE_NUM;
+	double* x = new double[n];
+	double* y = new double[n];
+	x[0] = ClusteringSimModel::SINK_X;
+	y[0] = ClusteringSimModel::SINK_Y;
+	double xmax = ClusteringSimModel::AREA_SIZE_X;
+	double ymax = ClusteringSimModel::AREA_SIZE_Y;
+	double precise = 1000.0;
+	for(int i=1;i<n;i++){
+		x[i] = (rand() % (int)(precise * xmax)) / precise;
+		y[i] = (rand() % (int)(precise * ymax)) / precise;
+	}
+	crunsim(x, y);
+	delete[] x;
+	delete[] y;
 }
 
 #ifdef _MATLAB_
