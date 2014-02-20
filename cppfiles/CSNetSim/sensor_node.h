@@ -4,6 +4,7 @@
 #include "csnetsim.h"
 #include "incluster_channel.h" // Base class: INode_InclusterChannel
 #include "clustering_member.h"
+#include "clustering_comm_proxy.h"
 #include "clustering_sim_model.h"
 #include "sensor_proc.h"
 

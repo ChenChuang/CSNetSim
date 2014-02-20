@@ -80,22 +80,3 @@ int CommProxy::receive(struct Msg* t_msg)
 	}
 	return 1;
 }
-
-int CommProxy::unicast(int fromaddr, int toaddr, int size, char cmd, int data_l, char* data)
-{
-	return this->push_msg(CommProxy::MSG_TYPE_UNICAST, fromaddr, toaddr, -1, size, cmd, data_l, data);
-}
-
-int CommProxy::broadcast(int fromaddr, double radius, int size, char cmd, int data_l, char* data)
-{
-	return this->push_msg(CommProxy::MSG_TYPE_BROADCAST, fromaddr, -1, radius, size, cmd, data_l, data);
-}
-
-int CommProxy::inclustercast(int fromaddr, int size, char cmd, int data_l, char* data)
-{
-	return this->push_msg(CommProxy::MSG_TYPE_INCLUSTERCAST, fromaddr, -1, -1, size, cmd, data_l, data);
-}
-
-int CommProxy::repost(Msg* msg, int toaddr){
-	return this->push_msg(CommProxy::MSG_TYPE_UNICAST, msg->toaddr, toaddr, -1, msg->size, msg->cmd, msg->data_l, msg->data);
-}

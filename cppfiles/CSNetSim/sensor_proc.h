@@ -3,6 +3,8 @@
 
 #include "csnetsim.h"
 #include "clustering_sim_model.h"
+#include "broadcast_channel.h"
+#include "unicast_channel.h"
 
 class Sensor_Proc : public Processor
 {

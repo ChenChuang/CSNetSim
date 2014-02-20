@@ -9,26 +9,16 @@ class CommProxy
 {
 public:
 	CommProxy();
-	~CommProxy();
+	virtual ~CommProxy();
 public:
-	int unicast(int fromaddr, int toaddr, int size, char cmd, int data_l, char* data);
-	int broadcast(int fromaddr, double radius, int size, char cmd, int data_l, char* data);
-	int inclustercast(int fromaddr, int size, char cmd, int data_l, char* data);
-	int repost(Msg* msg, int toaddr);
 	int receive(struct Msg* t_msg);
 	void clear_t_buf();
 	void clear_r_buf();
 	MsgIterator* get_t_msg_iter();
 	MsgIterator* get_r_msg_iter();
-private:
-	//called by unicast and broadcast to push msg into t_msg_buf
 	int push_msg(char type, int fromaddr, int toaddr, double radius, int size, char cmd, int data_l, char* data);
 	void clear_buf(MsgNode* buf);
 	
-public:
-	static const char MSG_TYPE_BROADCAST = 0x01;
-	static const char MSG_TYPE_UNICAST = 0x02;
-	static const char MSG_TYPE_INCLUSTERCAST = 0x03;
 private:
 	MsgNode* t_msg_buf;
 	MsgNode* r_msg_buf;

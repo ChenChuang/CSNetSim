@@ -10,7 +10,7 @@ InclusterChannel::~InclusterChannel()
 
 int InclusterChannel::communicate(Msg* msg)
 {
-	if(msg->type == CommProxy::MSG_TYPE_INCLUSTERCAST){
+	if(msg->type == InclusterChannel::MSG_TYPE_INCLUSTERCAST){
 		double d = 0;
 		double k = msg->size;
 		Node* t = this->network->node(msg->fromaddr);
@@ -36,4 +36,9 @@ int InclusterChannel::communicate(Msg* msg)
 	}else{
 		return -1;
 	}
+}
+
+int ECommProxy_InclusterChannel::inclustercast(int fromaddr, int size, char cmd, int data_l, char* data)
+{
+	return this->push_msg(InclusterChannel::MSG_TYPE_INCLUSTERCAST, fromaddr, -1, -1, size, cmd, data_l, data);
 }

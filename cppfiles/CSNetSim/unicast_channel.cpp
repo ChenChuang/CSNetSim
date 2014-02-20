@@ -10,7 +10,7 @@ UnicastChannel::~UnicastChannel()
 
 int UnicastChannel::communicate(Msg* msg)
 {
-	if(msg->type == CommProxy::MSG_TYPE_UNICAST){
+	if(msg->type == UnicastChannel::MSG_TYPE_UNICAST){
 		Node* t = this->network->node(msg->fromaddr);
 		Node* r = this->network->node(msg->toaddr);
 		double d = sqrt(pow(t->x - r->x, 2) + pow(t->y - r->y, 2));
@@ -28,4 +28,14 @@ int UnicastChannel::communicate(Msg* msg)
 	}else{
 		return -1;
 	}
+}
+
+int ECommProxy_UnicastChannel::unicast(int fromaddr, int toaddr, int size, char cmd, int data_l, char* data)
+{
+	return this->push_msg(UnicastChannel::MSG_TYPE_UNICAST, fromaddr, toaddr, -1, size, cmd, data_l, data);
+}
+
+int ECommProxy_UnicastChannel::repost(Msg* msg, int toaddr)
+{
+	return this->push_msg(UnicastChannel::MSG_TYPE_UNICAST, msg->toaddr, toaddr, -1, msg->size, msg->cmd, msg->data_l, msg->data);
 }

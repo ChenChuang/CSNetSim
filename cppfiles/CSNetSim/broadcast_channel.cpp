@@ -12,7 +12,7 @@ BroadcastChannel::~BroadcastChannel()
 
 int BroadcastChannel::communicate(Msg* msg)
 {
-	if(msg->type == CommProxy::MSG_TYPE_BROADCAST && msg->radius == this->radius){
+	if(msg->type == BroadcastChannel::MSG_TYPE_BROADCAST && msg->radius == this->radius){
 		double d = msg->radius;
 		double k = msg->size;
 		Adjv* vp = this->adjg->v[msg->fromaddr]->next;
@@ -36,4 +36,9 @@ int BroadcastChannel::communicate(Msg* msg)
 	}else{
 		return -1;
 	}
+}
+
+int ECommProxy_BroadcastChannel::broadcast(int fromaddr, double radius, int size, char cmd, int data_l, char* data)
+{
+	return this->push_msg(BroadcastChannel::MSG_TYPE_BROADCAST, fromaddr, -1, radius, size, cmd, data_l, data);
 }

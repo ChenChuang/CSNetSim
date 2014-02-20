@@ -7,11 +7,14 @@ SensorNode::SensorNode(Network* anetwork, int aaddr, double ax, double ay, doubl
 	next_hop(-1),
 	d_tosink(sqrt(pow(ax - ClusteringSimModel::SINK_X, 2) + pow(ay - ClusteringSimModel::SINK_Y, 2)))
 {
+	delete this->commproxy;
+	this->commproxy = new ClusteringCommProxy();
 }
 
 SensorNode::~SensorNode()
 {
 	delete this->mnmanager;
+	delete this->commproxy;
 }
 
 void SensorNode::print()
