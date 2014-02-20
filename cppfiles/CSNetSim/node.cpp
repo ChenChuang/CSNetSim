@@ -16,7 +16,9 @@ Node::Node(Network* anetwork, int aaddr, double ax, double ay, double aenergy):
 Node::~Node()
 {
 	delete this->commproxy;
+	this->commproxy = NULL;
 	delete this->procs_manager;
+	this->procs_manager = NULL;
 }
 
 void Node::print()
@@ -24,7 +26,7 @@ void Node::print()
 	printf("node %4d : location = ( %4f, %4f ), energy = %4f\n", this->addr, this->x, this->y, this->energy);
 }
 
-void Node::on_time_out()
+void Node::ticktock()
 {
 	MsgIterator* msg_iter = this->commproxy->get_r_msg_iter();
 	Msg* msg;

@@ -16,6 +16,7 @@ ChannelsManager::ChannelsManager(Network* anetwork): network(anetwork), channels
 ChannelsManager::~ChannelsManager()
 {
 	delete this->channel_iter;
+	this->channel_iter = NULL;
 	this->clear();
 }
 

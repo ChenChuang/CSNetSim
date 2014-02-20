@@ -2,11 +2,11 @@
 
 namespace EnergyModel
 {
-	double E_ELEC;    //J/byte
-	double E_FUSION;    //J/byte/source
-	double E_AMP_FREESPACE;    //J/byte/m^2
-	double E_AMP_MULTIPATH;   //J/byte/m^4
-	double D_THRESHOLD;   //metre
+	double E_ELEC = 400.0e-6;    //J/byte
+	double E_FUSION = 40.0e-6;    //J/byte/source
+	double E_AMP_FREESPACE = 80.0e-9;    //J/byte/m^2
+	double E_AMP_MULTIPATH = 0.0104e-9;   //J/byte/m^4
+	double D_THRESHOLD = 75;   //metre
 	
 	double calTransmit(double k, double d)
 	{

@@ -9,6 +9,7 @@ MnManager::~MnManager()
 {
 	this->clear();
 	delete this->mn_iter;
+	this->mn_iter = NULL;
 }
 
 void MnManager::remove(int addr)

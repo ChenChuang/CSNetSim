@@ -7,6 +7,7 @@
 #include "clustering_comm_proxy.h"
 #include "clustering_sim_model.h"
 #include "sensor_proc.h"
+#include "test_proc.h"
 
 class SensorNode : public Node, public INode_InclusterChannel, public INode_SensorProc
 {
@@ -28,6 +29,8 @@ public:
 	int ch_addr;
 	int next_hop;
 	double d_tosink;
+	
+	Processor* testproc;
 	
 friend class Monitor;
 friend class ClusteringMonitor;

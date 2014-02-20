@@ -19,6 +19,7 @@ namespace ClusteringSimModel
 	extern double DATA_CTRL_PACKET_SIZE;  //byte
 	extern double MAX_SIM_TIME;    //second
 	extern double RECORD_PERIOD;   //second	
+	extern double DEFAULT_TICK;   //second
 	extern double E_INIT;  //J
 };
 

@@ -55,6 +55,7 @@ struct Msg
 	~Msg() {
 		if(--this->rc <= 0 && this->data != NULL) {
 			delete this->data;
+			this->data = NULL;
 		}
 	}
 };

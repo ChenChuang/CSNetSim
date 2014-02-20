@@ -8,6 +8,7 @@ BroadcastChannel::BroadcastChannel(Network* anetwork, double aradius): network(a
 BroadcastChannel::~BroadcastChannel()
 {
 	delete this->adjg;
+	this->adjg = NULL;
 }
 
 int BroadcastChannel::communicate(Msg* msg)

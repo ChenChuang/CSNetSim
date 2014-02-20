@@ -1,16 +1,16 @@
-#ifndef SENSOR_PROC_H
-#define SENSOR_PROC_H
+#ifndef SENSORPROC_H
+#define SENSORPROC_H
 
 #include "csnetsim.h"
 #include "clustering_sim_model.h"
 #include "broadcast_channel.h"
 #include "unicast_channel.h"
 
-class Sensor_Proc : public Processor
+class SensorProc : public Processor
 {
 public:
-	Sensor_Proc(Node* anode, double aperiod, double aunit_l, double abuf_l);
-	~Sensor_Proc();
+	SensorProc(Node* anode, double aperiod, double aunit_l, double abuf_l);
+	~SensorProc();
 public:
 	virtual int process(Msg* msg);
 	virtual void ticktock(double time);
@@ -37,4 +37,4 @@ public:
 	virtual bool is_ch() = 0;
 };
 
-#endif // SENSOR_PROC_H
+#endif // SENSORPROC_H

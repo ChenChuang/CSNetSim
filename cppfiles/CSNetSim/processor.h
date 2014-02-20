@@ -10,7 +10,7 @@ class Processor
 {
 public:
 	Processor();
-	~Processor();
+	virtual ~Processor();
 public:
 	virtual void ticktock(double time) {}
 	virtual int process(Msg* msg) {return -1;}

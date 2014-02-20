@@ -16,6 +16,7 @@ ProcsManager::ProcsManager(Node* anode): node(anode), procs(NULL)
 ProcsManager::~ProcsManager()
 {
 	delete this->proc_iter;
+	this->proc_iter = NULL;
 	this->clear();
 }
 

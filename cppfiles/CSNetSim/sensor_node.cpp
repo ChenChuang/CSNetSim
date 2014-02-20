@@ -9,12 +9,20 @@ SensorNode::SensorNode(Network* anetwork, int aaddr, double ax, double ay, doubl
 {
 	delete this->commproxy;
 	this->commproxy = new ClusteringCommProxy();
+	
+	this->testproc = new TestProc(this);
+	this->procs_manager->add(this->testproc);
 }
 
 SensorNode::~SensorNode()
 {
 	delete this->mnmanager;
+	this->mnmanager = NULL;
 	delete this->commproxy;
+	this->commproxy = NULL;
+	
+	delete this->testproc;
+	this->testproc = NULL;
 }
 
 void SensorNode::print()

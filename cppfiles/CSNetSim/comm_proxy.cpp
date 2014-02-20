@@ -13,7 +13,9 @@ CommProxy::~CommProxy()
 	clear_t_buf();
 	clear_r_buf();
 	delete this->t_msg_iter;
+	this->t_msg_iter = NULL;
 	delete this->r_msg_iter;
+	this->r_msg_iter = NULL;
 }
 
 MsgIterator* CommProxy::get_t_msg_iter(){

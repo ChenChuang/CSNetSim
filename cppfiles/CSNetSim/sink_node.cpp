@@ -8,10 +8,3 @@ SinkNode::SinkNode(Network* anetwork, int aaddr, double ax, double ay):
 SinkNode::~SinkNode()
 {
 }
-
-void SinkNode::on_time_out()
-{
-}
-void SinkNode::print()
-{
-}

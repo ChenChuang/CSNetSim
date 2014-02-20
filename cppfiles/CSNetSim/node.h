@@ -20,14 +20,14 @@ public:
 	virtual ~Node();
 
 public:
-	virtual void on_time_out();
+	virtual void ticktock();
 	virtual void print();
 public:
 	virtual CommProxy* get_commproxy() {return this->commproxy;}
 	virtual Network* get_network() {return this->network;}
 
 	virtual int get_addr() {return this->addr;}
-	virtual bool is_alive() {return this->energy <= 0;}
+	virtual bool is_alive() {return this->energy > 0;}
 	virtual void consume(double e) {this->energy -= e;}
 	
 public:

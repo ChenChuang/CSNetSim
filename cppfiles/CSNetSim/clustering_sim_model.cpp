@@ -2,19 +2,20 @@
 
 namespace ClusteringSimModel
 {
-	double AREA_SIZE_X;
-	double AREA_SIZE_Y;
-	double NODE_NUM;
-	double SINK_X;  //metre
-	double SINK_Y;
-	int SINK_ADDR;
-	double CLUSTER_RADIUS;   //metre
-	double MAX_RADIUS;    //metre
-	double SENSE_DATA_PERIOD;   //unit time
-	double DATA_PACKET_SIZE;    //byte
-	double CTRL_PACKET_SIZE;   //byte
-	double DATA_CTRL_PACKET_SIZE;  //byte
-	double MAX_SIM_TIME;    //second
-	double RECORD_PERIOD;   //second	
-	double E_INIT;  //J
+	double AREA_SIZE_X = 100;
+	double AREA_SIZE_Y = 100;
+	double NODE_NUM = 500;
+	double SINK_X = 0;  //metre
+	double SINK_Y = 0;
+	int SINK_ADDR = 0;
+	double CLUSTER_RADIUS = 15;   //metre
+	double MAX_RADIUS = 33;    //metre
+	double SENSE_DATA_PERIOD = 1;   //unit time
+	double DATA_PACKET_SIZE = 100;    //byte
+	double CTRL_PACKET_SIZE = 25;   //byte
+	double DATA_CTRL_PACKET_SIZE = 100;  //byte
+	double MAX_SIM_TIME = 10;    //second
+	double RECORD_PERIOD = 1;   //second
+	double DEFAULT_TICK = 1;    //second
+	double E_INIT = 2000;  //J
 };

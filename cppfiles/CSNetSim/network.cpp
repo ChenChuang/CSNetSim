@@ -1,8 +1,8 @@
 #include "network.h"
 
-Network::Network(double* x, double* y, int num, double amax_time): nodes_num(num), max_time(amax_time)
+Network::Network(double* x, double* y, int num, double amax_time, double default_tick): nodes_num(num), max_time(amax_time)
 {
-	this->clock = new Clock(0, 1);
+	this->clock = new Clock(0, default_tick);
 	
 	this->nodes = new Node* [num];
 	for(int i = 0; i < num; i ++){
@@ -17,9 +17,13 @@ Network::Network(double* x, double* y, int num, double amax_time): nodes_num(num
 Network::~Network()
 {
 	delete this->clock;
+	this->clock = NULL;
 	delete[] this->nodes;
+	this->nodes = NULL;
 	delete this->monitor;
+	this->monitor = NULL;
 	delete this->channels;
+	this->channels = NULL;
 }
 
 bool Network::check()
@@ -61,7 +65,7 @@ void Network::run()
 		this->clock->tick_setter_init();
 		for(addr = 0; addr < this->nodes_num; addr ++){
 			if(this->nodes[addr]->is_alive()){
-				this->nodes[addr]->on_time_out();
+				this->nodes[addr]->ticktock();
 			}
 		}
 		this->communicate();		
@@ -79,7 +83,7 @@ void Network::run()
 void Network::communicate()
 {
 #ifdef _DEBUG_
-	printf("----------------------------commicating...------------------------------\n");
+	printf("----------------------------communicating...------------------------------\n");
 #endif
 	int t_i;
 	MsgIterator* msg_iter;

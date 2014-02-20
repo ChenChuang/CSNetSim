@@ -16,10 +16,10 @@ ClusteringMonitor::~ClusteringMonitor()
 
 void ClusteringMonitor::record_before_run()
 {
-	this->record_adjg("cluster_radius_G.mat", "cluster_radius_G", 
-		dynamic_cast<BroadcastChannel*>(this->network->cluster_radius_channel)->adjg);
-	this->record_adjg("max_radius_G.mat", "max_radius_G", 
-		dynamic_cast<BroadcastChannel*>(this->network->max_radius_channel)->adjg);
+	//this->record_adjg("cluster_radius_G.mat", "cluster_radius_G", 
+	//	dynamic_cast<BroadcastChannel*>(this->network->cluster_radius_channel)->adjg);
+	//this->record_adjg("max_radius_G.mat", "max_radius_G", 
+	//	dynamic_cast<BroadcastChannel*>(this->network->max_radius_channel)->adjg);
 
 	this->time = new double[this->max_records];
 	this->energy_sum = new double[this->max_records];
@@ -56,7 +56,7 @@ void ClusteringMonitor::record_after_run()
 
 void ClusteringMonitor::record_communicate(Msg* msg, double energy)
 {
-	if(msg->cmd != Sensor_Proc::CMD_SENSE_DATA_FUSED && msg->cmd != Sensor_Proc::CMD_SENSE_DATA_UNFUSED){
+	if(msg->cmd != SensorProc::CMD_SENSE_DATA_FUSED && msg->cmd != SensorProc::CMD_SENSE_DATA_UNFUSED){
 		this->rotate_overhead += energy;
 	}
 }
@@ -111,4 +111,5 @@ void ClusteringMonitor::record_adjg(string file_path, string var_name, AdjG* G)
 			p = p->next;
 		}
 	}
+	delete[] pr;
 }

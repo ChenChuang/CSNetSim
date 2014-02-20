@@ -13,8 +13,6 @@ public:
 public:
 	void consume(double e) {}
 	bool is_alive() {return true;}
-	void on_time_out();
-	void print();
 };
 
 #endif // SINKNODE_H

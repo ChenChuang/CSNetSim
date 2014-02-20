@@ -1,7 +1,7 @@
 #include "clustering_network.h"
 
 ClusteringNetwork::ClusteringNetwork(double* x, double* y): 
-	Network(x, y, ClusteringSimModel::NODE_NUM, ClusteringSimModel::MAX_SIM_TIME)
+	Network(x, y, ClusteringSimModel::NODE_NUM, ClusteringSimModel::MAX_SIM_TIME, ClusteringSimModel::DEFAULT_TICK)
 {
 	this->sensor_nodes_num = ClusteringSimModel::NODE_NUM - 1;
 	this->nodes[0] = new SinkNode(this, 0, ClusteringSimModel::SINK_X, ClusteringSimModel::SINK_Y);
@@ -26,12 +26,18 @@ ClusteringNetwork::~ClusteringNetwork()
 {
 	for(int i = 0; i < this->nodes_num; i ++){
 		delete this->nodes[i];
+		this->nodes[i] = NULL;
 	}
 	
 	delete this->max_radius_channel;
+	this->max_radius_channel = NULL;
 	delete this->cluster_radius_channel;
+	this->cluster_radius_channel = NULL;
 	delete this->unicast_channel;
+	this->unicast_channel = NULL;
 	delete this->incluster_channel;
+	this->incluster_channel = NULL;
 	
 	delete this->monitor;
+	this->monitor = NULL;
 }
