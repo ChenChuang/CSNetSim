@@ -3,7 +3,8 @@ CSNetSim
 
 A light simulator for wireless sensor network. It consists a small but complete simulator written in C++ and a MatLab interface.  
 ### Components  
-This light-weighted simulator is composed of eight base components (Channel, Network, Clock, CommunicationProxy, Message, Node, Processor and Monitor) and some auxiliary components (Timer, Adjacency List of the network ...). All components are connected via flexible virtual interfaces, which makes them scalable and extendable.  
+This light-weighted simulator is composed of eight base components (Channel, Network, Clock, CommunicationProxy, Message, Node, Processor and Monitor) and some auxiliary components (Timer, Adjacency List of the network ...).  
+All components are connected via flexible virtual interfaces, which makes them scalable and extendable.  
 ### Network
 A simulator normally runs one network.  
 A network is composed of one or more channels, a bunch of nodes, a clock and a monitor.  
