@@ -4,7 +4,9 @@
 #include "csnetsim.h"
 #include "broadcast_channel.h"
 #include "unicast_channel.h"
+#include "incluster_channel.h"
 #include "clustering_sim_model.h"
+#include "clustering_member.h"
 
 class TestProc : public Processor
 {

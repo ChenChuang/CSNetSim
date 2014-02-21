@@ -2,14 +2,14 @@
 #define SENSORNODE_H
 
 #include "csnetsim.h"
-#include "incluster_channel.h" // Base class: INode_InclusterChannel
+#include "incluster_channel.h" // Base class: INode_ClusteringMember
 #include "clustering_member.h"
 #include "clustering_comm_proxy.h"
 #include "clustering_sim_model.h"
 #include "sensor_proc.h"
 #include "test_proc.h"
 
-class SensorNode : public Node, public INode_InclusterChannel, public INode_SensorProc
+class SensorNode : public Node, public INode_ClusteringMember, public INode_SensorProc
 {
 public:
 	SensorNode(Network* anetwork, int aaddr, double ax, double ay, double aenergy);

@@ -52,4 +52,10 @@ public:
 	MnIterator* mn_iter;
 };
 
+class INode_ClusteringMember
+{
+public:
+	virtual MnManager* get_mnmanager() = 0;	
+};
+
 #endif // CLUSTERINGMEMBER_H

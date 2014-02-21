@@ -72,7 +72,11 @@ void MnManager::add(int addr)
 		p = p->next;
 	}
 	p = new MnNode(addr);
-	pp->next = p;
+	if(pp != NULL){
+		pp->next = p;
+	}else{
+		this->members = p;
+	}
 }
 
 bool MnManager::has(int addr)

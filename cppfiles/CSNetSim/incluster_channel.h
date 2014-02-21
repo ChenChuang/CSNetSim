@@ -19,12 +19,6 @@ private:
 	Network* network;
 };
 
-class INode_InclusterChannel
-{
-public:
-	virtual MnManager* get_mnmanager() = 0;	
-};
-
 class ECommProxy_InclusterChannel : virtual public CommProxy
 {
 public:

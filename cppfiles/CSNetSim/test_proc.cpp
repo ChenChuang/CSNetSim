@@ -2,6 +2,7 @@
 
 TestProc::TestProc(Node* anode): node(anode)
 {
+	
 }
 
 TestProc::~TestProc()
@@ -17,8 +18,9 @@ void TestProc::ticktock(double time)
 		ClusteringSimModel::CLUSTER_RADIUS, 
 		1, 
 		0x11,
-		1,
+		0,
 		NULL);
+	
 	int* a = new int(this->node->get_addr());
 	dynamic_cast<ECommProxy_UnicastChannel*>(this->node->get_commproxy())->unicast(
 		this->node->addr,
@@ -28,6 +30,12 @@ void TestProc::ticktock(double time)
 		1,
 		(char*)a);
 	delete a;
+	
+	if(this->node->get_addr() != ClusteringSimModel::SINK_ADDR){
+		dynamic_cast<INode_ClusteringMember*>(this->node)->get_mnmanager()->add(5);
+		dynamic_cast<ECommProxy_InclusterChannel*>(this->node->get_commproxy())->inclustercast(this->node->addr, 1, 0x33, 0, NULL);
+	}
+	
 	this->node->get_commproxy()->clear_r_buf();
 }
 
