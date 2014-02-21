@@ -56,7 +56,7 @@ void ClusteringMonitor::record_after_run()
 
 void ClusteringMonitor::record_communicate(Msg* msg, double energy)
 {
-	if(msg->cmd != SensorProc::CMD_SENSE_DATA_FUSED && msg->cmd != SensorProc::CMD_SENSE_DATA_UNFUSED){
+	if(msg->cmd != SensorDataProc::CMD_SENSE_DATA_FUSED && msg->cmd != SensorDataProc::CMD_SENSE_DATA_UNFUSED){
 		this->rotate_overhead += energy;
 	}
 }

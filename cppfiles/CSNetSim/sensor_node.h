@@ -6,10 +6,11 @@
 #include "clustering_member.h"
 #include "clustering_comm_proxy.h"
 #include "clustering_sim_model.h"
-#include "sensor_proc.h"
+#include "sensor_data_proc.h"
+#include "sensor_route_proc.h"
 #include "test_proc.h"
 
-class SensorNode : public Node, public INode_ClusteringMember, public INode_SensorProc
+class SensorNode : public Node, public INode_ClusteringMember, public INode_SensorDataProc, public INode_SensorRouteProc
 {
 public:
 	SensorNode(Network* anetwork, int aaddr, double ax, double ay, double aenergy);

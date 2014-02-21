@@ -1,23 +1,25 @@
-#ifndef SENSORPROC_H
-#define SENSORPROC_H
+#ifndef SensorDataProc_H
+#define SensorDataProc_H
 
 #include "csnetsim.h"
 #include "clustering_sim_model.h"
 #include "broadcast_channel.h"
 #include "unicast_channel.h"
 
-class SensorProc : public Processor
+class SensorDataProc : public Processor
 {
 public:
-	SensorProc(Node* anode, double aperiod, double aunit_l, double abuf_l);
-	~SensorProc();
+	SensorDataProc(Node* anode, double aperiod, double amin_wait, double aunit_l, double abuf_l);
+	~SensorDataProc();
 public:
+	virtual void init();
 	virtual int process(Msg* msg);
 	virtual void ticktock(double time);
 	void send(char cmd);
 	void sense();
 public:
 	double period;
+	double min_wait;
 	double unit_l;
 	double buf_l;
 	static const char CMD_SENSE_DATA_FUSED = 0x91;
@@ -29,12 +31,11 @@ private:
 	Timer* wait_timer;
 };
 
-class INode_SensorProc
+class INode_SensorDataProc
 {
 public:
 	virtual int get_next_hop() = 0;
-	virtual void set_next_hop(int addr) = 0;
 	virtual bool is_ch() = 0;
 };
 
-#endif // SENSORPROC_H
+#endif // SensorDataProc_H
