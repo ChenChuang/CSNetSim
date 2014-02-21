@@ -37,6 +37,8 @@ void TestProc::ticktock(double time)
 		dynamic_cast<ECommProxy_InclusterChannel*>(this->node->get_commproxy())->inclustercast(this->node->addr, 1, 0x33, 0, NULL);
 	}
 	
+	this->node->get_network()->get_clock()->try_set_tick(0.5);
+	
 	this->node->get_commproxy()->clear_r_buf();
 }
 
