@@ -3,6 +3,8 @@
 
 #include "compile_config.h"
 
+#include <stdio.h>
+
 //nodes in WSN use this struct to communicate with each other
 struct Msg
 {
@@ -55,6 +57,10 @@ struct Msg
 	~Msg() {
 		delete this->data;
 		this->data = NULL;
+	}
+	
+	void print(){
+		printf("0x%02X, %d -> %d, %2.2f, %d, 0x%02X, %d\n", this->type, this->fromaddr, this->toaddr, this->radius, this->size, this->cmd, this->data_l);
 	}
 };
 

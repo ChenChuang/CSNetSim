@@ -3,6 +3,7 @@
 
 #include "csnetsim.h"
 #include "broadcast_channel.h"
+#include "unicast_channel.h"
 #include "clustering_sim_model.h"
 
 class TestProc : public Processor
@@ -12,7 +13,7 @@ public:
 	~TestProc();
 public:
 	virtual void ticktock(double time);
-	virtual int process(Msg* msg) {return -1;}
+	virtual int process(Msg* msg);
 	virtual void init() {}
 public:
 	Node* node;

@@ -33,6 +33,14 @@ bool Network::check()
 			printf("some nodes are NULL\n");
 			return false;
 		}
+		if(this->nodes[i]->commproxy == NULL){
+			printf("some nodes' commproxy is NULL\n");
+			return false;
+		}
+		if(this->nodes[i]->procs_manager == NULL){
+			printf("some nodes' procs_manager is NULL\n");
+			return false;
+		}
 	}
 	if(this->monitor == NULL){
 		printf("no monitor\n");

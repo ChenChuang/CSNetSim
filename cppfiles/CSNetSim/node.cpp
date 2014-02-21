@@ -4,7 +4,7 @@
 
 Node::Node(Network* anetwork, int aaddr, double ax, double ay, double aenergy):
 	network(anetwork),
-	commproxy(new CommProxy()),
+	commproxy(NULL),
 	procs_manager(new ProcsManager(this)),
 	addr(aaddr),
 	x(ax),
@@ -15,8 +15,6 @@ Node::Node(Network* anetwork, int aaddr, double ax, double ay, double aenergy):
 
 Node::~Node()
 {
-	delete this->commproxy;
-	this->commproxy = NULL;
 	delete this->procs_manager;
 	this->procs_manager = NULL;
 }
