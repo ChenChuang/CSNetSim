@@ -31,11 +31,13 @@ MsgIterator* CommProxy::get_r_msg_iter(){
 void CommProxy::clear_t_buf()
 {
 	this->clear_buf(this->t_msg_buf);
+	this->t_msg_buf = NULL;
 }
 
 void CommProxy::clear_r_buf()
 {
 	this->clear_buf(this->r_msg_buf);
+	this->r_msg_buf = NULL;
 }
 
 void CommProxy::clear_buf(MsgNode* buf)
@@ -48,7 +50,6 @@ void CommProxy::clear_buf(MsgNode* buf)
 		delete p;
 		p = np;
 	}
-	buf = NULL;
 }
 
 int CommProxy::send(char type, int fromaddr, int toaddr, double radius, int size, char cmd, int data_l, char* data){
@@ -65,7 +66,6 @@ int CommProxy::send(char type, int fromaddr, int toaddr, double radius, int size
 #ifdef _DEBUG_
 	printf("send_Msg : type = %x, from = %d, to = %d, r = %f, cmd = %x, data_l = %d\n", t_msg->type, t_msg->fromaddr, t_msg->toaddr, t_msg->radius, t_msg->cmd, t_msg->data_l);
 #endif
-	delete t_msg;
 	return 1;
 }
 

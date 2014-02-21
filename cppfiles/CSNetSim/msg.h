@@ -33,7 +33,7 @@ struct Msg
 		cmd(-2),
 		data_l(0),
 		data(NULL),
-		rc(1) {}
+		rc(0) {}
 	
 	Msg(char atype, int afromaddr, int atoaddr, double aradius, int asize, char acmd, int adata_l, char* adata):
 		type(atype),
@@ -43,9 +43,9 @@ struct Msg
 		size(asize),
 		cmd(acmd),
 		data_l(adata_l), 
-		rc(1) 
+		rc(0) 
 	{
-		if (adata_l > 0) {
+		if (adata_l > 0 && adata != NULL) {
 			this->data = new char[adata_l];
 			memcpy(this->data, adata, adata_l);	
 		}
@@ -53,10 +53,8 @@ struct Msg
 
 	
 	~Msg() {
-		if(--this->rc <= 0 && this->data != NULL) {
-			delete this->data;
-			this->data = NULL;
-		}
+		delete this->data;
+		this->data = NULL;
 	}
 };
 
@@ -69,7 +67,11 @@ struct MsgNode
 	}
 	MsgNode(): body(NULL), next(NULL) {}
 	~MsgNode() {
-		delete body;
+		if(--(this->body->rc) <= 0){
+			delete this->body;
+		}
+		this->body = NULL;
+		this->next = NULL;
 	}
 };
 

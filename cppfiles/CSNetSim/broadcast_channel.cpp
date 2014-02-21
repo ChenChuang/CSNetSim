@@ -23,7 +23,7 @@ int BroadcastChannel::communicate(Msg* msg)
 		double r_energy = EnergyModel::calReceive(k);
 		int r_count = 0;
 		while(vp != NULL){
-			r = this->network->node(msg->toaddr);
+			r = this->network->node(vp->addr);
 			if(r->is_alive()){
 				r->get_commproxy()->receive(msg);
 				r->consume(r_energy);
