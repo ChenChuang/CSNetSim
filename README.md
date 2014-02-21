@@ -1,7 +1,7 @@
 CSNetSim
 ========
 
-A light simulator for wireless sensor network. It consists a small but complete simulator written in C++ and a MatLab interface.  
+A light simulator for wireless sensor network. It consists a small but complete simulator written in C++ and a Matlab interface.  
 ### Components  
 This light-weighted simulator is composed of eight base components (Channel, Network, Clock, CommunicationProxy, Message, Node, Processor and Monitor) and some auxiliary components (Timer, Adjacency List of the network ...).  
 All components are connected via flexible virtual interfaces, which makes them scalable and extendable.  
@@ -20,8 +20,8 @@ Iterators and manager are provided to manage channels in network, messages in co
 ### Clock  
 Clock provides global time and its simulating step is variable, which enables a refined and efficient simulation.  
 ### Monitor  
-Monitor is applied to record the every aspects of the simulation and write them into '.mat' files for analysis in MatLab.  
+Monitor is applied to record the every aspects of the simulation and write them into '.mat' files for analysis in Matlab.  
 ### Model   
 A common used energy model is implemented as a standard model.  
-### MatLab Interfaces   
-The simulator can be called from MatLab and outputs results automatically after simulation ends.  
+### Matlab Interfaces   
+The simulator can be called from Matlab and outputs results automatically after simulation ends.  
