@@ -1,18 +1,21 @@
 #ifndef SINKROUTEPROC_H
 #define SINKROUTEPROC_H
 
-#include "processor.h" // Base class: Processor
+#include "csnetsim.h" // Base class: Processor
 
 class SinkRouteProc : public Processor
 {
 public:
-	SinkRouteProc();
+	SinkRouteProc(Node* anode);
 	~SinkRouteProc();
-
 public:
-	virtual void init();
-	virtual int process(Msg* msg);
-	virtual void ticktock(double time);
+	void init();
+	int process(Msg* msg);
+	void ticktock(double time);
+	void start_route();
+
+private:
+	Node* node;
 };
 
 #endif // SINKROUTEPROC_H

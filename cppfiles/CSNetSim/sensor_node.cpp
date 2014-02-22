@@ -12,6 +12,19 @@ SensorNode::SensorNode(Network* anetwork, int aaddr, double ax, double ay, doubl
 	
 	this->testproc = new TestProc(this);
 	this->procs_manager->add(this->testproc);
+	
+	this->dataproc = new SensorDataProc(this, 
+		ClusteringSimModel::SENSE_DATA_PERIOD, 
+		ClusteringSimModel::SENSE_DATA_PERIOD, 
+		ClusteringSimModel::DATA_PACKET_SIZE, 
+		ClusteringSimModel::DATA_PACKET_SIZE * 20);
+	this->procs_manager->add(this->dataproc);
+	
+	this->routeproc = new SensorRouteProc(this);
+	this->procs_manager->add(this->routeproc);
+	
+	this->heedproc = new SensorHeedProc(this);
+	this->procs_manager->add(this->heedproc);
 }
 
 SensorNode::~SensorNode()
@@ -29,4 +42,9 @@ void SensorNode::print()
 {
 	printf("node %4d : location = ( %4f, %4f ), energy = %4f, ch = %4d, nexthop = %4d, d_tosink = %4f\n", 
 		this->addr, this->x, this->y, this->energy, this->ch_addr, this->next_hop, this->d_tosink);
+}
+
+void SensorNode::start_route()
+{
+	dynamic_cast<SensorRouteProc*>(this->routeproc)->start_route();
 }

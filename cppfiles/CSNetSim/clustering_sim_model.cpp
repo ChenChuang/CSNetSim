@@ -11,6 +11,7 @@ namespace ClusteringSimModel
 	double CLUSTER_RADIUS = 15;   //metre
 	double MAX_RADIUS = 33;    //metre
 	double SENSE_DATA_PERIOD = 1;   //unit time
+	double SENSE_DATA_WAIT = 1;
 	double DATA_PACKET_SIZE = 100;    //byte
 	double CTRL_PACKET_SIZE = 25;   //byte
 	double DATA_CTRL_PACKET_SIZE = 100;  //byte

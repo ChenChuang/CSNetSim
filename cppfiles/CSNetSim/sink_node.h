@@ -5,6 +5,8 @@
 #include "clustering_sim_model.h"
 #include "sink_comm_proxy.h"
 #include "test_proc.h"
+#include "sink_data_proc.h"
+#include "sink_route_proc.h"
 
 class SinkNode : public Node
 {
@@ -14,9 +16,13 @@ public:
 public:
 	void consume(double e) {}
 	bool is_alive() {return true;}
-	
+public:
+	void start_route();
+
 public:
 	Processor* testproc;
+	Processor* dataproc;
+	Processor* routeproc;
 };
 
 #endif // SINKNODE_H

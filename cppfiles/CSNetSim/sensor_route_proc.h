@@ -1,18 +1,22 @@
 #ifndef SENSORROUTEPROC_H
 #define SENSORROUTEPROC_H
 
-#include "processor.h" // Base class: Processor
+#include "csnetsim.h" // Base class: Processor
 
 class SensorRouteProc : public Processor
 {
 public:
-	SensorRouteProc();
+	SensorRouteProc(Node* anode);
 	~SensorRouteProc();
-
 public:
-	virtual void init();
-	virtual int process(Msg* msg);
-	virtual void ticktock(double time);
+	void init();
+	int process(Msg* msg);
+	void ticktock(double time);
+public:
+	void start_route();
+	
+private:
+	Node* node;
 };
 
 class INode_SensorRouteProc

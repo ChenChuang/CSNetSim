@@ -9,7 +9,7 @@
 class SensorDataProc : public Processor
 {
 public:
-	SensorDataProc(Node* anode, double aperiod, double amin_wait, double aunit_l, double abuf_l);
+	SensorDataProc(Node* anode, double aperiod, double amax_wait, double aunit_l, double abuf_l);
 	~SensorDataProc();
 public:
 	virtual void init();
@@ -19,7 +19,7 @@ public:
 	void sense();
 public:
 	double period;
-	double min_wait;
+	double max_wait;
 	double unit_l;
 	double buf_l;
 	static const char CMD_SENSE_DATA_FUSED = 0x91;

@@ -1,6 +1,6 @@
 #include "sink_route_proc.h"
 
-SinkRouteProc::SinkRouteProc()
+SinkRouteProc::SinkRouteProc(Node* anode) : node(anode)
 {
 }
 
@@ -19,4 +19,9 @@ int SinkRouteProc::process(Msg* msg)
 
 void SinkRouteProc::ticktock(double time)
 {
+}
+
+void SinkRouteProc::start_route()
+{
+	
 }

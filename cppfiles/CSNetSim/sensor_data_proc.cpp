@@ -1,8 +1,8 @@
 #include "sensor_data_proc.h"
 
-SensorDataProc::SensorDataProc(Node* anode, double aperiod, double amin_wait, double aunit_l, double abuf_l): 
+SensorDataProc::SensorDataProc(Node* anode, double aperiod, double amax_wait, double aunit_l, double abuf_l): 
 	period(aperiod), 
-	min_wait(amin_wait),
+	max_wait(amax_wait),
 	unit_l(aunit_l),
 	buf_l(abuf_l),
 	data_l(0),
@@ -23,7 +23,7 @@ SensorDataProc::~SensorDataProc()
 void SensorDataProc::init()
 {
 	this->sense_timer->set_after(0);
-	this->wait_timer->set_after(this->min_wait);
+	this->wait_timer->set_after(this->max_wait);
 }
 
 int SensorDataProc::process(Msg* msg)
@@ -45,7 +45,7 @@ void SensorDataProc::ticktock(double time)
 		if(this->data_l >= this->buf_l || this->wait_timer->is_timeout()){
 			this->node->consume(EnergyModel::calFusion(this->data_l));
 			this->send(SensorDataProc::CMD_SENSE_DATA_FUSED);
-			this->wait_timer->set_after(this->min_wait);
+			this->wait_timer->set_after(this->max_wait);
 		}
 	}else{
 		if(this->data_l > 0){
@@ -55,14 +55,19 @@ void SensorDataProc::ticktock(double time)
 }
 
 void SensorDataProc::send(char cmd){
+	int next_hop = dynamic_cast<INode_SensorDataProc*>(this->node)->get_next_hop();
+	if(next_hop < 0){
+		return;
+	}
 	int* data = new int[1];
 	data[0] = this->data_l;
 	dynamic_cast<ECommProxy_UnicastChannel*>(this->node->get_commproxy())->unicast(
 		this->node->get_addr(), 
-		dynamic_cast<INode_SensorDataProc*>(this->node)->get_next_hop(), 
+		next_hop, 
 		ClusteringSimModel::DATA_PACKET_SIZE, 
 		cmd, 
 		sizeof(int), (char*)data);
+	this->data_l = 0;
 	delete[] data;
 }
 

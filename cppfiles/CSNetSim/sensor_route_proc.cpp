@@ -1,6 +1,6 @@
 #include "sensor_route_proc.h"
 
-SensorRouteProc::SensorRouteProc()
+SensorRouteProc::SensorRouteProc(Node* anode) : node(anode)
 {
 }
 
@@ -19,4 +19,9 @@ int SensorRouteProc::process(Msg* msg)
 
 void SensorRouteProc::ticktock(double time)
 {
+}
+
+void SensorRouteProc::start_route()
+{
+	
 }

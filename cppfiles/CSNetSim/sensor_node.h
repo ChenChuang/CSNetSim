@@ -8,9 +8,14 @@
 #include "clustering_sim_model.h"
 #include "sensor_data_proc.h"
 #include "sensor_route_proc.h"
+#include "sensor_heed_proc.h"
 #include "test_proc.h"
 
-class SensorNode : public Node, public INode_ClusteringMember, public INode_SensorDataProc, public INode_SensorRouteProc
+class SensorNode : public Node, 
+	public INode_ClusteringMember, 
+	public INode_SensorDataProc, 
+	public INode_SensorRouteProc, 
+	public INode_SensorHeedProc
 {
 public:
 	SensorNode(Network* anetwork, int aaddr, double ax, double ay, double aenergy);
@@ -24,6 +29,7 @@ public:
 	int get_next_hop() {return this->next_hop;}
 	void set_next_hop(int addr) {this->next_hop = addr;}
 	bool is_ch() {return this->ch_addr == this->addr;}
+	void start_route();
 	
 public:
 	MnManager* mnmanager;	
@@ -32,6 +38,9 @@ public:
 	double d_tosink;
 	
 	Processor* testproc;
+	Processor* dataproc;
+	Processor* heedproc;
+	Processor* routeproc;
 	
 friend class Monitor;
 friend class ClusteringMonitor;
