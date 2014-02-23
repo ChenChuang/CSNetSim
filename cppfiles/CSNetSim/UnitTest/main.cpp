@@ -72,23 +72,23 @@ class A
 public:
 	A(int n) : n(n) {};
 	~A() {};
-	bool operator <(const A& a){
-		return this->n < a.n;
+	bool operator <(const A& a) const{
+		return n < a.n;
 	}
-	bool operator <=(const A& a){
-		return this->n <= a.n;
+	bool operator <=(const A& a) const{
+		return n <= a.n;
 	}
-	bool operator ==(const A& a){
-		return this->n == a.n;
+	bool operator ==(const A& a) const{
+		return n == a.n;
 	}
-	bool operator >=(const A& a){
-		return this->n >= a.n;
+	bool operator >=(const A& a) const{
+		return n >= a.n;
 	}
-	bool operator >(const A& a){
-		return this->n > a.n;
+	bool operator >(const A& a) const{
+		return n > a.n;
 	}
-	bool operator !=(const A& a){
-		return this->n != a.n;
+	bool operator !=(const A& a) const{
+		return n != a.n;
 	}
 private:
 	int n;
@@ -117,6 +117,6 @@ struct SortedListFixture
 TEST_FIXTURE(SortedListFixture, TestSortedList)
 {
 	SortedList<A>* list = _list;
-	list->seek(-1);
+	list->remove_equalto(A(2));
 	CHECK(1 == 1);
 }

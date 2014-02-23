@@ -25,7 +25,7 @@ public:
 public:
 	int add(T* t);
 	int force_add(T* t);
-	int remove_equalto(T* t);
+	int remove_equalto(const T& t);
 	void clear();
 	int length();
 	bool has_more();
@@ -128,12 +128,12 @@ T* SortedList<T>::next()
 }
 
 template<class T>
-int SortedList<T>::remove_equalto(T* t)
+int SortedList<T>::remove_equalto(const T& t)
 {
 	SortedListNode<T>* p = this->head;
 	SortedListNode<T>* pp = NULL;
 	while(p != NULL){
-		if(*t == *(p->body)){
+		if(t == *(p->body)){
 			if(pp == NULL){
 				this->head = p->next;
 				delete p;
