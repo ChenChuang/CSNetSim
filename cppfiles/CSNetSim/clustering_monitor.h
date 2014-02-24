@@ -21,6 +21,7 @@ public:
 	void record_after_run();
 	void record_communicate(Msg* msg, double energy);
 private:
+	void record_xy(Node** nodes);
 	void record_adjg(string file_path, string var_name, AdjG* G);
 	void record_periodically(Node** nodes);
 	void record_ch(Node** nodes);
@@ -44,7 +45,7 @@ private:
 	
 	int record_count;
 	int max_records;	
-	double min_step;
+	double step;
 	Timer* timer;
 };
 

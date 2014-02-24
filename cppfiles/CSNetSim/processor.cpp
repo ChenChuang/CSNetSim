@@ -41,6 +41,7 @@ void ProcsManager::init()
 	ProcNode* p = this->procs;
 	while(p != NULL){
 		p->body->init();
+		p = p->next;
 	}
 }
 

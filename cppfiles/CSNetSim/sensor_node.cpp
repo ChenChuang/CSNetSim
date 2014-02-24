@@ -3,6 +3,7 @@
 SensorNode::SensorNode(Network* anetwork, int aaddr, double ax, double ay, double energy): 
 	Node(anetwork, aaddr, ax, ay, energy), 
 	mnmanager(new MnManager(this)),
+	ngbs(new NgbManager()),
 	ch_addr(-1),
 	next_hop(-1),
 	d_tosink(sqrt(pow(ax - ClusteringSimModel::SINK_X, 2) + pow(ay - ClusteringSimModel::SINK_Y, 2)))
@@ -11,7 +12,7 @@ SensorNode::SensorNode(Network* anetwork, int aaddr, double ax, double ay, doubl
 	this->commproxy = new ClusteringCommProxy();
 	
 	this->testproc = new TestProc(this);
-	this->procs_manager->add(this->testproc);
+	//this->procs_manager->add(this->testproc);
 	
 	this->dataproc = new SensorDataProc(this, 
 		ClusteringSimModel::SENSE_DATA_PERIOD, 
@@ -47,4 +48,14 @@ void SensorNode::print()
 void SensorNode::start_route()
 {
 	dynamic_cast<SensorRouteProc*>(this->routeproc)->start_route();
+}
+
+void SensorNode::init_neighbors(Adjv* adjv)
+{
+	Adjv* p = adjv;
+	while(p != NULL){
+		this->ngbs->add(new Ngb(p->addr, p->d));
+		p = p->next;
+	}
+	1 == 1;
 }

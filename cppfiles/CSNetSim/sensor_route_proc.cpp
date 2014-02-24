@@ -14,7 +14,7 @@ void SensorRouteProc::init()
 
 int SensorRouteProc::process(Msg* msg)
 {
-	return 1;
+	return -1;
 }
 
 void SensorRouteProc::ticktock(double time)

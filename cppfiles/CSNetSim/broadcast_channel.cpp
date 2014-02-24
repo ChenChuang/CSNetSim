@@ -39,6 +39,11 @@ int BroadcastChannel::communicate(Msg* msg)
 	}
 }
 
+Adjv* BroadcastChannel::get_ajdv(int addr)
+{
+	return this->adjg->v[addr]->next;
+}
+
 int ECommProxy_BroadcastChannel::broadcast(int fromaddr, double radius, int size, char cmd, int data_l, char* data)
 {
 	return this->send(BroadcastChannel::MSG_TYPE_BROADCAST, fromaddr, -1, radius, size, cmd, data_l, data);

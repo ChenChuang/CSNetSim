@@ -22,6 +22,7 @@ public:
 public:
 	virtual void ticktock();
 	virtual void print();
+	virtual void init();
 public:
 	virtual CommProxy* get_commproxy() {return this->commproxy;}
 	virtual Network* get_network() {return this->network;}

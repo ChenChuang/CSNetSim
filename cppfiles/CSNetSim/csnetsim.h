@@ -14,6 +14,7 @@
 #include "timer.h"
 #include "comm_proxy.h"
 #include "adj_g.h"
+#include "sorted_list.h"
 
 #include "energy_model.h"
 

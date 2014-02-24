@@ -16,12 +16,12 @@ public:
 	ClusteringNetwork(double* x, double* y);
 	~ClusteringNetwork();
 
-private:
+public:
 	int sensor_nodes_num;
-	Channel* max_radius_channel;
-	Channel* cluster_radius_channel;
-	Channel* unicast_channel;
-	Channel* incluster_channel;
+	BroadcastChannel* max_radius_channel;
+	BroadcastChannel* cluster_radius_channel;
+	UnicastChannel* unicast_channel;
+	InclusterChannel* incluster_channel;
 	
 friend class Monitor;
 friend class ClusteringMonitor;

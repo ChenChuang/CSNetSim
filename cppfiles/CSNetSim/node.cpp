@@ -19,6 +19,11 @@ Node::~Node()
 	this->procs_manager = NULL;
 }
 
+void Node::init()
+{
+	this->procs_manager->init();
+}
+
 void Node::print()
 {
 	printf("node %4d : location = ( %4f, %4f ), energy = %4f\n", this->addr, this->x, this->y, this->energy);
@@ -26,11 +31,14 @@ void Node::print()
 
 void Node::ticktock()
 {
+	this->commproxy->clear_t_buf();
+	
 	MsgIterator* msg_iter = this->commproxy->get_r_msg_iter();
 	Msg* msg;
 	ProcIterator* proc_iter;
 	Processor* proc;
 	int result;
+	
 	while(msg_iter->has_more()){
 		msg = msg_iter->next();
 		result = -1;
@@ -40,10 +48,12 @@ void Node::ticktock()
 			result = proc->process(msg);
 		}
 	}
+	
 	proc_iter = this->procs_manager->get_proc_iter();
 	while(proc_iter->has_more()){
 		proc = proc_iter->next();
 		proc->ticktock(this->network->get_clock()->get_time());
 	}
+	
+	this->commproxy->clear_r_buf();
 }
-

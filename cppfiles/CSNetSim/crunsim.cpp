@@ -11,6 +11,8 @@
 #include "energy_model.h"
 
 #include <cmath>
+#include <iostream>
+using namespace std;
 
 void crunsim(double* x, double* y)
 {
@@ -28,10 +30,9 @@ void crunsim()
 	y[0] = ClusteringSimModel::SINK_Y;
 	double xmax = ClusteringSimModel::AREA_SIZE_X;
 	double ymax = ClusteringSimModel::AREA_SIZE_Y;
-	double precise = 1000.0;
 	for(int i=1;i<n;i++){
-		x[i] = (rand() % (int)(precise * xmax)) / precise;
-		y[i] = (rand() % (int)(precise * ymax)) / precise;
+		x[i] = (double)rand() / RAND_MAX * xmax;
+		y[i] = (double)rand() / RAND_MAX * ymax;
 	}
 	crunsim(x, y);
 	delete[] x;

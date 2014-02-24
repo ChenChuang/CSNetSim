@@ -6,7 +6,7 @@ SinkNode::SinkNode(Network* anetwork, int aaddr, double ax, double ay):
 	this->commproxy = new SinkCommProxy();
 	
 	this->testproc = new TestProc(this);
-	this->procs_manager->add(this->testproc);
+	//this->procs_manager->add(this->testproc);
 	
 	this->dataproc = new SinkDataProc();
 	this->procs_manager->add(this->dataproc);

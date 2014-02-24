@@ -20,6 +20,10 @@ ClusteringNetwork::ClusteringNetwork(double* x, double* y):
 	this->channels->add(this->incluster_channel);
 	
 	this->monitor = new ClusteringMonitor(this);
+	
+	for(int i = 1; i < ClusteringSimModel::NODE_NUM; i ++){
+		dynamic_cast<SensorNode*>(this->nodes[i])->init_neighbors(this->cluster_radius_channel->get_ajdv(i));
+	}
 }
 
 ClusteringNetwork::~ClusteringNetwork()

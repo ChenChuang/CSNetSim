@@ -9,7 +9,8 @@ public:
 	BroadcastChannel(Network* anetwork, double aradius);
 	~BroadcastChannel();
 public:
-	virtual int communicate(Msg* msg);
+	int communicate(Msg* msg);
+	Adjv* get_ajdv(int addr);
 
 public:
 	static const char MSG_TYPE_BROADCAST = 0x01;

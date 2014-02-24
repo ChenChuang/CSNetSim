@@ -26,6 +26,7 @@ public:
 	virtual ~Network();
 public:
 	virtual bool check();
+	virtual void init();
 	virtual void run();
 	virtual void communicate();
 public:

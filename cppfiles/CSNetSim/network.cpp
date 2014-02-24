@@ -26,6 +26,13 @@ Network::~Network()
 	this->channels = NULL;
 }
 
+void Network::init()
+{
+	for(int i = 0; i < this->nodes_num; i++){
+		this->nodes[i]->init();
+	}
+}
+
 bool Network::check()
 {
 	for(int i=0; i < this->nodes_num; i++){
@@ -63,12 +70,14 @@ void Network::run()
 		printf("WSN simulation exits\n");
 		return;
 	}
+	this->init();
 	this->monitor->record_before_run();
 	printf("WSN simulation running...\n");
 	// main loop starts
 	int addr;
 	while(this->clock->get_time() < this->max_time){
-		printf("----------------------------------time: %f----------------------------------\n", this->clock->get_time());
+		printf("-----------------------time: %f------------------------\n", this->clock->get_time());
+		fflush(stdout);
 		
 		this->clock->tick_setter_init();
 		for(addr = 0; addr < this->nodes_num; addr ++){
@@ -91,7 +100,7 @@ void Network::run()
 void Network::communicate()
 {
 #ifdef _DEBUG_
-	printf("----------------------------communicating...------------------------------\n");
+	printf("------------------communicating...---------------------\n");
 #endif
 	int t_i;
 	MsgIterator* msg_iter;

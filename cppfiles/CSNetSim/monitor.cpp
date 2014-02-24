@@ -42,7 +42,7 @@ bool Monitor::wirte_to_mat(const string& file_path, const string& var_name, cons
 bool Monitor::wirte_to_mat(const string& file_path, const string& var_name, const double* array, int row_num, int col_num)
 {
 	MatFile* matfile = new MatFile(file_path);
-	bool result = matfile->WriteMatrix(var_name, col_num, row_num, array);
+	bool result = matfile->WriteMatrix(var_name, row_num, col_num, array);
 	delete matfile;
 	return result;
 }

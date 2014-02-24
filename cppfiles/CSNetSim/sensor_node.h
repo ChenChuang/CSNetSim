@@ -4,12 +4,14 @@
 #include "csnetsim.h"
 #include "incluster_channel.h" // Base class: INode_ClusteringMember
 #include "clustering_member.h"
+#include "clustering_neighbor.h"
 #include "clustering_comm_proxy.h"
 #include "clustering_sim_model.h"
 #include "sensor_data_proc.h"
 #include "sensor_route_proc.h"
 #include "sensor_heed_proc.h"
 #include "test_proc.h"
+
 
 class SensorNode : public Node, 
 	public INode_ClusteringMember, 
@@ -23,7 +25,9 @@ public:
 public:
 	void print();
 public:
+	void init_neighbors(Adjv* adjv);
 	MnManager* get_mnmanager() {return this->mnmanager;}
+	NgbManager* get_neighbors() {return this->ngbs;}
 	int get_ch_addr() {return this->ch_addr;}
 	void set_ch_addr(int addr) {this->ch_addr = addr;}
 	int get_next_hop() {return this->next_hop;}
@@ -32,7 +36,8 @@ public:
 	void start_route();
 	
 public:
-	MnManager* mnmanager;	
+	MnManager* mnmanager;
+	NgbManager* ngbs;
 	int ch_addr;
 	int next_hop;
 	double d_tosink;

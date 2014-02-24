@@ -16,6 +16,8 @@ void Timer::set_after(double after)
 bool Timer::is_timeout()
 {
 	bool result = (this->time >= 0 && this->time <= this->clock->get_time());
-	this->time = -1;
+	if(result){
+		this->time = -1;
+	}
 	return result;
 }

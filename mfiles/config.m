@@ -16,7 +16,7 @@ AREA_SIZE_Y = 100;
 NODE_NUM = 500;
 SINK_X = 0;  % metre
 SINK_Y = 0;
-SINK_ADDR = -1;
+SINK_ADDR = 0;
 
 CLUSTER_RADIUS = 15;   % metre
 MAX_RADIUS = 33;    % metre
