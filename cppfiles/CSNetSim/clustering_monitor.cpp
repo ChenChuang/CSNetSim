@@ -43,16 +43,16 @@ void ClusteringMonitor::record_before_run()
 	for(i=0;i<this->max_records;i++){
 		this->alive_sum[i] = -1;
 	}
-	this->energy_snapshot = new double[this->max_records * this->network->sensor_nodes_num];
-	for(i=0;i<this->max_records * this->network->sensor_nodes_num;i++){
+	this->energy_snapshot = new double[this->max_records * this->network->nodes_num];
+	for(i=0;i<this->max_records * this->network->nodes_num;i++){
 		this->energy_snapshot[i] = -1;
 	}
-	this->ch_snapshot = new double[this->max_records * this->network->sensor_nodes_num];
-	for(i=0;i<this->max_records * this->network->sensor_nodes_num;i++){
+	this->ch_snapshot = new double[this->max_records * this->network->nodes_num];
+	for(i=0;i<this->max_records * this->network->nodes_num;i++){
 		this->ch_snapshot[i] = -1;
 	}
-	this->hop_snapshot = new double[this->max_records * this->network->sensor_nodes_num];
-	for(i=0;i<this->max_records * this->network->sensor_nodes_num;i++){
+	this->hop_snapshot = new double[this->max_records * this->network->nodes_num];
+	for(i=0;i<this->max_records * this->network->nodes_num;i++){
 		this->hop_snapshot[i] = -1;
 	}
 	this->output = 0;
@@ -83,6 +83,7 @@ void ClusteringMonitor::record_in_run()
 
 void ClusteringMonitor::record_after_run()
 {
+	printf("Monitor is writing ... ");
 	this->wirte_to_mat("../../../mfiles/time.mat","time", this->time, 1, this->record_count);
 	this->wirte_to_mat("../../../mfiles/energy_sum.mat","energy_sum", this->energy_sum, 1, this->record_count);
 	this->wirte_to_mat("../../../mfiles/alive_sum.mat","alive_sum", this->alive_sum, 1, this->record_count);
@@ -92,6 +93,7 @@ void ClusteringMonitor::record_after_run()
 	this->wirte_to_mat("../../../mfiles/output_track.mat","output_track", this->output_track, 1, this->record_count);
 	this->wirte_to_mat("../../../mfiles/rotate_overhead_track.mat","rotate_overhead_track", this->rotate_overhead_track, 1, this->record_count);
 	this->wirte_to_mat("../../../mfiles/rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_count);
+	printf("done\n");
 }
 
 void ClusteringMonitor::record_communicate(Msg* msg, double energy)
@@ -144,7 +146,7 @@ void ClusteringMonitor::record_xy(Node** nodes)
 }
 
 /** deprecated **/
-void ClusteringMonitor::record_adjg(string file_path, string var_name, AdjG* G)
+void ClusteringMonitor::record_adjg(std::string file_path, std::string var_name, AdjG* G)
 {
 	int n = this->network->sensor_nodes_num;
 	double* pr = new double[n*n];

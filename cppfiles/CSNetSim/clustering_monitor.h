@@ -6,7 +6,6 @@
 
 #include <string>
 #include <cmath>
-using namespace std;
 
 class ClusteringNetwork;
 
@@ -22,7 +21,7 @@ public:
 	void record_communicate(Msg* msg, double energy);
 private:
 	void record_xy(Node** nodes);
-	void record_adjg(string file_path, string var_name, AdjG* G);
+	void record_adjg(std::string file_path, std::string var_name, AdjG* G);
 	void record_periodically(Node** nodes);
 	void record_ch(Node** nodes);
 	void record_next_hop(Node** nodes);

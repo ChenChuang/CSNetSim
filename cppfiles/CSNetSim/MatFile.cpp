@@ -27,8 +27,6 @@
 
 #include "MatFile.h"
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <cstring>
@@ -36,7 +34,7 @@ using namespace std;
 MatFile::MatFile() : file(-1)
 {
 }
-MatFile::MatFile(const string& fn) : file(-1)
+MatFile::MatFile(const std::string& fn) : file(-1)
 {
 	Open(fn);
 }
@@ -46,7 +44,7 @@ MatFile::~MatFile()
 	Close();
 }
 
-bool MatFile::Open(const string& fn)
+bool MatFile::Open(const std::string& fn)
 {
 	if (file >= 0)
 		Close();
@@ -73,7 +71,7 @@ bool MatFile::IsOpen() const
 	return file >= 0;
 }
 
-bool MatFile::WriteMatrix(const string& varname, int nx, int ny, const double* data)
+bool MatFile::WriteMatrix(const std::string& varname, int nx, int ny, const double* data)
 {
 	if (file < 0)
 		return false;
@@ -87,7 +85,7 @@ bool MatFile::WriteMatrix(const string& varname, int nx, int ny, const double* d
 	return H5LTmake_dataset_double(file, varname.c_str(), 2, dimsf, data) >= 0;
 }
 
-bool MatFile::WriteVector(const string& varname, int nx, const double* data)
+bool MatFile::WriteVector(const std::string& varname, int nx, const double* data)
 {
 	if (file < 0)
 		return false;
@@ -108,7 +106,7 @@ bool MatFile::PrependHeader(const char* filename)
 	FILE* fd = fopen(filename, "r+b");
 	if (!fd)
 	{
-		cerr << "Couldn't open file for writing header." << endl;
+		std::cerr << "Couldn't open file for writing header." << std::endl;
 		return false;
 	}
 
@@ -128,7 +126,7 @@ bool MatFile::PrependHeader(const char* filename)
 	// TODO: Do this properly without reading entire file into memory.
 	if (length > 1024L*1024L*1024L) // 10 GB.
 	{
-		cerr << "File too big to write header, sorry.";
+		std::cerr << "File too big to write header, sorry.";
 		fclose(fd);
 		return false;
 	}
@@ -137,7 +135,7 @@ bool MatFile::PrependHeader(const char* filename)
 	if (fread(buffer, 1, length, fd) != length)
 	{
 		delete[] buffer;
-		cerr << "Couldn't read file, sorry.";
+		std::cerr << "Couldn't read file, sorry.";
 		fclose(fd);
 		return false;
 	}

@@ -16,13 +16,10 @@ public:
 public:
 	void consume(double e) {}
 	bool is_alive() {return true;}
-public:
-	void start_route();
 
 public:
-	Processor* testproc;
-	Processor* dataproc;
-	Processor* routeproc;
+	TestProc* testproc;
+	SinkDataProc* dataproc;
 };
 
 #endif // SINKNODE_H

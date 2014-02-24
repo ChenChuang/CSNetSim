@@ -21,7 +21,7 @@ int InclusterChannel::communicate(Msg* msg)
 		int r_count = 0;
 		while(mn_iter->has_more()){
 			r = this->network->node(mn_iter->next_addr());
-			d = max(d, sqrt(pow(t->x - r->x, 2) + pow(t->y - r->y, 2)));
+			d = std::max(d, sqrt(pow(t->x - r->x, 2) + pow(t->y - r->y, 2)));
 			if(r->is_alive()){
 				r->get_commproxy()->receive(msg);
 				r->consume(EnergyModel::calReceive(k));

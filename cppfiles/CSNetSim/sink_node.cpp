@@ -10,9 +10,6 @@ SinkNode::SinkNode(Network* anetwork, int aaddr, double ax, double ay):
 	
 	this->dataproc = new SinkDataProc();
 	this->procs_manager->add(this->dataproc);
-	
-	this->routeproc = new SinkRouteProc(this);
-	this->procs_manager->add(this->routeproc);
 }
 
 SinkNode::~SinkNode()
@@ -21,9 +18,6 @@ SinkNode::~SinkNode()
 	this->commproxy = NULL;
 	delete this->testproc;
 	this->testproc = NULL;
-}
-
-void SinkNode::start_route()
-{
-	dynamic_cast<SinkRouteProc*>(this->routeproc)->start_route();
+	delete this->dataproc;
+	this->dataproc = NULL;
 }

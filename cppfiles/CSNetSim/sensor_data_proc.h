@@ -22,8 +22,8 @@ public:
 	double max_wait;
 	double unit_l;
 	double buf_l;
-	static const char CMD_SENSE_DATA_FUSED = 0x91;
-	static const char CMD_SENSE_DATA_UNFUSED = 0x92;
+	static const char CMD_SENSE_DATA_FUSED = 0x01;
+	static const char CMD_SENSE_DATA_UNFUSED = 0x02;
 private:
 	double data_l;
 	Node* node;

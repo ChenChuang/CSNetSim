@@ -12,12 +12,14 @@
 
 #include <cmath>
 #include <iostream>
-using namespace std;
 
 void crunsim(double* x, double* y)
 {
 	ClusteringNetwork* network = new ClusteringNetwork(x, y);
 	network->run();
+	for(int i=1;i<network->nodes_num;i++){
+		//cout<<dynamic_cast<SensorNode*>(network->node(i))->get_next_hop()<<endl;
+	}
 	delete network;
 }
 

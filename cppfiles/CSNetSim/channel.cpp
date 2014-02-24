@@ -42,7 +42,7 @@ void ChannelsManager::clear()
 	ChannelNode* np;
 	while(p != NULL){
 		np = p->next;
-		delete np;
+		delete p;
 		p = np;
 	}
 }

@@ -11,6 +11,9 @@ UnicastChannel::~UnicastChannel()
 int UnicastChannel::communicate(Msg* msg)
 {
 	if(msg->type == UnicastChannel::MSG_TYPE_UNICAST){
+		if(msg->fromaddr < 0 || msg->toaddr < 0){
+			return 1;
+		}
 		Node* t = this->network->node(msg->fromaddr);
 		Node* r = this->network->node(msg->toaddr);
 		double d = sqrt(pow(t->x - r->x, 2) + pow(t->y - r->y, 2));

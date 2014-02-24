@@ -51,7 +51,7 @@ void ProcsManager::clear()
 	ProcNode* np;
 	while(p != NULL){
 		np = p->next;
-		delete np;
+		delete p;
 		p = np;
 	}
 }

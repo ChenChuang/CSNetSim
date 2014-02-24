@@ -33,6 +33,8 @@ public:
 	int get_next_hop() {return this->next_hop;}
 	void set_next_hop(int addr) {this->next_hop = addr;}
 	bool is_ch() {return this->ch_addr == this->addr;}
+	double get_d_tosink() {return this->d_tosink;}
+	double get_neighbor_d(int addr);
 	void start_route();
 	
 public:
@@ -42,10 +44,10 @@ public:
 	int next_hop;
 	double d_tosink;
 	
-	Processor* testproc;
-	Processor* dataproc;
-	Processor* heedproc;
-	Processor* routeproc;
+	TestProc* testproc;
+	SensorDataProc* dataproc;
+	SensorHeedProc* heedproc;
+	SensorRouteProc* routeproc;
 	
 friend class Monitor;
 friend class ClusteringMonitor;

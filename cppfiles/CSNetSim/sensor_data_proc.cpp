@@ -52,6 +52,8 @@ void SensorDataProc::ticktock(double time)
 			this->send(SensorDataProc::CMD_SENSE_DATA_UNFUSED);
 		}
 	}
+	this->node->get_network()->get_clock()->try_set_tick(
+		std::min(this->wait_timer->get_time(), this->sense_timer->get_time()) - this->node->get_network()->get_clock()->get_time());
 }
 
 void SensorDataProc::send(char cmd){

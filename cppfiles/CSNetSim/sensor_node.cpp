@@ -47,7 +47,7 @@ void SensorNode::print()
 
 void SensorNode::start_route()
 {
-	dynamic_cast<SensorRouteProc*>(this->routeproc)->start_route();
+	this->routeproc->start_route();
 }
 
 void SensorNode::init_neighbors(Adjv* adjv)
@@ -57,5 +57,13 @@ void SensorNode::init_neighbors(Adjv* adjv)
 		this->ngbs->add(new Ngb(p->addr, p->d));
 		p = p->next;
 	}
-	1 == 1;
+}
+
+double SensorNode::get_neighbor_d(int addr)
+{
+	Ngb* ngb = this->ngbs->find(Ngb(addr, 0));
+	if(ngb != NULL){
+		return ngb->d;
+	}
+	return -1;
 }

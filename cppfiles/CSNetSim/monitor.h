@@ -10,7 +10,6 @@
 #endif
 
 #include <string>
-using namespace std;
 
 class Monitor
 {
@@ -22,7 +21,7 @@ public:
 	virtual void record_before_run() {};
 	virtual void record_after_run() {};
 public:
-	bool wirte_to_mat(const string& file_path, const string& var_name, const double* array, int row_num, int col_num);
+	bool wirte_to_mat(const std::string& file_path, const std::string& var_name, const double* array, int row_num, int col_num);
 };
 
 #endif // MONITOR_H

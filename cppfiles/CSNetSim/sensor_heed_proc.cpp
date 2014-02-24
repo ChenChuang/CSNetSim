@@ -5,38 +5,83 @@ SensorHeedProc::SensorHeedProc(Node* anode) : node(anode)
 	this->inode = dynamic_cast<INode_SensorHeedProc*>(this->node);
 	this->c_prob = 0.07;
 	this->p_min = 0.0001;
+	this->heed_time = log(1/0.0001) / log(2) + 3;
+	this->stable_time = 1800;
+	this->min_tick = 1;
 	this->costs = new SortedList<Scost>();
+	this->timer = new Timer(this->node->get_network()->get_clock());
 }
 
 SensorHeedProc::~SensorHeedProc()
 {
 	delete this->costs;
 	this->costs = NULL;
+	delete this->timer;
+	this->timer = NULL;
 }
 
 void SensorHeedProc::init()
 {
-	this->proc_state = SensorHeedProc::PROC_GETREADY;
+	this->start_clustering();
 }
 
-int SensorHeedProc::process(Msg* msg)
+void SensorHeedProc::start_clustering()
 {
-	if(msg->cmd == SensorHeedProc::CMD_COST){
-		this->receive_cost_msg(msg);
-		return 1;
-	}else if(msg->cmd == SensorHeedProc::CMD_CH){
-		this->receive_ch_msg(msg);
-		return 1;
-	}else if(msg->cmd == SensorHeedProc::CMD_JOIN){
-		this->receive_join_msg(msg);
-		return 1;
+	this->proc_state = SensorHeedProc::PROC_GETREADY;
+	this->timer->set_after(this->heed_time);
+}
+
+void SensorHeedProc::exit_clustering()
+{
+	if(this->inode->get_ch_addr() < 0){
+		this->inode->set_ch_addr(this->node->get_addr());
 	}
-	return 0;
+	this->proc_state = SensorHeedProc::PROC_OFF;
+	this->timer->set_after(this->stable_time);
 }
 
 void SensorHeedProc::ticktock(double time)
 {
-	this->proc_clustering();
+	if(this->timer->is_timeout()){
+		if(this->proc_state == SensorHeedProc::PROC_OFF){
+			this->start_clustering();
+			this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
+		}else{
+			this->exit_clustering();
+			this->inode->start_route();
+		}
+	}else{
+		if(this->proc_state == SensorHeedProc::PROC_OFF){
+			this->node->get_network()->get_clock()->try_set_tick(
+				this->timer->get_time() - this->node->get_network()->get_clock()->get_time());
+		}else{
+			this->proc_clustering();
+			this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
+		}
+	}
+}
+
+int SensorHeedProc::process(Msg* msg)
+{
+	switch(msg->cmd)
+	{
+	case SensorHeedProc::CMD_COST:
+	{
+		this->receive_cost_msg(msg);
+		return 1;
+	}
+	case SensorHeedProc::CMD_CH:
+	{
+		this->receive_ch_msg(msg);
+		return 1;
+	}
+	case SensorHeedProc::CMD_JOIN:
+	{
+		this->receive_join_msg(msg);
+		return 1;
+	}
+	}
+	return 0;
 }
 
 void SensorHeedProc::add_member(int addr)
@@ -145,13 +190,17 @@ int SensorHeedProc::proc_clustering()
 	{
 		break;
 	}
+	case SensorHeedProc::PROC_DONE:
+	{
+		break;
+	}
 	case SensorHeedProc::PROC_GETREADY:
 	{
 		this->costs->clear();
 		this->cal_broadcast_cost();
 		this->ch_type = SensorHeedProc::NOT_CH;
 		
-		this->ch_prob = max( this->c_prob * this->node->energy / ClusteringSimModel::E_INIT, this->p_min );
+		this->ch_prob = std::max( this->c_prob * this->node->energy / ClusteringSimModel::E_INIT, this->p_min );
 		//this->ch_prob = max( this->c_prob * ( this->node->energy + 10 / pow(2, (double)BaseNetwork::sim_timer) * rand() / (RAND_MAX + 1.0) ) / EnergyModel::E_INIT, this->p_min );
 		this->ch_prob_pre = 0;
 		this->heed_count = 0;
@@ -208,7 +257,7 @@ int SensorHeedProc::proc_clustering()
 				}
 			}
 			this->ch_prob_pre = this->ch_prob;
-			this->ch_prob = min( this->ch_prob * 2, 1.0 );
+			this->ch_prob = std::min( this->ch_prob * 2, 1.0 );
 		}else{
 			this->proc_state = SensorHeedProc::PROC_FINAL;
 		}
@@ -222,7 +271,7 @@ int SensorHeedProc::proc_clustering()
 			if( lcost_final_ch >= 0 )
 			{
 				this->join_cluster(lcost_final_ch);
-				this->proc_state = SensorHeedProc::PROC_OFF;
+				this->proc_state = SensorHeedProc::PROC_DONE;
 			}
 			else
 			{
@@ -230,7 +279,7 @@ int SensorHeedProc::proc_clustering()
 					this->inode->set_ch_addr(this->node->get_addr());
 					this->ch_type = SensorHeedProc::FINAL_CH;
 					this->cluster_head_msg();
-					this->proc_state = SensorHeedProc::PROC_OFF;
+					this->proc_state = SensorHeedProc::PROC_DONE;
 				}else{
 					this->heed_count ++;
 					this->proc_state = SensorHeedProc::PROC_FINAL;
@@ -241,7 +290,7 @@ int SensorHeedProc::proc_clustering()
 			this->inode->set_ch_addr(this->node->get_addr());
 			this->ch_type = SensorHeedProc::FINAL_CH;
 			this->cluster_head_msg();
-			this->proc_state = SensorHeedProc::PROC_OFF;
+			this->proc_state = SensorHeedProc::PROC_DONE;
 		}
 		break;
 	}

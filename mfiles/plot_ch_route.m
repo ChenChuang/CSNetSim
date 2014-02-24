@@ -1,22 +1,27 @@
-plot_nodes;
-hold on;
-load('ch_route.mat');
-load('heed_ch.mat');
+load('nodes_x.mat')
+load('nodes_y.mat')
+load 'hop_snapshot';
+load 'ch_snapshot';
 load 'energy_snapshot';
-for i = 1:NODE_NUM
-    if energy_snapshot(MAX_PERIOD_COUNT, i) > 0
-        scatter(nodes_x(heed_ch(i)+1), nodes_y(heed_ch(i)+1), '*r');
-    end
-   %circle(nodes_x(heed_ch(i)+1), nodes_y(heed_ch(i)+1), CLUSTER_RADIUS);
-end
-for i = 1:NODE_NUM
-    if energy_snapshot(MAX_PERIOD_COUNT, i) > 0
-        if ch_route(i) == SINK_ADDR
-            plot([nodes_x(i), SINK_X], [nodes_y(i), SINK_Y]); 
-        elseif ch_route(i) >= 0
-            plot([nodes_x(i), nodes_x(ch_route(i)+1)], [nodes_y(i), nodes_y(ch_route(i)+1)]);
-            %circle(nodes_x(ch_route(i)+1), nodes_y(ch_route(i)+1), MAX_RADIUS);
+figure;
+
+snap = 9;
+
+axis([0, AREA_SIZE_X, 0, AREA_SIZE_Y]);
+scatter(nodes_x, nodes_y, '+');
+hold on;
+scatter(SINK_X, SINK_Y, '*');
+
+hops = hop_snapshot(:,snap);
+chs = ch_snapshot(:,snap);
+
+for i = 2:NODE_NUM
+    if (energy_snapshot(hops(i)+1, snap) > 0 || hops(i) == SINK_ADDR) && energy_snapshot(i, snap) > 0
+        if chs(i) == i-1
+            plot([nodes_x(i), nodes_x(hops(i)+1)], [nodes_y(i), nodes_y(hops(i)+1)], 'r','linewidth',2);
+        else
+            plot([nodes_x(i), nodes_x(hops(i)+1)], [nodes_y(i), nodes_y(hops(i)+1)]);
         end
     end
 end
-title('CH route');
+axis([0, AREA_SIZE_X, 0, AREA_SIZE_Y]);

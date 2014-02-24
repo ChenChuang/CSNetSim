@@ -20,6 +20,8 @@ public:
 	int process(Msg* msg);
 	void ticktock(double time);
 public:
+	void start_clustering();
+	void exit_clustering();
 	int proc_clustering();
 	
 	void cal_broadcast_cost();
@@ -45,17 +47,21 @@ public:
 	static const char PROC_GETREADY = 0x02;
 	static const char PROC_MAIN = 0x03;
 	static const char PROC_FINAL = 0x04;
+	static const char PROC_DONE = 0x05;
 	
 	static const char NOT_CH = 0x01;
 	static const char TENT_CH = 0x02;
 	static const char FINAL_CH = 0x03;
 	
-	static const char CMD_COST = 0x11;
-	static const char CMD_CH = 0x12;
-	static const char CMD_JOIN = 0x13;
+	static const char CMD_COST = 0x61;
+	static const char CMD_CH = 0x62;
+	static const char CMD_JOIN = 0x63;
 public:
 	double c_prob;
 	double p_min;
+	double heed_time;
+	double stable_time;
+	double min_tick;
 	
 private:
 	Node* node;
@@ -67,6 +73,8 @@ private:
 	double ch_prob;
 	double ch_prob_pre;
 	int heed_count;
+	
+	Timer* timer;
 };
 
 class INode_SensorHeedProc
