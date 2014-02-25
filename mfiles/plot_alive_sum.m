@@ -1,3 +1,4 @@
+load('time.mat');
 load('alive_sum.mat');
 figure;
 hold on;

@@ -30,7 +30,9 @@ public:
 public:
 	void init_neighbors(Adjv* adjv);
 	MnManager* get_mnmanager() {return this->mnmanager;}
-	NgbManager* get_neighbors() {return this->ngbs;}
+	NgbManager* get_neighbors() {
+		return this->ngbs;
+		}
 	int get_ch_addr() {return this->ch_addr;}
 	void set_ch_addr(int addr) {this->ch_addr = addr;}
 	int get_next_hop() {return this->next_hop;}

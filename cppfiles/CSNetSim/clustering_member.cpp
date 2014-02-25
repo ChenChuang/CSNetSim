@@ -96,3 +96,14 @@ MnIterator* MnManager::get_mn_iter()
 	this->mn_iter->seek(this->members);
 	return this->mn_iter;
 }
+
+int MnManager::length()
+{
+	int c = 0;
+	struct MnNode* p = this->members;
+	while(p != NULL){
+		c++;
+		p = p->next;
+	}
+	return c;
+}

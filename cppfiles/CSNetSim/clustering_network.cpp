@@ -54,3 +54,8 @@ double ClusteringNetwork::d_between(int addr1, int addr2)
 	double y2 = this->nodes[addr2]->y;
 	return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
 }
+
+bool ClusteringNetwork::is_alive(int addr)
+{
+	return this->nodes[addr]->is_alive();
+}

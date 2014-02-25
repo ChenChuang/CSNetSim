@@ -4,7 +4,7 @@ load 'ch_snapshot';
 load 'energy_snapshot';
 figure;
 
-snap = 9;
+snap = 100;
 
 axis([0, AREA_SIZE_X, 0, AREA_SIZE_Y]);
 scatter(nodes_x, nodes_y, '+');

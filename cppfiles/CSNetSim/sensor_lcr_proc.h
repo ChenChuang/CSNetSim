@@ -26,8 +26,9 @@ public:
 	virtual int process(Msg* msg);
 	virtual void ticktock(double time);
 public:
-	void start_clustering();
+	void start();
 	void start_rotating();
+	void start_init_chs();
 private:
 	bool check_ch_alive();
 	bool check_energy();
@@ -40,6 +41,7 @@ private:
 	void cal_tent_costs();
 	int get_least_cost_newch();
 	int get_least_cost_nexthop();
+	int get_best_ch();
 	
 	void ch_send_query();
 	void mn_receive_query(int addr);
@@ -63,6 +65,7 @@ private:
 public:
 	static const char PROC_SLEEP = 0x01;
 	static const char PROC_WAIT_CLUSTERING = 0x02;
+	static const char PROC_INIT_CHS = 0x03;
 	
 	static const char PROC_MN_CHECK = 0x11;
 	static const char PROC_MN_WAIT_NEWCH = 0x12;
@@ -73,6 +76,7 @@ public:
 
 	static const char PROC_NEWCH_WAIT_MN = 0x31;
 	static const char PROC_ISOLATED = 0x32;
+	static const char PROC_ISOLATED_WAIT_SELF = 0x33;
 	
 	static const char CMD_CH_QUERY = 0x71;
 	static const char CMD_MN_RESP = 0x72;
@@ -86,7 +90,9 @@ public:
 	
 public:
 	double clustering_time;
+	double init_chs_time;
 	double lcr_time;
+	double ch_wait_resp_time;
 	double mn_wait_newch_time;
 	double ch_wait_newch_time;
 	double newch_wait_mn_time;
@@ -106,6 +112,7 @@ private:
 	
 	Timer* wait_clustering_timer;
 	Timer* lcr_timer;
+	Timer* wait_resp_timer;
 	Timer* wait_newch_timer;
 	Timer* wait_mn_timer;
 	Timer* wait_self_timer;
@@ -213,6 +220,7 @@ class INet_SensorLcrProc
 {
 public:
 	virtual double d_between(int addr1, int addr2) = 0;
+	virtual bool is_alive(int addr) = 0;
 };
 
 #endif // SENSORLCRPROC_H

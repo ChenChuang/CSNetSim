@@ -18,6 +18,7 @@ public:
 	~ClusteringNetwork();
 public:
 	double d_between(int addr1, int addr2);
+	bool is_alive(int addr);
 	
 public:
 	int sensor_nodes_num;

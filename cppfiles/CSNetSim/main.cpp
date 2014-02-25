@@ -8,8 +8,8 @@ void crunsim(void);
 
 int main(int argc, char **argv)
 {
-	std::srand((unsigned)time(0));
-	//std::srand(1);
+	//std::srand((unsigned)time(0));
+	std::srand(1);
 	
 	std::cout << "Hello, CSNetSim\n" << std::endl << std::endl;
 	int t0 = std::time(NULL);

@@ -11,6 +11,7 @@ Timer::~Timer()
 void Timer::set_after(double after)
 {
 	this->time = this->clock->get_time() + after;
+	this->clock->try_set_tick(after);
 }
 
 bool Timer::is_timeout()

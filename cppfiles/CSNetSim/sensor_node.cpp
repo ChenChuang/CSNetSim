@@ -69,8 +69,8 @@ void SensorNode::init()
 	this->procs_manager->init();
 	this->dataproc->turn_on();
 	
-	//this->heedproc->turn_on(); this->heedproc->start_clustering();
-	//this->lcrproc->turn_on();
+	// this->heedproc->turn_on(); this->heedproc->start_clustering();
+	this->lcrproc->turn_on(); this->lcrproc->start();
 }
 
 void SensorNode::start_route()

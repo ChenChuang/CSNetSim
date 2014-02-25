@@ -2,6 +2,17 @@
 
 SensorLcrProc::SensorLcrProc(Node* anode) : node(anode)
 {
+	this->clustering_time = 100;
+	this->init_chs_time = 3;
+	this->lcr_time = 20;
+	this->ch_wait_resp_time = 3;
+	this->mn_wait_newch_time = 3;
+	this->ch_wait_newch_time = 3;
+	this->newch_wait_mn_time = 3;
+	this->max_wait_self_time = 5;
+	this->energy_thrd = 0.5;
+	this->energy_thrd_2 = 10;
+	
 	this->inode = dynamic_cast<INode_SensorLcrProc*>(anode);
 	this->comm_proxy = dynamic_cast<ClusteringCommProxy*>(anode->get_commproxy());
 	this->inetwork = dynamic_cast<INet_SensorLcrProc*>(anode->get_network());
@@ -12,6 +23,7 @@ SensorLcrProc::SensorLcrProc(Node* anode) : node(anode)
 	
 	this->wait_clustering_timer = new Timer(this->node->get_network()->get_clock());
 	this->lcr_timer = new Timer(this->node->get_network()->get_clock());
+	this->wait_resp_timer = new Timer(this->node->get_network()->get_clock());
 	this->wait_newch_timer = new Timer(this->node->get_network()->get_clock());
 	this->wait_mn_timer = new Timer(this->node->get_network()->get_clock());
 	this->wait_self_timer = new Timer(this->node->get_network()->get_clock());
@@ -34,6 +46,9 @@ SensorLcrProc::~SensorLcrProc()
 	delete this->lcr_timer;
 	this->lcr_timer = NULL;
 	
+	delete this->wait_resp_timer;
+	this->wait_resp_timer = NULL;
+	
 	delete this->wait_newch_timer;
 	this->wait_newch_timer = NULL;
 	
@@ -49,7 +64,7 @@ void SensorLcrProc::init()
 	this->proc_state = SensorLcrProc::PROC_SLEEP;
 }
 
-void SensorLcrProc::start_clustering()
+void SensorLcrProc::start()
 {
 	this->proc_state = SensorLcrProc::PROC_WAIT_CLUSTERING;
 	this->inode->start_clustering();
@@ -60,8 +75,18 @@ void SensorLcrProc::start_rotating()
 {
 	if(this->inode->is_ch()){
 		this->proc_state = SensorLcrProc::PROC_CH_CHECK;
+		this->energy_pre = this->node->energy;
 	}else{
 		this->proc_state = SensorLcrProc::PROC_MN_CHECK;
+	}
+}
+
+void SensorLcrProc::start_init_chs()
+{
+	this->proc_state = SensorLcrProc::PROC_INIT_CHS;
+	this->wait_clustering_timer->set_after(this->init_chs_time);
+	if(this->inode->is_ch()){
+		this->newch_send_anc();
 	}
 }
 
@@ -105,6 +130,7 @@ int SensorLcrProc::process(Msg* msg)
 
 void SensorLcrProc::ticktock(double time)
 {
+	this->node->get_network()->get_clock()->try_set_tick(ClusteringSimModel::DEFAULT_TICK);
 	switch(this->proc_state)
 	{
 	case SensorLcrProc::PROC_SLEEP:
@@ -116,6 +142,14 @@ void SensorLcrProc::ticktock(double time)
 		if(this->wait_clustering_timer->is_timeout())
 		{
 			this->inode->exit_clustering();
+			this->start_init_chs();
+		}
+		break;
+	}
+	case SensorLcrProc::PROC_INIT_CHS:
+	{
+		if(this->wait_clustering_timer->is_timeout())
+		{
 			this->start_rotating();
 		}
 		break;
@@ -132,24 +166,31 @@ void SensorLcrProc::ticktock(double time)
 	{
 		if(this->check_energy())
 		{
+			this->tent_params->clear();
+			this->tents->clear();
 			this->ch_send_query();
+			this->newch = -1;
 			this->proc_state = SensorLcrProc::PROC_CH_WAIT_TENTS;
+			this->wait_resp_timer->set_after(this->ch_wait_resp_time);
 		}
 		break;
 	}
 	case SensorLcrProc::PROC_CH_WAIT_TENTS:
 	{
-		this->cal_tent_costs();
-		int newch = this->get_least_cost_newch();
-		if(newch > 0)
-		{
-			this->ch_send_assign(newch);
-			this->proc_state = SensorLcrProc::PROC_CH_WAIT_NEWCH;
-			this->wait_newch_timer->set_after(this->ch_wait_newch_time);
-		}
-		else
-		{
-			this->proc_state = SensorLcrProc::PROC_CH_CHECK;
+		if(this->wait_resp_timer->is_timeout()){
+			this->cal_tent_costs();
+			int newch = this->get_least_cost_newch();
+			if(newch >= 0)
+			{
+				this->ch_send_assign(newch);
+				this->proc_state = SensorLcrProc::PROC_CH_WAIT_NEWCH;
+				this->wait_newch_timer->set_after(this->ch_wait_newch_time);
+			}
+			else
+			{
+				this->proc_state = SensorLcrProc::PROC_CH_CHECK;
+				this->energy_pre = this->node->energy;
+			}
 		}
 		break;
 	}
@@ -175,11 +216,47 @@ void SensorLcrProc::ticktock(double time)
 		if(this->wait_mn_timer->is_timeout())
 		{
 			this->proc_state = SensorLcrProc::PROC_CH_CHECK;
+			this->energy_pre = this->node->energy;
 		}
 		break;
 	}
 	case SensorLcrProc::PROC_ISOLATED:
 	{
+		int addr = this->get_best_ch();
+		if(addr < 0)
+		{
+			this->wait_self_timer->set_after(this->node->energy / ClusteringSimModel::E_INIT * this->max_wait_self_time);
+			this->proc_state = SensorLcrProc::PROC_ISOLATED_WAIT_SELF;
+		}
+		else
+		{
+			this->inode->set_ch_addr(addr);
+			this->inode->set_next_hop(addr);
+			this->send_join();
+			this->proc_state = SensorLcrProc::PROC_MN_CHECK;
+		}
+		break;
+	}
+	case SensorLcrProc::PROC_ISOLATED_WAIT_SELF:
+	{
+		int addr = this->get_best_ch();
+		if(addr >= 0)
+		{
+			this->wait_self_timer->reset();
+			
+			this->inode->set_ch_addr(addr);
+			this->inode->set_next_hop(addr);
+			this->send_join();
+			this->proc_state = SensorLcrProc::PROC_MN_CHECK;
+		}
+		else if(this->wait_self_timer->is_timeout())
+		{
+			this->inode->set_ch_addr(this->node->get_addr());
+			this->reset_next_hop();
+			this->newch_send_anc();
+			this->wait_mn_timer->set_after(this->newch_wait_mn_time);
+			this->proc_state = SensorLcrProc::PROC_NEWCH_WAIT_MN;
+		}
 		break;
 	}
 	}
@@ -200,6 +277,9 @@ void SensorLcrProc::mn_receive_query(int addr)
 	*((double*)(data) + 0) = this->inetwork->d_between(this->node->get_addr(), addr);
 	*((double*)(data) + 1) = this->node->energy;
 	*((double*)(data) + 2) = this->cal_fcd();
+	if(this->node->get_addr() == 296){
+		NgbManager* a = this->inode->get_neighbors();
+	}
 	*((NgbManager**)(data + sizeof(double)*3)) = this->inode->get_neighbors();
 	this->comm_proxy->unicast(this->node->get_addr(), addr, 0, SensorLcrProc::CMD_MN_RESP, data_l, data);
 	
@@ -213,16 +293,13 @@ void SensorLcrProc::ch_receive_resp(int addr, double* params)
 	if(this->proc_state != SensorLcrProc::PROC_CH_WAIT_TENTS || !this->inode->get_mnmanager()->has(addr)){
 		return;
 	}
-	this->add_tent_param(addr, params[0], params[1], params[2], (NgbManager*)(&params[3]));
+	this->add_tent_param(addr, params[0], params[1], params[2], *(NgbManager**)(&params[3]));
 }
 
 void SensorLcrProc::ch_send_assign(int addr)
 {
 	int* data = new int(addr);
-	this->comm_proxy->inclustercast(this->node->get_addr(), 0, SensorLcrProc::CMD_CH_ASSIGN, 1, (char*)data);
-	
-	this->wait_newch_timer->set_after(this->ch_wait_newch_time);
-	this->proc_state = SensorLcrProc::PROC_CH_WAIT_NEWCH;
+	this->comm_proxy->inclustercast(this->node->get_addr(), 0, SensorLcrProc::CMD_CH_ASSIGN, sizeof(int), (char*)data);
 }
 
 void SensorLcrProc::mn_receive_assign(int addr, int newch)
@@ -232,6 +309,8 @@ void SensorLcrProc::mn_receive_assign(int addr, int newch)
 	}
 	if(addr == this->node->get_addr()){
 		this->newch_send_anc();
+		this->inode->set_ch_addr(addr);
+		this->reset_next_hop();
 		
 		this->wait_newch_timer->reset();
 		this->wait_mn_timer->set_after(this->newch_wait_mn_time);
@@ -249,13 +328,14 @@ void SensorLcrProc::newch_send_anc()
 		this->node->get_addr(), ClusteringSimModel::MAX_RADIUS, 
 		ClusteringSimModel::CTRL_PACKET_SIZE, 
 		SensorLcrProc::CMD_NEWCH_ANC, 
-		1, (char*)data);
+		sizeof(double)*2, (char*)data);
 }
 
 void SensorLcrProc::receive_newch_anc(int addr, double* params)
 {
 	if(this->proc_state == SensorLcrProc::PROC_MN_WAIT_NEWCH && this->newch == addr){
 		this->inode->set_ch_addr(addr);
+		this->inode->set_next_hop(addr);
 		
 		this->wait_newch_timer->reset();
 		this->proc_state = SensorLcrProc::PROC_MN_CHECK;
@@ -275,7 +355,7 @@ void SensorLcrProc::newmn_send_anc()
 void SensorLcrProc::receive_newmn_anc(int addr)
 {
 	this->remove_ch(addr);
-	if(this->inode->get_next_hop() == addr){
+	if(this->inode->is_ch() && this->inode->get_next_hop() == addr){
 		this->reset_next_hop();
 	}
 }
@@ -297,7 +377,7 @@ void SensorLcrProc::receive_join(int addr)
 
 double SensorLcrProc::cal_fcd()
 {
-	return this->chs->length();
+	return (double)(this->chs->length());
 }
 
 void SensorLcrProc::cal_tent_costs()
@@ -339,9 +419,9 @@ void SensorLcrProc::cal_tent_costs()
 		fe = ctp->e / ClusteringSimModel::E_INIT;
 		fd = 1 - ctp->d / ClusteringSimModel::CLUSTER_RADIUS;
 		fc = ctp->fc / max_fc;
-		cost = 100.0 * floor(fe * 10.0) + 
+		cost = 1/(100.0 * floor(fe * 10.0) + 
 			10.0 * floor(fd * 10.0) + 
-			1.0 * floor(fc * 10.0);
+			1.0 * floor(fc * 10.0));
 		this->tents->add(new lcr::Tent(ctp->addr, cost));
 	}
 	
@@ -350,7 +430,7 @@ void SensorLcrProc::cal_tent_costs()
 
 bool SensorLcrProc::check_ch_alive()
 {
-	return true;
+	return this->inetwork->is_alive(this->inode->get_ch_addr());
 }
 
 bool SensorLcrProc::check_energy()
@@ -400,9 +480,28 @@ int SensorLcrProc::get_least_cost_newch()
 
 int SensorLcrProc::get_least_cost_nexthop()
 {
-	lcr::Sch* sc = this->chs->seek(0);
-	if(sc != NULL){
-		return sc->addr;
+	lcr::Sch* sc;
+	this->chs->seek(0);
+	while(this->chs->has_more()){
+		sc = this->chs->next();
+		if(sc->d_tosink < this->inode->get_d_tosink()){
+			return sc->addr;
+		}
 	}
 	return -1;
+}
+
+int SensorLcrProc::get_best_ch()
+{
+	lcr::Sch* sc;
+	int addr = -1;
+	double max_e = ClusteringSimModel::E_INIT + 1;
+	this->chs->seek(0);
+	while(this->chs->has_more()){
+		sc = this->chs->next();
+		if(sc->anc_energy > max_e || max_e > ClusteringSimModel::E_INIT){
+			addr = sc->addr;
+		}
+	}
+	return addr;
 }

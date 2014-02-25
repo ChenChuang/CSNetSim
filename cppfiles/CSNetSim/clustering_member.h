@@ -44,6 +44,7 @@ public:
 	void add(int addr);
 	bool has(int addr);
 	void clear_dead();
+	int length();
 	MnIterator* get_mn_iter();
 	
 public:
