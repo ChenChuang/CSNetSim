@@ -7,8 +7,31 @@
 #include "clustering_comm_proxy.h"
 #include "broadcast_channel.h"
 
+namespace heed
+{
+struct Tent
+{
+public:
+	int addr;
+	double cost;
+	char type;
+public:
+	Tent(int aaddr, double acost, char atype) : addr(aaddr), cost(acost), type(atype) {}
+	~Tent() {}
+public:
+	bool operator <(const Tent& a) const{
+		return cost < a.cost;
+	}
+	bool operator ==(const Tent& a) const{
+		return cost == a.cost;
+	}
+	bool is(const Tent& a) const{
+		return addr == a.addr;
+	} 
+};
+}
+
 class INode_SensorHeedProc;
-struct Scost;
 
 class SensorHeedProc : public Processor
 {
@@ -20,7 +43,7 @@ public:
 	int process(Msg* msg);
 	void ticktock(double time);
 public:
-	void start_clustering();
+	double start_clustering();
 	void exit_clustering();
 	int proc_clustering();
 	
@@ -36,14 +59,14 @@ public:
 	void join_cluster(int ch_addr);
 	
 	bool has_sch();
-	void set_scost_type(int addr, char ch_state);
-	void add_scost(int addr, double cost);
+	void set_tent_type(int addr, char ch_state);
+	void add_tent(int addr, double cost);
 	void add_member(int addr);
 	
 	double calAMRP();
 
 public:
-	static const char PROC_OFF = 0x01;
+	static const char PROC_SLEEP = 0x01;
 	static const char PROC_GETREADY = 0x02;
 	static const char PROC_MAIN = 0x03;
 	static const char PROC_FINAL = 0x04;
@@ -66,7 +89,7 @@ public:
 private:
 	Node* node;
 	INode_SensorHeedProc* inode;	
-	SortedList<Scost>* costs;
+	SortedList<heed::Tent>* tents;
 
 	char proc_state;
 	char ch_type;
@@ -86,27 +109,6 @@ public:
 	virtual bool is_ch() = 0;
 	virtual void start_route() = 0;
 	virtual NgbManager* get_neighbors() = 0;
-};
-
-struct Scost
-{
-public:
-	int addr;
-	double cost;
-	char type;
-public:
-	Scost(int aaddr, double acost, char atype) : addr(aaddr), cost(acost), type(atype) {}
-	~Scost() {}
-public:
-	bool operator <(const Scost& a) const{
-		return cost < a.cost;
-	}
-	bool operator ==(const Scost& a) const{
-		return cost == a.cost;
-	}
-	bool is(const Scost& a) const{
-		return addr == a.addr;
-	} 
 };
 
 #endif // SENSORHEEDPROC_H

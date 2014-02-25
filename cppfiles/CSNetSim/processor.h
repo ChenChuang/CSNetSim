@@ -15,6 +15,10 @@ public:
 	virtual void ticktock(double time) {}
 	virtual int process(Msg* msg) {return -1;}
 	virtual void init() {}
+	virtual void turn_on() {this->isTurnOn = true;}
+	virtual void turn_off() {this->isTurnOn = false;}
+public:
+	bool isTurnOn;
 };
 
 struct ProcNode

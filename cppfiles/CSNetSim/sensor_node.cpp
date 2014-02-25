@@ -26,17 +26,36 @@ SensorNode::SensorNode(Network* anetwork, int aaddr, double ax, double ay, doubl
 	
 	this->heedproc = new SensorHeedProc(this);
 	this->procs_manager->add(this->heedproc);
+	
+	this->lcrproc = new SensorLcrProc(this);
+	this->procs_manager->add(this->lcrproc);
 }
 
 SensorNode::~SensorNode()
 {
 	delete this->mnmanager;
 	this->mnmanager = NULL;
+	
+	delete this->ngbs;
+	this->ngbs = NULL;
+	
 	delete this->commproxy;
 	this->commproxy = NULL;
 	
 	delete this->testproc;
 	this->testproc = NULL;
+	
+	delete this->dataproc;
+	this->dataproc = NULL;
+	
+	delete this->routeproc;
+	this->routeproc = NULL;
+	
+	delete this->heedproc;
+	this->heedproc = NULL;
+	
+	delete this->lcrproc;
+	this->lcrproc = NULL;
 }
 
 void SensorNode::print()
@@ -45,9 +64,31 @@ void SensorNode::print()
 		this->addr, this->x, this->y, this->energy, this->ch_addr, this->next_hop, this->d_tosink);
 }
 
+void SensorNode::init()
+{
+	this->procs_manager->init();
+	this->dataproc->turn_on();
+	
+	//this->heedproc->turn_on(); this->heedproc->start_clustering();
+	//this->lcrproc->turn_on();
+}
+
 void SensorNode::start_route()
 {
+	this->routeproc->turn_on();
 	this->routeproc->start_route();
+}
+
+void SensorNode::start_clustering()
+{
+	this->heedproc->turn_on();
+	this->heedproc->start_clustering();
+}
+
+void SensorNode::exit_clustering()
+{
+	this->heedproc->exit_clustering();
+	this->heedproc->turn_off();
 }
 
 void SensorNode::init_neighbors(Adjv* adjv)

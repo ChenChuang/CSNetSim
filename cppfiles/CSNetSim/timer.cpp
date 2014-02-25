@@ -21,3 +21,8 @@ bool Timer::is_timeout()
 	}
 	return result;
 }
+
+void Timer::reset()
+{
+	this->time = -1;
+}

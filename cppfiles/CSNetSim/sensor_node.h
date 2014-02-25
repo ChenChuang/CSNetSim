@@ -10,6 +10,7 @@
 #include "sensor_data_proc.h"
 #include "sensor_route_proc.h"
 #include "sensor_heed_proc.h"
+#include "sensor_lcr_proc.h"
 #include "test_proc.h"
 
 
@@ -17,13 +18,15 @@ class SensorNode : public Node,
 	public INode_ClusteringMember, 
 	public INode_SensorDataProc, 
 	public INode_SensorRouteProc, 
-	public INode_SensorHeedProc
+	public INode_SensorHeedProc, 
+	public INode_SensorLcrProc
 {
 public:
 	SensorNode(Network* anetwork, int aaddr, double ax, double ay, double aenergy);
 	~SensorNode();
 public:
 	void print();
+	void init();
 public:
 	void init_neighbors(Adjv* adjv);
 	MnManager* get_mnmanager() {return this->mnmanager;}
@@ -36,6 +39,8 @@ public:
 	double get_d_tosink() {return this->d_tosink;}
 	double get_neighbor_d(int addr);
 	void start_route();
+	void start_clustering();
+	void exit_clustering();
 	
 public:
 	MnManager* mnmanager;
@@ -48,6 +53,7 @@ public:
 	SensorDataProc* dataproc;
 	SensorHeedProc* heedproc;
 	SensorRouteProc* routeproc;
+	SensorLcrProc* lcrproc;
 	
 friend class Monitor;
 friend class ClusteringMonitor;

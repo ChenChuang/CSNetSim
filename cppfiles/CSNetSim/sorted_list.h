@@ -39,6 +39,26 @@ public:
 	SortedListNode<T>* ptr;
 };
 
+template<class T>
+class SortedListIter
+{
+public:
+	SortedListIter(SortedList<T>* s) : head(s->head), ptr(s->head) {}
+	~SortedListIter() {}
+	void reset() {this->ptr = this->head;}
+	bool has_more() {return this->ptr != NULL;}
+	T* next() {
+		if(this->ptr == NULL){
+			return NULL;
+		}
+		T* t = this->ptr->body;
+		this->ptr = this->ptr->next;
+		return t;
+	}
+public:
+	SortedListNode<T>* head;
+	SortedListNode<T>* ptr;
+};
 
 template<class T>
 SortedList<T>::SortedList() : head(NULL), ptr(NULL)
@@ -228,3 +248,4 @@ bool SortedList<T>::has_more()
 {
 	return this->ptr != NULL;
 }
+

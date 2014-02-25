@@ -11,6 +11,7 @@ public:
 	~Timer();
 	void set_after(double after);
 	bool is_timeout();
+	void reset();
 	double get_time() {return this->time;}
 private:
 	Clock* clock;

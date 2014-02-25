@@ -1,6 +1,6 @@
 #include "processor.h"
 
-Processor::Processor()
+Processor::Processor() : isTurnOn(false)
 {
 }
 

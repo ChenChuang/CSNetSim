@@ -45,14 +45,18 @@ void Node::ticktock()
 		proc_iter = this->procs_manager->get_proc_iter();
 		while(proc_iter->has_more() && result <= 0){
 			proc = proc_iter->next();
-			result = proc->process(msg);
+			if(proc->isTurnOn){
+				result = proc->process(msg);
+			}
 		}
 	}
 	
 	proc_iter = this->procs_manager->get_proc_iter();
 	while(proc_iter->has_more()){
 		proc = proc_iter->next();
-		proc->ticktock(this->network->get_clock()->get_time());
+		if(proc->isTurnOn){
+			proc->ticktock(this->network->get_clock()->get_time());
+		}
 	}
 	
 	this->commproxy->clear_r_buf();

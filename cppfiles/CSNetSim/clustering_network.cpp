@@ -45,3 +45,12 @@ ClusteringNetwork::~ClusteringNetwork()
 	delete this->monitor;
 	this->monitor = NULL;
 }
+
+double ClusteringNetwork::d_between(int addr1, int addr2)
+{
+	double x1 = this->nodes[addr1]->x;
+	double y1 = this->nodes[addr1]->y;
+	double x2 = this->nodes[addr2]->x;
+	double y2 = this->nodes[addr2]->y;
+	return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+}

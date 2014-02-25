@@ -15,7 +15,7 @@ SensorRouteProc::~SensorRouteProc()
 
 void SensorRouteProc::init()
 {
-	this->proc_state = SensorRouteProc::PROC_OFF;
+	this->proc_state = SensorRouteProc::PROC_SLEEP;
 }
 
 int SensorRouteProc::process(Msg* msg)
@@ -38,7 +38,7 @@ void SensorRouteProc::ticktock(double time)
 {
 	switch(this->proc_state)
 	{
-	case SensorRouteProc::PROC_OFF:
+	case SensorRouteProc::PROC_SLEEP:
 	{
 		return;
 	}
@@ -67,7 +67,7 @@ void SensorRouteProc::ticktock(double time)
 		{
 			this->inode->set_next_hop(this->inode->get_ch_addr());
 		}
-		this->proc_state = SensorRouteProc::PROC_OFF;
+		this->proc_state = SensorRouteProc::PROC_SLEEP;
 		break;
 	}
 	}

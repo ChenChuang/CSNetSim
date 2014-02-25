@@ -13,15 +13,15 @@ public:
 	SensorRouteProc(Node* anode);
 	~SensorRouteProc();
 public:
-	void init();
-	int process(Msg* msg);
-	void ticktock(double time);
+	virtual void init();
+	virtual int process(Msg* msg);
+	virtual void ticktock(double time);
 public:
-	void start_route();
-	int get_best_ch();
+	virtual void start_route();
+	virtual int get_best_ch();
 	
 public:
-	static const char PROC_OFF = 0x01;
+	static const char PROC_SLEEP = 0x01;
 	static const char PROC_GETREADY = 0x02;
 	static const char PROC_CHOOSE = 0x03;
 	

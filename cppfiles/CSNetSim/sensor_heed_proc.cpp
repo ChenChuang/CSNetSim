@@ -8,27 +8,28 @@ SensorHeedProc::SensorHeedProc(Node* anode) : node(anode)
 	this->heed_time = log(1/0.0001) / log(2) + 3;
 	this->stable_time = 1800;
 	this->min_tick = 1;
-	this->costs = new SortedList<Scost>();
+	this->tents = new SortedList<heed::Tent>();
 	this->timer = new Timer(this->node->get_network()->get_clock());
 }
 
 SensorHeedProc::~SensorHeedProc()
 {
-	delete this->costs;
-	this->costs = NULL;
+	delete this->tents;
+	this->tents = NULL;
 	delete this->timer;
 	this->timer = NULL;
 }
 
 void SensorHeedProc::init()
 {
-	this->start_clustering();
+	this->proc_state = SensorHeedProc::PROC_SLEEP;
 }
 
-void SensorHeedProc::start_clustering()
+double SensorHeedProc::start_clustering()
 {
 	this->proc_state = SensorHeedProc::PROC_GETREADY;
 	this->timer->set_after(this->heed_time);
+	return this->heed_time;
 }
 
 void SensorHeedProc::exit_clustering()
@@ -36,14 +37,14 @@ void SensorHeedProc::exit_clustering()
 	if(this->inode->get_ch_addr() < 0){
 		this->inode->set_ch_addr(this->node->get_addr());
 	}
-	this->proc_state = SensorHeedProc::PROC_OFF;
+	this->proc_state = SensorHeedProc::PROC_SLEEP;
 	this->timer->set_after(this->stable_time);
 }
 
 void SensorHeedProc::ticktock(double time)
 {
 	if(this->timer->is_timeout()){
-		if(this->proc_state == SensorHeedProc::PROC_OFF){
+		if(this->proc_state == SensorHeedProc::PROC_SLEEP){
 			this->start_clustering();
 			this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
 		}else{
@@ -51,7 +52,7 @@ void SensorHeedProc::ticktock(double time)
 			this->inode->start_route();
 		}
 	}else{
-		if(this->proc_state == SensorHeedProc::PROC_OFF){
+		if(this->proc_state == SensorHeedProc::PROC_SLEEP){
 			this->node->get_network()->get_clock()->try_set_tick(
 				this->timer->get_time() - this->node->get_network()->get_clock()->get_time());
 		}else{
@@ -89,15 +90,15 @@ void SensorHeedProc::add_member(int addr)
 	this->inode->get_mnmanager()->add(addr);
 }
 
-void SensorHeedProc::set_scost_type(int addr, char ch_type)
+void SensorHeedProc::set_tent_type(int addr, char ch_type)
 {
-	Scost* sc = this->costs->find(Scost(addr, 0, 0x00));
+	heed::Tent* sc = this->tents->find(heed::Tent(addr, 0, 0x00));
 	sc->type = ch_type;
 }
 
-void SensorHeedProc::add_scost(int addr, double cost)
+void SensorHeedProc::add_tent(int addr, double cost)
 {
-	this->costs->add(new Scost(addr, cost, SensorHeedProc::NOT_CH));
+	this->tents->add(new heed::Tent(addr, cost, SensorHeedProc::NOT_CH));
 }
 
 double SensorHeedProc::calAMRP()
@@ -121,7 +122,7 @@ void SensorHeedProc::cal_broadcast_cost()
 {
 	double* data = new double[1];
 	data[0] = this->calAMRP();
-	this->add_scost(this->node->get_addr(), data[0]);
+	this->add_tent(this->node->get_addr(), data[0]);
 	dynamic_cast<ClusteringCommProxy*>(this->node->get_commproxy())->broadcast(
 		this->node->get_addr(), ClusteringSimModel::CLUSTER_RADIUS, 
 		ClusteringSimModel::CTRL_PACKET_SIZE, 
@@ -144,10 +145,10 @@ void SensorHeedProc::cluster_head_msg()
 
 int SensorHeedProc::get_least_cost_ch()
 {
-	Scost* sc = NULL;
-	this->costs->seek(0);
-	while(this->costs->has_more()){
-		sc = this->costs->next();
+	heed::Tent* sc = NULL;
+	this->tents->seek(0);
+	while(this->tents->has_more()){
+		sc = this->tents->next();
 		if(sc->type == SensorHeedProc::TENT_CH || sc->type == SensorHeedProc::FINAL_CH){
 			return sc->addr;
 		}
@@ -157,10 +158,10 @@ int SensorHeedProc::get_least_cost_ch()
 
 int SensorHeedProc::get_least_cost_final_ch()
 {
-	Scost* sc = NULL;
-	this->costs->seek(0);
-	while(this->costs->has_more()){
-		sc = this->costs->next();
+	heed::Tent* sc = NULL;
+	this->tents->seek(0);
+	while(this->tents->has_more()){
+		sc = this->tents->next();
 		if(sc->type == SensorHeedProc::FINAL_CH){
 			return sc->addr;
 		}
@@ -186,7 +187,7 @@ int SensorHeedProc::proc_clustering()
 {	
 	switch(this->proc_state)
 	{
-	case SensorHeedProc::PROC_OFF:
+	case SensorHeedProc::PROC_SLEEP:
 	{
 		break;
 	}
@@ -196,7 +197,7 @@ int SensorHeedProc::proc_clustering()
 	}
 	case SensorHeedProc::PROC_GETREADY:
 	{
-		this->costs->clear();
+		this->tents->clear();
 		this->cal_broadcast_cost();
 		this->ch_type = SensorHeedProc::NOT_CH;
 		
@@ -223,7 +224,7 @@ int SensorHeedProc::proc_clustering()
 						{
 							this->ch_type = SensorHeedProc::FINAL_CH;
 							this->inode->set_ch_addr(this->node->get_addr());
-							this->set_scost_type(this->node->get_addr(), this->ch_type);
+							this->set_tent_type(this->node->get_addr(), this->ch_type);
 							this->cluster_head_msg();
 						}
 					}
@@ -232,7 +233,7 @@ int SensorHeedProc::proc_clustering()
 						if(this->ch_type == SensorHeedProc::NOT_CH)
 						{
 							this->ch_type = SensorHeedProc::TENT_CH;
-							this->set_scost_type(this->node->get_addr(), this->ch_type);
+							this->set_tent_type(this->node->get_addr(), this->ch_type);
 							this->cluster_head_msg();
 						}
 					}
@@ -244,7 +245,7 @@ int SensorHeedProc::proc_clustering()
 				{
 					this->ch_type = SensorHeedProc::FINAL_CH;
 					this->inode->set_ch_addr(this->node->get_addr());
-					this->set_scost_type(this->node->get_addr(), this->ch_type);
+					this->set_tent_type(this->node->get_addr(), this->ch_type);
 					this->cluster_head_msg();
 				}
 			}
@@ -252,7 +253,7 @@ int SensorHeedProc::proc_clustering()
 			{
 				if(this->ch_type == SensorHeedProc::NOT_CH){
 					this->ch_type = SensorHeedProc::TENT_CH;
-					this->set_scost_type(this->node->get_addr(), this->ch_type);
+					this->set_tent_type(this->node->get_addr(), this->ch_type);
 					this->cluster_head_msg();
 				}
 			}
@@ -300,12 +301,12 @@ int SensorHeedProc::proc_clustering()
 
 void SensorHeedProc::receive_ch_msg(Msg* msg)
 {
-	this->set_scost_type(msg->fromaddr, msg->data[0]);
+	this->set_tent_type(msg->fromaddr, msg->data[0]);
 }
 
 void SensorHeedProc::receive_cost_msg(Msg* msg)
 {
-	this->add_scost(msg->fromaddr, ((double*)(msg->data))[0]);
+	this->add_tent(msg->fromaddr, ((double*)(msg->data))[0]);
 }
 
 void SensorHeedProc::receive_join_msg(Msg* msg)
@@ -316,10 +317,10 @@ void SensorHeedProc::receive_join_msg(Msg* msg)
 
 bool SensorHeedProc::has_sch()
 {
-	Scost* sc = NULL;
-	this->costs->seek(0);
-	while(this->costs->has_more()){
-		sc = this->costs->next();
+	heed::Tent* sc = NULL;
+	this->tents->seek(0);
+	while(this->tents->has_more()){
+		sc = this->tents->next();
 		if(sc->type == SensorHeedProc::TENT_CH || sc->type == SensorHeedProc::FINAL_CH){
 			return true;
 		}
