@@ -70,6 +70,7 @@ void ClusteringMonitor::record_before_run()
 	for(i=0;i<this->max_records;i++){
 		this->rotate_overhead_track[i] = -1;
 	}
+	this->fnd = -1;
 	
 	this->record_xy(this->network->nodes);
 	
@@ -94,6 +95,7 @@ void ClusteringMonitor::record_after_run()
 	this->wirte_to_mat("../../../mfiles/rotate_overhead_track.mat","rotate_overhead_track", this->rotate_overhead_track, 1, this->record_count);
 	this->wirte_to_mat("../../../mfiles/rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_count);
 	printf("done\n");
+	printf("\nFND = %f\n", this->fnd);
 }
 
 void ClusteringMonitor::record_communicate(Msg* msg, double energy)
@@ -117,6 +119,8 @@ void ClusteringMonitor::record_periodically(Node** nodes)
 		if(nodes[i]->is_alive()){
 			e_sum += nodes[i]->energy;
 			al_sum ++;
+		}else if(this->fnd < 0){
+			this->fnd = this->network->get_clock()->get_time();
 		}
 	}	
 	for(int i = 1; i < this->network->nodes_num; i ++){

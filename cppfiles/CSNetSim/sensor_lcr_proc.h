@@ -139,7 +139,7 @@ public:
 	Sch(int addr, double d, double d_tosink, double anc_time, double anc_energy) :
 		addr(addr), d(d), d_tosink(d_tosink), anc_time(anc_time), anc_energy(anc_energy)
 	{
-		this->cost = d_tosink;
+		this->cost = sqrt( pow(d_tosink, (d_tosink > EnergyModel::D_THRESHOLD ? 4:2)) + pow(d, 2) );
 	}
 	~Sch() {}
 public:

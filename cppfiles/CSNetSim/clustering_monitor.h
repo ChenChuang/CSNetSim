@@ -41,6 +41,7 @@ private:
 	double *rotate_times_track;
 	double rotate_overhead;
 	double *rotate_overhead_track;
+	double fnd;
 	
 	int record_count;
 	int max_records;	

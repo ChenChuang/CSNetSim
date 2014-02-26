@@ -15,7 +15,7 @@ namespace ClusteringSimModel
 	double DATA_PACKET_SIZE = 100;    //byte
 	double CTRL_PACKET_SIZE = 25;   //byte
 	double DATA_CTRL_PACKET_SIZE = 100;  //byte
-	double MAX_SIM_TIME = 400000;    //second
+	double MAX_SIM_TIME = 100000;    //second
 	double RECORD_PERIOD = 100;   //second
 	double DEFAULT_TICK = 1;    //second
 	double E_INIT = 2000;  //J
