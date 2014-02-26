@@ -10,8 +10,9 @@ SensorLcrProc::SensorLcrProc(Node* anode) : node(anode)
 	this->ch_wait_newch_time = 2;
 	this->newch_wait_mn_time = 2;
 	this->max_wait_self_time = 50;
-	this->energy_thrd = 0.7;
-	this->energy_thrd_2 = 20;
+	this->energy_thrd = 0.5;
+	this->energy_thrd_2 = 10;
+	this->energy_thrd_3 = 100;
 	
 	this->inode = dynamic_cast<INode_SensorLcrProc*>(anode);
 	this->comm_proxy = dynamic_cast<ClusteringCommProxy*>(anode->get_commproxy());
@@ -163,10 +164,15 @@ void SensorLcrProc::ticktock(double time)
 		{
 			this->proc_state = SensorLcrProc::PROC_ISOLATED;
 		}
+		tick = -1;
 		break;
 	}
 	case SensorLcrProc::PROC_CH_CHECK:
 	{
+		if(!this->check_nexthop_alive())
+		{
+			this->reset_next_hop();
+		}
 		if(this->check_energy())
 		{
 			if(this->node->get_addr() == 491){
@@ -178,6 +184,8 @@ void SensorLcrProc::ticktock(double time)
 			this->newch = -1;
 			this->proc_state = SensorLcrProc::PROC_CH_WAIT_TENTS;
 			this->wait_resp_timer->set_after(this->ch_wait_resp_time);
+		}else{
+			tick = -1;
 		}
 		break;
 	}
@@ -457,7 +465,8 @@ void SensorLcrProc::cal_tent_costs()
 	this->tent_params->seek(0);
 	while(this->tent_params->has_more()){
 		ctp = this->tent_params->next();
-		if(ctp->e <= this->energy_thrd_2){
+		//if(ctp->e <= this->energy_thrd_2){
+		if(ctp->e <= -1){
 			fe = 0;
 		}else{
 			fe = ctp->e / ClusteringSimModel::E_INIT;
@@ -475,19 +484,34 @@ void SensorLcrProc::cal_tent_costs()
 
 bool SensorLcrProc::check_ch_alive()
 {
-	return this->inetwork->is_alive(this->inode->get_ch_addr());
+	bool r = this->inetwork->is_alive(this->inode->get_ch_addr());
+	if(!r){
+		this->remove_ch(this->inode->get_ch_addr());
+	}
+	return r;
+}
+
+bool SensorLcrProc::check_nexthop_alive()
+{
+	bool r = this->inetwork->is_alive(this->inode->get_next_hop());
+	if(!r){
+		this->remove_ch(this->inode->get_next_hop());
+	}
+	return r;
 }
 
 bool SensorLcrProc::check_energy()
 {
-	return (this->node->energy/this->energy_pre < this->energy_thrd || 
-		this->node->energy < this->energy_thrd_2);
+	return (this->node->energy/this->energy_pre < this->energy_thrd && 
+		this->energy_pre - this->node->energy > this->energy_thrd_3) || 
+		this->node->energy < this->energy_thrd_2;
 }
 
 void SensorLcrProc::reset_next_hop()
 {
 	if(this->inode->get_d_tosink() < ClusteringSimModel::MAX_RADIUS){
 		this->inode->set_next_hop(ClusteringSimModel::SINK_ADDR);
+		return;
 	}
 	int addr = this->get_least_cost_nexthop();
 	if(addr >= 0){

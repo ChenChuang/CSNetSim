@@ -6,7 +6,7 @@ SensorHeedProc::SensorHeedProc(Node* anode) : node(anode)
 	this->c_prob = 0.07;
 	this->p_min = 0.0001;
 	this->heed_time = log(1/0.0001) / log(2) + 3;
-	this->stable_time = 1800;
+	this->stable_time = 300;
 	this->min_tick = 1;
 	this->tents = new SortedList<heed::Tent>();
 	this->timer = new Timer(this->node->get_network()->get_clock());

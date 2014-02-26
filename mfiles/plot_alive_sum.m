@@ -1,7 +1,11 @@
-load('time.mat');
-load('alive_sum.mat');
-figure;
+dir = 'heed/';
+%dir = 'lcr/';
+load([dir,'time.mat']);
+load([dir,'alive_sum.mat']);
+load([dir,'output_track.mat']);
+%figure;
 hold on;
-plot(time, alive_sum);
+%plot(time, alive_sum);
+plot(output_track, alive_sum);
 %axis([0, length(alive_sum), 0, NODE_NUM]);
 title('time - num of dead node');

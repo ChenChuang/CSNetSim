@@ -6,4 +6,7 @@
 	// #define _DEBUG_
 #endif
 
+#define _HEED_
+//#define _LCR_
+
 #include <cstring>

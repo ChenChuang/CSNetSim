@@ -31,6 +31,7 @@ public:
 	void start_init_chs();
 private:
 	bool check_ch_alive();
+	bool check_nexthop_alive();
 	bool check_energy();
 	
 	void add_tent_param(int addr, double d, double e, double fcd, NgbManager* ngbs);
@@ -99,6 +100,7 @@ public:
 	double max_wait_self_time;
 	double energy_thrd;
 	double energy_thrd_2;
+	double energy_thrd_3;
 	
 private:
 	Node* node;
@@ -139,7 +141,8 @@ public:
 	Sch(int addr, double d, double d_tosink, double anc_time, double anc_energy) :
 		addr(addr), d(d), d_tosink(d_tosink), anc_time(anc_time), anc_energy(anc_energy)
 	{
-		this->cost = sqrt( pow(d_tosink, (d_tosink > EnergyModel::D_THRESHOLD ? 4:2)) + pow(d, 2) );
+		//this->cost = sqrt( pow(d_tosink, (d_tosink > EnergyModel::D_THRESHOLD ? 4:2)) + pow(d, 2) );
+		this->cost = sqrt( pow(d_tosink, 2) + pow(d, 2) );
 	}
 	~Sch() {}
 public:

@@ -85,15 +85,28 @@ void ClusteringMonitor::record_in_run()
 void ClusteringMonitor::record_after_run()
 {
 	printf("Monitor is writing ... ");
-	this->wirte_to_mat("../../../mfiles/time.mat","time", this->time, 1, this->record_count);
-	this->wirte_to_mat("../../../mfiles/energy_sum.mat","energy_sum", this->energy_sum, 1, this->record_count);
-	this->wirte_to_mat("../../../mfiles/alive_sum.mat","alive_sum", this->alive_sum, 1, this->record_count);
-	this->wirte_to_mat("../../../mfiles/energy_snapshot.mat","energy_snapshot", this->energy_snapshot, this->record_count, this->network->nodes_num);
-	this->wirte_to_mat("../../../mfiles/ch_snapshot.mat","ch_snapshot", this->ch_snapshot, this->record_count, this->network->nodes_num);
-	this->wirte_to_mat("../../../mfiles/hop_snapshot.mat","hop_snapshot", this->hop_snapshot, this->record_count, this->network->nodes_num);
-	this->wirte_to_mat("../../../mfiles/output_track.mat","output_track", this->output_track, 1, this->record_count);
-	this->wirte_to_mat("../../../mfiles/rotate_overhead_track.mat","rotate_overhead_track", this->rotate_overhead_track, 1, this->record_count);
-	this->wirte_to_mat("../../../mfiles/rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_count);
+#ifdef _HEED_
+	this->wirte_to_mat("../../../mfiles/heed/time.mat","time", this->time, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/heed/energy_sum.mat","energy_sum", this->energy_sum, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/heed/alive_sum.mat","alive_sum", this->alive_sum, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/heed/energy_snapshot.mat","energy_snapshot", this->energy_snapshot, this->record_count, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/heed/ch_snapshot.mat","ch_snapshot", this->ch_snapshot, this->record_count, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/heed/hop_snapshot.mat","hop_snapshot", this->hop_snapshot, this->record_count, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/heed/output_track.mat","output_track", this->output_track, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/heed/rotate_overhead_track.mat","rotate_overhead_track", this->rotate_overhead_track, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/heed/rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_count);
+#endif
+#ifdef _LCR_
+	this->wirte_to_mat("../../../mfiles/lcr/time.mat","time", this->time, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/lcr/energy_sum.mat","energy_sum", this->energy_sum, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/lcr/alive_sum.mat","alive_sum", this->alive_sum, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/lcr/energy_snapshot.mat","energy_snapshot", this->energy_snapshot, this->record_count, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/lcr/ch_snapshot.mat","ch_snapshot", this->ch_snapshot, this->record_count, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/lcr/hop_snapshot.mat","hop_snapshot", this->hop_snapshot, this->record_count, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/lcr/output_track.mat","output_track", this->output_track, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/lcr/rotate_overhead_track.mat","rotate_overhead_track", this->rotate_overhead_track, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/lcr/rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_count);
+#endif
 	printf("done\n");
 	printf("\nFND = %f\n", this->fnd);
 }
@@ -112,6 +125,8 @@ void ClusteringMonitor::record_periodically(Node** nodes)
 	}
 	this->timer->set_after(this->step);
 	this->time[this->record_count] = this->network->get_clock()->get_time();
+	
+	this->output = dynamic_cast<SinkNode*>(nodes[0])->dataproc->data_l;
 	
 	double e_sum = 0;
 	int al_sum = 0;
@@ -145,8 +160,14 @@ void ClusteringMonitor::record_xy(Node** nodes)
 		xs[i] = nodes[i]->x;
 		ys[i] = nodes[i]->y;
 	}
-	this->wirte_to_mat("../../../mfiles/nodes_x.mat","nodes_x", xs, 1, this->network->nodes_num);
-	this->wirte_to_mat("../../../mfiles/nodes_y.mat","nodes_y", ys, 1, this->network->nodes_num);
+#ifdef _HEED_
+	this->wirte_to_mat("../../../mfiles/heed/nodes_x.mat","nodes_x", xs, 1, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/heed/nodes_y.mat","nodes_y", ys, 1, this->network->nodes_num);
+#endif
+#ifdef _LCR_
+	this->wirte_to_mat("../../../mfiles/lcr/nodes_x.mat","nodes_x", xs, 1, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/lcr/nodes_y.mat","nodes_y", ys, 1, this->network->nodes_num);
+#endif
 }
 
 /** deprecated **/

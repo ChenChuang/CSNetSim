@@ -10,6 +10,8 @@ SinkNode::SinkNode(Network* anetwork, int aaddr, double ax, double ay):
 	
 	this->dataproc = new SinkDataProc();
 	this->procs_manager->add(this->dataproc);
+	
+	this->dataproc->turn_on();
 }
 
 SinkNode::~SinkNode()

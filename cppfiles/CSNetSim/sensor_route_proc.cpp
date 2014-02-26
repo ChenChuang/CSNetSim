@@ -84,6 +84,9 @@ void SensorRouteProc::start_route()
 
 int SensorRouteProc::get_best_ch()
 {
+	if(this->inode->get_d_tosink() < ClusteringSimModel::MAX_RADIUS){
+		this->inode->set_next_hop(ClusteringSimModel::SINK_ADDR);
+	}
 	this->chs->seek(0);
 	Sch* sc;
 	while(this->chs->has_more()){

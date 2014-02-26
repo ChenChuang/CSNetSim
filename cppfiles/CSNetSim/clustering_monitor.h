@@ -3,6 +3,7 @@
 
 #include "csnetsim.h"
 #include "clustering_sim_model.h"
+#include "sink_node.h"
 
 #include <string>
 #include <cmath>
