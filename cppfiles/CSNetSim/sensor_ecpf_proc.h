@@ -1,6 +1,8 @@
 #ifndef SENSORECPFPROC_H
 #define SENSORECPFPROC_H
 
+#include <fl/Headers.h>
+
 #include "csnetsim.h" // Base class: Processor
 #include "clustering_member.h"
 #include "clustering_neighbor.h"
@@ -143,6 +145,18 @@ class INet_SensorEcpfProc
 public:
 	virtual double d_between(int addr1, int addr2) = 0;
 	virtual bool is_alive(int addr) = 0;
+};
+
+namespace ecpf
+{
+	class FuzzyCostComputor
+	{
+	public:
+		fl::Engine* engine;
+	public:
+		FuzzyCostComputor();
+		~FuzzyCostComputor();
+	};
 };
 
 #endif // SENSORECPFPROC_H

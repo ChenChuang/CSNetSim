@@ -311,7 +311,7 @@ double SensorEcpfProc::calFuzzyCost()
 		}
 	}
 	double centrality = sqrt(s / c)/ (ClusteringSimModel::AREA_SIZE_X + ClusteringSimModel::AREA_SIZE_Y) * 2.0;
-	double degree = c;
+	double degree = c / ClusteringSimModel::NODE_NUM;
 	this->fuzzycost = 0;
 	return this->fuzzycost;
 }
@@ -395,4 +395,73 @@ bool SensorEcpfProc::has_sch()
 		}
 	}
 	return false;
+}
+
+ecpf::FuzzyCostComputor::FuzzyCostComputor()
+{
+	this->engine = new fl::Engine;
+	this->engine->setName("FuzzyCostComputor");
+	
+	fl::InputVariable* degree = new fl::InputVariable;
+	degree->setEnabled(true);
+	degree->setName("degree");
+	degree->setRange(0.000, 1.000);
+
+	degree->addTerm(new fl::Trapezoid("low", 0.000, 0.000, 0.150, 0.300));
+	degree->addTerm(new fl::Triangle("med", 0.150, 0.300, 0.450));
+	degree->addTerm(new fl::Trapezoid("high", 0.300, 0.450, 1.000, 1.000));
+	this->engine->addInputVariable(degree);
+	
+	fl::InputVariable* centrality = new fl::InputVariable;
+	centrality->setEnabled(true);
+	centrality->setName("centrality");
+	centrality->setRange(0.000, 1.000);
+
+	centrality->addTerm(new fl::Triangle("close", 0.000, 0.250, 0.500));
+	centrality->addTerm(new fl::Triangle("adequate", 0.250, 0.500, 0.750));
+	centrality->addTerm(new fl::Triangle("far", 0.500, 0.750, 1.000));
+	this->engine->addInputVariable(centrality);
+	
+	fl::OutputVariable* cost = new fl::OutputVariable;
+	cost->setName("cost");
+	cost->setRange(0.000, 1.000);
+	cost->fuzzyOutput()->setAccumulation(new fl::Maximum);
+	cost->setDefuzzifier(new fl::Centroid(200));
+	cost->setDefaultValue(fl::nan);
+	cost->setLockValidOutput(false);
+	cost->setLockOutputRange(false);
+
+	cost->addTerm(new fl::Triangle("vl", 0.000, 0.250, 0.500));
+	cost->addTerm(new fl::Triangle("l", 0.250, 0.500, 0.750));
+	cost->addTerm(new fl::Triangle("rl", 0.500, 0.750, 1.000));
+	cost->addTerm(new fl::Triangle("ml", 0.000, 0.250, 0.500));
+	cost->addTerm(new fl::Triangle("m", 0.250, 0.500, 0.750));
+	cost->addTerm(new fl::Triangle("mh", 0.500, 0.750, 1.000));
+	cost->addTerm(new fl::Triangle("rh", 0.000, 0.250, 0.500));
+	cost->addTerm(new fl::Triangle("h", 0.250, 0.500, 0.750));
+	cost->addTerm(new fl::Triangle("vh", 0.500, 0.750, 1.000));
+	engine->addOutputVariable(cost);
+	
+	fl::RuleBlock* ruleblock1 = new fl::RuleBlock;
+	ruleblock1->setEnabled(true);
+	ruleblock1->setName("");
+	ruleblock1->setConjunction(NULL);
+	ruleblock1->setDisjunction(NULL);
+	ruleblock1->setActivation(new fl::Minimum);
+
+	ruleblock1->addRule(fl::Rule::parse("if centrality is close and degree is high then cost is vl", engine));
+	ruleblock1->addRule(fl::Rule::parse("if centrality is close and degree is med then cost is l", engine));
+	ruleblock1->addRule(fl::Rule::parse("if centrality is close and degree is low then cost is rl", engine));
+	ruleblock1->addRule(fl::Rule::parse("if centrality is adequate and degree is high then cost is ml", engine));
+	ruleblock1->addRule(fl::Rule::parse("if centrality is adequate and degree is med then cost is m", engine));
+	ruleblock1->addRule(fl::Rule::parse("if centrality is adequate and degree is low then cost is mh", engine));
+	ruleblock1->addRule(fl::Rule::parse("if centrality is far and degree is high then cost is rh", engine));
+	ruleblock1->addRule(fl::Rule::parse("if centrality is far and degree is med then cost is h", engine));
+	ruleblock1->addRule(fl::Rule::parse("if centrality is far and degree is low then cost is vh", engine));
+	engine->addRuleBlock(ruleblock1);
+}
+
+ecpf::FuzzyCostComputor::~FuzzyCostComputor()
+{
+	delete this->engine;
 }
