@@ -11,6 +11,7 @@
 #include "sensor_route_proc.h"
 #include "sensor_heed_proc.h"
 #include "sensor_lcr_proc.h"
+#include "sensor_ecpf_proc.h"
 #include "test_proc.h"
 
 
@@ -19,7 +20,8 @@ class SensorNode : public Node,
 	public INode_SensorDataProc, 
 	public INode_SensorRouteProc, 
 	public INode_SensorHeedProc, 
-	public INode_SensorLcrProc
+	public INode_SensorLcrProc,
+	public INode_SensorEcpfProc
 {
 public:
 	SensorNode(Network* anetwork, int aaddr, double ax, double ay, double aenergy);
@@ -42,8 +44,8 @@ public:
 	double get_neighbor_d(int addr);
 	void start_route();
 	void stop_route();
-	void start_clustering_routing();
-	void exit_clustering_routing();
+	void start_cluster_route();
+	void exit_cluster_route();
 	
 public:
 	MnManager* mnmanager;
@@ -57,6 +59,7 @@ public:
 	SensorHeedProc* heedproc;
 	SensorRouteProc* routeproc;
 	SensorLcrProc* lcrproc;
+	SensorEcpfProc* ecpfproc;
 	
 friend class Monitor;
 friend class ClusteringMonitor;

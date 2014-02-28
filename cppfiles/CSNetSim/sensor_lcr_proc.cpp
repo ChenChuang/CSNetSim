@@ -68,7 +68,7 @@ void SensorLcrProc::init()
 void SensorLcrProc::start()
 {
 	this->proc_state = SensorLcrProc::PROC_WAIT_CLUSTERING;
-	this->inode->start_clustering_routing();
+	this->inode->start_cluster_route();
 	this->wait_clustering_timer->set_after(this->clustering_time);
 }
 
@@ -144,7 +144,7 @@ void SensorLcrProc::ticktock(double time)
 	{
 		if(this->wait_clustering_timer->is_timeout())
 		{
-			this->inode->exit_clustering_routing();
+			this->inode->exit_cluster_route();
 			this->start_init_chs();
 		}
 		tick = -1;

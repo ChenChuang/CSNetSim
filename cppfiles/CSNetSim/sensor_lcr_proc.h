@@ -206,8 +206,8 @@ public:
 class INode_SensorLcrProc
 {
 public:
-	virtual void start_clustering_routing() = 0;
-	virtual void exit_clustering_routing() = 0;
+	virtual void start_cluster_route() = 0;
+	virtual void exit_cluster_route() = 0;
 	virtual MnManager* get_mnmanager() = 0;
 	virtual int get_ch_addr() = 0;
 	virtual void set_ch_addr(int addr) = 0;

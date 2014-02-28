@@ -29,6 +29,9 @@ SensorNode::SensorNode(Network* anetwork, int aaddr, double ax, double ay, doubl
 	
 	this->lcrproc = new SensorLcrProc(this);
 	this->procs_manager->add(this->lcrproc);
+	
+	this->ecpfproc = new SensorEcpfProc(this);
+	this->procs_manager->add(this->ecpfproc);
 }
 
 SensorNode::~SensorNode()
@@ -56,6 +59,9 @@ SensorNode::~SensorNode()
 	
 	delete this->lcrproc;
 	this->lcrproc = NULL;
+	
+	delete this->ecpfproc;
+	this->ecpfproc = NULL;
 }
 
 void SensorNode::print()
@@ -74,6 +80,9 @@ void SensorNode::init()
 #ifdef _LCR_
 	this->lcrproc->turn_on(); this->lcrproc->start();
 #endif
+#ifdef _ECPF_
+	this->ecpfproc->turn_on(); this->ecpfproc->start_clustering();
+#endif
 }
 
 void SensorNode::start_route()
@@ -87,13 +96,13 @@ void SensorNode::stop_route()
 	this->routeproc->turn_off();
 }
 
-void SensorNode::start_clustering_routing()
+void SensorNode::start_cluster_route()
 {
 	this->heedproc->turn_on();
 	this->heedproc->start_clustering();
 }
 
-void SensorNode::exit_clustering_routing()
+void SensorNode::exit_cluster_route()
 {
 	this->heedproc->exit_clustering();
 	this->heedproc->turn_off();
