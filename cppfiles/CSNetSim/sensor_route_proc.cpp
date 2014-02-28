@@ -2,7 +2,7 @@
 
 SensorRouteProc::SensorRouteProc(Node* anode) : node(anode)
 {
-	this->min_tick = 1;
+	this->min_tick = 0.1;
 	this->inode = dynamic_cast<INode_SensorRouteProc*>(this->node);
 	this->inetwork = dynamic_cast<INet_SensorRouteProc*>(this->node->get_network());
 	this->chs = new SortedList<Sch>();

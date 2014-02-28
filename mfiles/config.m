@@ -11,11 +11,11 @@
 DISTRIBUTE_MASK = '';   % image file path of mask
 CELL_D = 10;
 
-AREA_SIZE_X = 150;    % metre
-AREA_SIZE_Y = 150;
-NODE_NUM = 1000;
-SINK_X = 50;  % metre
-SINK_Y = 50;
+AREA_SIZE_X = 100;    % metre
+AREA_SIZE_Y = 100;
+NODE_NUM = 500;
+SINK_X = 0;  % metre
+SINK_Y = 0;
 SINK_ADDR = 0;
 
 CLUSTER_RADIUS = 15;   % metre

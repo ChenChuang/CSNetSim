@@ -82,8 +82,11 @@ public:
 public:
 	double c_prob;
 	double p_min;
+	
 	double heed_time;
+	double route_time;
 	double stable_time;
+	
 	double min_tick;
 	
 private:

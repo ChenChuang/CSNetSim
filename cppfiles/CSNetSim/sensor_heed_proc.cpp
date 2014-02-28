@@ -8,6 +8,7 @@ SensorHeedProc::SensorHeedProc(Node* anode) : node(anode)
 	this->p_min = 0.0001;
 	//this->heed_time = log(1/0.0001) / log(2) * this->min_tick;
 	this->heed_time = 1;
+	this->route_time = 1;
 	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 5;
 	
 	this->tents = new SortedList<heed::Tent>();
@@ -42,7 +43,7 @@ void SensorHeedProc::exit_clustering()
 		this->inode->set_ch_addr(this->node->get_addr());
 	}
 	this->proc_state = SensorHeedProc::PROC_SLEEP;
-	this->timer->set_after(this->stable_time);
+	this->timer->set_after(this->route_time + this->stable_time);
 }
 
 void SensorHeedProc::ticktock(double time)

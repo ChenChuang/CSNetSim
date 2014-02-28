@@ -28,6 +28,8 @@ SensorLcrProc::SensorLcrProc(Node* anode) : node(anode)
 	this->wait_newch_timer = new Timer(this->node->get_network()->get_clock());
 	this->wait_mn_timer = new Timer(this->node->get_network()->get_clock());
 	this->wait_self_timer = new Timer(this->node->get_network()->get_clock());
+	
+	this->energy_pre = ClusteringSimModel::E_INIT;
 }
 
 SensorLcrProc::~SensorLcrProc()
