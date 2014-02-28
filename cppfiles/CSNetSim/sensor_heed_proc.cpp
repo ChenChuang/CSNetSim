@@ -3,11 +3,13 @@
 SensorHeedProc::SensorHeedProc(Node* anode) : node(anode)
 {
 	this->inode = dynamic_cast<INode_SensorHeedProc*>(this->node);
+	this->min_tick = 0.01;
 	this->c_prob = 0.07;
 	this->p_min = 0.0001;
-	this->heed_time = log(1/0.0001) / log(2) + 3;
-	this->stable_time = 300;
-	this->min_tick = 1;
+	//this->heed_time = log(1/0.0001) / log(2) * this->min_tick;
+	this->heed_time = 1;
+	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 5;
+	
 	this->tents = new SortedList<heed::Tent>();
 	this->timer = new Timer(this->node->get_network()->get_clock());
 }
@@ -27,6 +29,8 @@ void SensorHeedProc::init()
 
 double SensorHeedProc::start_clustering()
 {
+	this->inode->set_ch_addr(-1);
+	this->inode->set_next_hop(-1);
 	this->proc_state = SensorHeedProc::PROC_GETREADY;
 	this->timer->set_after(this->heed_time);
 	return this->heed_time;
@@ -57,7 +61,6 @@ void SensorHeedProc::ticktock(double time)
 				this->timer->get_time() - this->node->get_network()->get_clock()->get_time());
 		}else{
 			this->proc_clustering();
-			this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
 		}
 	}
 }
@@ -207,6 +210,7 @@ int SensorHeedProc::proc_clustering()
 		this->heed_count = 0;
 		
 		this->proc_state = SensorHeedProc::PROC_MAIN;
+		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
 		break;
 	}
 	case SensorHeedProc::PROC_MAIN:
@@ -262,6 +266,7 @@ int SensorHeedProc::proc_clustering()
 		}else{
 			this->proc_state = SensorHeedProc::PROC_FINAL;
 		}
+		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
 		break;
 	}
 	case SensorHeedProc::PROC_FINAL:
@@ -276,7 +281,7 @@ int SensorHeedProc::proc_clustering()
 			}
 			else
 			{
-				if(this->heed_count > 4 || rand() / (RAND_MAX + 1.0) < this->c_prob * pow(2, (double)(this->heed_count))){
+				if(this->heed_count > 2 || rand() / (RAND_MAX + 1.0) < this->c_prob * pow(2, (double)(this->heed_count))){
 					this->inode->set_ch_addr(this->node->get_addr());
 					this->ch_type = SensorHeedProc::FINAL_CH;
 					this->cluster_head_msg();
@@ -293,6 +298,7 @@ int SensorHeedProc::proc_clustering()
 			this->cluster_head_msg();
 			this->proc_state = SensorHeedProc::PROC_DONE;
 		}
+		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
 		break;
 	}
 	}

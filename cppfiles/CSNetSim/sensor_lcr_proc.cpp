@@ -2,17 +2,17 @@
 
 SensorLcrProc::SensorLcrProc(Node* anode) : node(anode)
 {
-	this->clustering_time = 100;
+	this->clustering_time = 5;
 	this->init_chs_time = 3;
 	this->lcr_time = 20;
-	this->ch_wait_resp_time = 2;
-	this->mn_wait_newch_time = 2;
-	this->ch_wait_newch_time = 2;
-	this->newch_wait_mn_time = 2;
-	this->max_wait_self_time = 50;
-	this->energy_thrd = 0.5;
-	this->energy_thrd_2 = 10;
-	this->energy_thrd_3 = 100;
+	this->ch_wait_resp_time = 0.02;
+	this->mn_wait_newch_time = 0.02;
+	this->ch_wait_newch_time = 0.02;
+	this->newch_wait_mn_time = 0.02;
+	this->max_wait_self_time = 0.7;
+	this->energy_thrd = 0.7;
+	this->energy_thrd_2 = 0;
+	this->energy_thrd_3 = 50;
 	
 	this->inode = dynamic_cast<INode_SensorLcrProc*>(anode);
 	this->comm_proxy = dynamic_cast<ClusteringCommProxy*>(anode->get_commproxy());
@@ -68,7 +68,7 @@ void SensorLcrProc::init()
 void SensorLcrProc::start()
 {
 	this->proc_state = SensorLcrProc::PROC_WAIT_CLUSTERING;
-	this->inode->start_clustering();
+	this->inode->start_clustering_routing();
 	this->wait_clustering_timer->set_after(this->clustering_time);
 }
 
@@ -131,7 +131,8 @@ int SensorLcrProc::process(Msg* msg)
 
 void SensorLcrProc::ticktock(double time)
 {
-	double tick = ClusteringSimModel::DEFAULT_TICK;
+	//double tick = ClusteringSimModel::DEFAULT_TICK;
+	double tick = 0.01;
 	switch(this->proc_state)
 	{
 	case SensorLcrProc::PROC_SLEEP:
@@ -143,7 +144,7 @@ void SensorLcrProc::ticktock(double time)
 	{
 		if(this->wait_clustering_timer->is_timeout())
 		{
-			this->inode->exit_clustering();
+			this->inode->exit_clustering_routing();
 			this->start_init_chs();
 		}
 		tick = -1;
@@ -484,6 +485,9 @@ void SensorLcrProc::cal_tent_costs()
 
 bool SensorLcrProc::check_ch_alive()
 {
+	if(this->inode->get_ch_addr() < 0){
+		return true;
+	}
 	bool r = this->inetwork->is_alive(this->inode->get_ch_addr());
 	if(!r){
 		this->remove_ch(this->inode->get_ch_addr());
@@ -493,6 +497,9 @@ bool SensorLcrProc::check_ch_alive()
 
 bool SensorLcrProc::check_nexthop_alive()
 {
+	if(this->inode->get_next_hop() < 0){
+		return true;
+	}
 	bool r = this->inetwork->is_alive(this->inode->get_next_hop());
 	if(!r){
 		this->remove_ch(this->inode->get_next_hop());

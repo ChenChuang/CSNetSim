@@ -11,9 +11,9 @@
 DISTRIBUTE_MASK = '';   % image file path of mask
 CELL_D = 10;
 
-AREA_SIZE_X = 100;    % metre
-AREA_SIZE_Y = 100;
-NODE_NUM = 500;
+AREA_SIZE_X = 150;    % metre
+AREA_SIZE_Y = 150;
+NODE_NUM = 1000;
 SINK_X = 50;  % metre
 SINK_Y = 50;
 SINK_ADDR = 0;

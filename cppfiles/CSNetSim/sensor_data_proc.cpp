@@ -59,14 +59,19 @@ void SensorDataProc::ticktock(double time)
 void SensorDataProc::send(char cmd){
 	int next_hop = dynamic_cast<INode_SensorDataProc*>(this->node)->get_next_hop();
 	if(next_hop < 0){
-		return;
+		//return;
+		next_hop = ClusteringSimModel::SINK_ADDR;
 	}
 	int* data = new int[1];
 	data[0] = this->data_l;
+	double size = ClusteringSimModel::DATA_PACKET_SIZE;
+	if(cmd == SensorDataProc::CMD_SENSE_DATA_UNFUSED){
+		size = size * this->data_l / this->unit_l;
+	}
 	dynamic_cast<ECommProxy_UnicastChannel*>(this->node->get_commproxy())->unicast(
 		this->node->get_addr(), 
 		next_hop, 
-		ClusteringSimModel::DATA_PACKET_SIZE, 
+		size, 
 		cmd, 
 		sizeof(int), (char*)data);
 	this->data_l = 0;

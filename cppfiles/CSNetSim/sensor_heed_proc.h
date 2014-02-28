@@ -106,8 +106,10 @@ public:
 	virtual MnManager* get_mnmanager() = 0;
 	virtual int get_ch_addr() = 0;
 	virtual void set_ch_addr(int addr) = 0;
+	virtual void set_next_hop(int addr) = 0;
 	virtual bool is_ch() = 0;
 	virtual void start_route() = 0;
+	virtual void stop_route() = 0;
 	virtual NgbManager* get_neighbors() = 0;
 };
 

@@ -4,7 +4,7 @@
 
 ClusteringMonitor::ClusteringMonitor(ClusteringNetwork* anetwork): network(anetwork)
 {
-	this->step = 10;
+	this->step = ClusteringSimModel::RECORD_PERIOD;
 	this->record_count = 0;
 	this->max_records = floor(anetwork->max_time / this->step) + 1;
 	this->timer = new Timer(this->network->get_clock());
@@ -71,6 +71,7 @@ void ClusteringMonitor::record_before_run()
 		this->rotate_overhead_track[i] = -1;
 	}
 	this->fnd = -1;
+	this->lnd = -1;
 	
 	this->record_xy(this->network->nodes);
 	
@@ -107,8 +108,19 @@ void ClusteringMonitor::record_after_run()
 	this->wirte_to_mat("../../../mfiles/lcr/rotate_overhead_track.mat","rotate_overhead_track", this->rotate_overhead_track, 1, this->record_count);
 	this->wirte_to_mat("../../../mfiles/lcr/rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_count);
 #endif
+#ifdef _ECPF_
+	this->wirte_to_mat("../../../mfiles/ecpf/time.mat","time", this->time, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/ecpf/energy_sum.mat","energy_sum", this->energy_sum, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/ecpf/alive_sum.mat","alive_sum", this->alive_sum, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/ecpf/energy_snapshot.mat","energy_snapshot", this->energy_snapshot, this->record_count, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/ecpf/ch_snapshot.mat","ch_snapshot", this->ch_snapshot, this->record_count, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/ecpf/hop_snapshot.mat","hop_snapshot", this->hop_snapshot, this->record_count, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/ecpf/output_track.mat","output_track", this->output_track, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/ecpf/rotate_overhead_track.mat","rotate_overhead_track", this->rotate_overhead_track, 1, this->record_count);
+	this->wirte_to_mat("../../../mfiles/ecpf/rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_count);
+#endif
 	printf("done\n");
-	printf("\nFND = %f\n", this->fnd);
+	printf("\nFND = %f\nLND = %f\n", this->fnd, this->lnd);
 }
 
 void ClusteringMonitor::record_communicate(Msg* msg, double energy)
@@ -130,14 +142,17 @@ void ClusteringMonitor::record_periodically(Node** nodes)
 	
 	double e_sum = 0;
 	int al_sum = 0;
-	for(int i = 1; i < this->network->nodes_num; i ++){
+	for(int i = 1; i < this->network->nodes_num; i++){
 		if(nodes[i]->is_alive()){
 			e_sum += nodes[i]->energy;
 			al_sum ++;
 		}else if(this->fnd < 0){
 			this->fnd = this->network->get_clock()->get_time();
 		}
-	}	
+	}
+	if(this->lnd < 0 && al_sum == 0){
+		this->lnd = this->network->get_clock()->get_time();
+	}
 	for(int i = 1; i < this->network->nodes_num; i ++){
 		this->energy_snapshot[ this->record_count * this->network->nodes_num + i ] = nodes[i]->energy;
 		this->ch_snapshot[ this->record_count * this->network->nodes_num + i ] = dynamic_cast<SensorNode*>(nodes[i])->ch_addr;
@@ -167,6 +182,10 @@ void ClusteringMonitor::record_xy(Node** nodes)
 #ifdef _LCR_
 	this->wirte_to_mat("../../../mfiles/lcr/nodes_x.mat","nodes_x", xs, 1, this->network->nodes_num);
 	this->wirte_to_mat("../../../mfiles/lcr/nodes_y.mat","nodes_y", ys, 1, this->network->nodes_num);
+#endif
+#ifdef _ECPF_
+	this->wirte_to_mat("../../../mfiles/ecpf/nodes_x.mat","nodes_x", xs, 1, this->network->nodes_num);
+	this->wirte_to_mat("../../../mfiles/ecpf/nodes_y.mat","nodes_y", ys, 1, this->network->nodes_num);
 #endif
 }
 

@@ -82,16 +82,22 @@ void SensorNode::start_route()
 	this->routeproc->start_route();
 }
 
-void SensorNode::start_clustering()
+void SensorNode::stop_route()
+{
+	this->routeproc->turn_off();
+}
+
+void SensorNode::start_clustering_routing()
 {
 	this->heedproc->turn_on();
 	this->heedproc->start_clustering();
 }
 
-void SensorNode::exit_clustering()
+void SensorNode::exit_clustering_routing()
 {
 	this->heedproc->exit_clustering();
 	this->heedproc->turn_off();
+	this->routeproc->turn_off();
 }
 
 void SensorNode::init_neighbors(Adjv* adjv)

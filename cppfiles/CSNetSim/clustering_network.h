@@ -6,12 +6,13 @@
 #include "sink_node.h"
 #include "sensor_node.h"
 #include "sensor_lcr_proc.h"
+#include "sensor_route_proc.h"
 #include "clustering_monitor.h"
 #include "broadcast_channel.h"
 #include "unicast_channel.h"
 #include "incluster_channel.h"
 
-class ClusteringNetwork : public Network, public INet_SensorLcrProc
+class ClusteringNetwork : public Network, public INet_SensorLcrProc, public INet_SensorRouteProc
 {
 public:
 	ClusteringNetwork(double* x, double* y);

@@ -6,6 +6,7 @@
 
 struct Sch;
 class INode_SensorRouteProc;
+class INet_SensorRouteProc;
 
 class SensorRouteProc : public Processor
 {
@@ -31,6 +32,7 @@ public:
 private:
 	Node* node;
 	INode_SensorRouteProc* inode;
+	INet_SensorRouteProc* inetwork;
 	SortedList<Sch>* chs;
 	
 	char proc_state;
@@ -45,6 +47,12 @@ public:
 	virtual bool is_ch() = 0;
 	virtual double get_d_tosink() = 0;
 	virtual double get_neighbor_d(int addr) = 0;
+};
+
+class INet_SensorRouteProc
+{
+public:
+	virtual bool is_alive(int addr) = 0;
 };
 
 struct Sch

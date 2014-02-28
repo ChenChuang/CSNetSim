@@ -41,8 +41,9 @@ public:
 	double get_d_tosink() {return this->d_tosink;}
 	double get_neighbor_d(int addr);
 	void start_route();
-	void start_clustering();
-	void exit_clustering();
+	void stop_route();
+	void start_clustering_routing();
+	void exit_clustering_routing();
 	
 public:
 	MnManager* mnmanager;

@@ -4,6 +4,7 @@ SensorRouteProc::SensorRouteProc(Node* anode) : node(anode)
 {
 	this->min_tick = 1;
 	this->inode = dynamic_cast<INode_SensorRouteProc*>(this->node);
+	this->inetwork = dynamic_cast<INet_SensorRouteProc*>(this->node->get_network());
 	this->chs = new SortedList<Sch>();
 }
 
@@ -24,10 +25,8 @@ int SensorRouteProc::process(Msg* msg)
 	{
 	case SensorRouteProc::CMD_CH:
 	{
-		if(this->inode->is_ch()){
-			double* data = (double*)(msg->data);
-			this->chs->add(new Sch(msg->fromaddr, data[0], this->inode->get_neighbor_d(msg->fromaddr)));
-		}
+		double* data = (double*)(msg->data);
+		this->chs->add(new Sch(msg->fromaddr, data[0], this->inode->get_neighbor_d(msg->fromaddr)));
 		return 1;
 	}
 	}
@@ -40,6 +39,11 @@ void SensorRouteProc::ticktock(double time)
 	{
 	case SensorRouteProc::PROC_SLEEP:
 	{
+		int h = this->inode->get_next_hop();
+		if(h >= 0 && !this->inetwork->is_alive(h)){
+			h = this->get_best_ch();
+			this->inode->set_next_hop(h);
+		}
 		return;
 	}
 	case SensorRouteProc::PROC_GETREADY:
@@ -54,7 +58,9 @@ void SensorRouteProc::ticktock(double time)
 				SensorRouteProc::CMD_CH, 
 				sizeof(double), (char*)data);
 		}
+		this->inode->set_next_hop(-1);
 		this->proc_state = SensorRouteProc::PROC_CHOOSE;
+		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
 		break;
 	}
 	case SensorRouteProc::PROC_CHOOSE:
@@ -71,7 +77,6 @@ void SensorRouteProc::ticktock(double time)
 		break;
 	}
 	}
-	this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
 }
 
 void SensorRouteProc::start_route()
@@ -85,13 +90,13 @@ void SensorRouteProc::start_route()
 int SensorRouteProc::get_best_ch()
 {
 	if(this->inode->get_d_tosink() < ClusteringSimModel::MAX_RADIUS){
-		this->inode->set_next_hop(ClusteringSimModel::SINK_ADDR);
+		return ClusteringSimModel::SINK_ADDR;
 	}
 	this->chs->seek(0);
 	Sch* sc;
 	while(this->chs->has_more()){
 		sc = this->chs->next();
-		if(sc->d_tosink < this->inode->get_d_tosink()){
+		if(this->inetwork->is_alive(sc->addr) && sc->d_tosink < this->inode->get_d_tosink()){
 			return sc->addr;
 		}
 	}
