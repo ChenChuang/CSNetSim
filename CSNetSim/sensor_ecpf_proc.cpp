@@ -310,8 +310,8 @@ double SensorEcpfProc::calFuzzyCost()
 			s += pow(d, 2);
 		}
 	}
-	double centrality = sqrt(s / c)/ (ClusteringSimModel::AREA_SIZE_X + ClusteringSimModel::AREA_SIZE_Y) * 2.0;
-	double degree = c / ClusteringSimModel::NODE_NUM;
+	//double centrality = sqrt(s / c)/ (ClusteringSimModel::AREA_SIZE_X + ClusteringSimModel::AREA_SIZE_Y) * 2.0;
+	//double degree = c / ClusteringSimModel::NODE_NUM;
 	this->fuzzycost = 0;
 	return this->fuzzycost;
 }

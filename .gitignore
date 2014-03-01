@@ -30,11 +30,15 @@
 *.workspace.chenchuang
 *.workspace.session
 
-cppfiles/CSNetSim/Debug/
-cppfiles/CSNetSim/Release/
-cppfiles/CSNetSim/.codelite/
-cppfiles/CSNetSim/Makefile
-cppfiles/CSNetSim/UnitTest/Debug/
+CSNetSim/Debug/
+CSNetSim/Release/
+CSNetSim/.codelite/
+CSNetSim/Makefile
+CSNetSim/UnitTest/Debug/
+
+fuzzylite-4.0/
+hdf5-1.8.12/
+results/
 
 # Matlab
 *.mat

@@ -39,7 +39,7 @@ bool Monitor::wirte_to_mat(const std::string& file_path, const std::string& var_
 
 #ifndef _MATLAB_
 
-bool Monitor::wirte_to_mat(const std::string& file_path, const std::string& var_name, const double* array, int row_num, int col_num)
+bool Monitor::write_to_mat(const std::string& file_path, const std::string& var_name, const double* array, int row_num, int col_num)
 {
 	MatFile* matfile = new MatFile(file_path);
 	bool result = matfile->WriteMatrix(var_name, row_num, col_num, array);
@@ -47,4 +47,11 @@ bool Monitor::wirte_to_mat(const std::string& file_path, const std::string& var_
 	return result;
 }
 #endif
+
+void Monitor::write_to_dat(const std::string& file_path, const double* array, int n)
+{
+	std::ofstream f(file_path.c_str(), std::ios::binary|std::ios::out);
+	f.write((char*)array, n*sizeof(double));
+	f.close();
+}
 

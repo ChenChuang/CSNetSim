@@ -10,6 +10,7 @@
 #endif
 
 #include <string>
+#include <fstream>
 
 class Monitor
 {
@@ -21,7 +22,8 @@ public:
 	virtual void record_before_run() {};
 	virtual void record_after_run() {};
 public:
-	bool wirte_to_mat(const std::string& file_path, const std::string& var_name, const double* array, int row_num, int col_num);
+	void write_to_dat(const std::string& file_path, const double* array, int n);
+	bool write_to_mat(const std::string& file_path, const std::string& var_name, const double* array, int row_num, int col_num);
 };
 
 #endif // MONITOR_H
