@@ -11,7 +11,7 @@
 #endif
 
 //#define _HEED_
-#define _LCR_
-//#define _ECPF_
+//#define _LCR_
+#define _ECPF_
 
 #include <cstring>

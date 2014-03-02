@@ -85,10 +85,10 @@ public:
 	static const char TENT_CH = 0x02;
 	static const char FINAL_CH = 0x03;
 	
-	static const char CMD_CH = 0x62;
-	static const char CMD_JOIN = 0x63;
-	static const char CMD_NEED = 0x64;
-	static const char CMD_CLUSTER = 0x65;
+	static const char CMD_CH = 0x82;
+	static const char CMD_JOIN = 0x83;
+	static const char CMD_NEED = 0x84;
+	static const char CMD_CLUSTER = 0x85;
 	
 public:
 	double energy_thrd;

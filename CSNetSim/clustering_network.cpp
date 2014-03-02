@@ -12,11 +12,13 @@ ClusteringNetwork::ClusteringNetwork(double* x, double* y):
 	
 	this->max_radius_channel = new BroadcastChannel(this, ClusteringSimModel::MAX_RADIUS);
 	this->cluster_radius_channel = new BroadcastChannel(this, ClusteringSimModel::CLUSTER_RADIUS);
+	this->netcast_channel = new NetcastChannel(this);
 	this->unicast_channel = new UnicastChannel(this);
 	this->incluster_channel = new InclusterChannel(this);
 	
 	this->channels->add(this->max_radius_channel);
 	this->channels->add(this->cluster_radius_channel);
+	this->channels->add(this->netcast_channel);
 	this->channels->add(this->unicast_channel);
 	this->channels->add(this->incluster_channel);
 	
@@ -38,6 +40,8 @@ ClusteringNetwork::~ClusteringNetwork()
 	this->max_radius_channel = NULL;
 	delete this->cluster_radius_channel;
 	this->cluster_radius_channel = NULL;
+	delete this->netcast_channel;
+	this->netcast_channel = NULL;
 	delete this->unicast_channel;
 	this->unicast_channel = NULL;
 	delete this->incluster_channel;

@@ -12,6 +12,7 @@
 #include "broadcast_channel.h"
 #include "unicast_channel.h"
 #include "incluster_channel.h"
+#include "netcast_channel.h"
 
 class ClusteringNetwork : public Network, public INet_SensorLcrProc, public INet_SensorEcpfProc, public INet_SensorRouteProc
 {
@@ -26,6 +27,7 @@ public:
 	int sensor_nodes_num;
 	BroadcastChannel* max_radius_channel;
 	BroadcastChannel* cluster_radius_channel;
+	NetcastChannel* netcast_channel;
 	UnicastChannel* unicast_channel;
 	InclusterChannel* incluster_channel;
 	

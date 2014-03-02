@@ -7,8 +7,8 @@ SensorEcpfProc::SensorEcpfProc(Node* anode) : node(anode)
 	this->clock = this->node->get_network()->get_clock();
 	this->comm = dynamic_cast<ClusteringCommProxy*>(this->node->get_commproxy());
 	
-	this->energy_thrd = 0.5;
-	this->max_main_iter = 2;
+	this->energy_thrd = 0.7;
+	this->max_main_iter = 5;
 	this->max_wait_self_time = 0.7;
 
 	this->ecpf_time = 2;
@@ -17,7 +17,7 @@ SensorEcpfProc::SensorEcpfProc(Node* anode) : node(anode)
 	this->check_time = 1;
 	
 	this->min_tick = 0.01;
-	this->main_iter_tick = 0.1;
+	this->main_iter_tick = 0.01;
 	
 	this->tents = new SortedList<ecpf::Tent>();
 	this->timer = new Timer(this->node->get_network()->get_clock());
@@ -110,6 +110,7 @@ void SensorEcpfProc::ticktock(double time)
 				this->proc_state = SensorEcpfProc::PROC_SLEEP;
 				this->timer->set_after(this->ecpf_time + this->route_time + this->stable_time);
 			}
+			break;
 		}
 		default:
 		{
@@ -197,9 +198,14 @@ int SensorEcpfProc::proc_clustering()
 					if( lcost_ch == this->node->get_addr() )
 					{
 						this->ch_type = SensorEcpfProc::FINAL_CH;
+						//this->node->energy = 800;
 						this->add_tent(this->node->get_addr(), this->ch_type, this->fuzzycost);
 						this->broadcast_ch_msg();
 					}
+				}
+				else
+				{
+					this->main_iter = this->max_main_iter;
 				}
 			}
 			else
@@ -226,11 +232,11 @@ int SensorEcpfProc::proc_clustering()
 			{
 				this->join_cluster(lcost_final_ch);
 				this->inode->set_ch_addr(lcost_final_ch);
-				this->proc_state = SensorEcpfProc::PROC_DONE;
 			}
 			else
 			{
 				this->ch_type = SensorEcpfProc::FINAL_CH;
+				//this->node->energy = 400;
 				this->add_tent(this->node->get_addr(), this->ch_type, this->fuzzycost);
 				this->broadcast_ch_msg();
 			}
@@ -289,7 +295,7 @@ void SensorEcpfProc::add_tent(int addr, char type, double cost)
 double SensorEcpfProc::calDelay()
 {
 	//return 1 / std::max(this->node->energy / ClusteringSimModel::E_INIT, 0.01) / 100;
-	return (1 - this->node->energy / ClusteringSimModel::E_INIT);
+	return (1 - this->node->energy / ClusteringSimModel::E_INIT)  * this->max_wait_self_time + this->min_tick;
 	//return (1 - this->node->energy / ClusteringSimModel::E_INIT * rand() / (RAND_MAX + 1.0)) * this->max_wait_self_time;
 }
 
@@ -407,9 +413,13 @@ ecpf::FuzzyCostComputor::FuzzyCostComputor()
 	degree->setName("degree");
 	degree->setRange(0.000, 1.000);
 
-	degree->addTerm(new fl::Trapezoid("low", 0.000, 0.000, 0.150, 0.300));
-	degree->addTerm(new fl::Triangle("med", 0.150, 0.300, 0.450));
-	degree->addTerm(new fl::Trapezoid("high", 0.300, 0.450, 1.000, 1.000));
+	double ad = ClusteringSimModel::NODE_NUM / 
+		(ClusteringSimModel::AREA_SIZE_X * ClusteringSimModel::AREA_SIZE_Y / pow(ClusteringSimModel::CLUSTER_RADIUS, 2) / 3.14);
+	double md = ad*3/2;
+	double ld = ad/2;
+	degree->addTerm(new fl::Trapezoid("low", 0.000, 0.000, ld, ad));
+	degree->addTerm(new fl::Triangle("med", ld, ad, md));
+	degree->addTerm(new fl::Trapezoid("high", ad, md, 1.000, 1.000));
 	this->engine->addInputVariable(degree);
 	
 	this->centrality = new fl::InputVariable;
@@ -417,29 +427,32 @@ ecpf::FuzzyCostComputor::FuzzyCostComputor()
 	centrality->setName("centrality");
 	centrality->setRange(0.000, 1.000);
 
-	centrality->addTerm(new fl::Triangle("close", 0.000, 0.250, 0.500));
-	centrality->addTerm(new fl::Triangle("adequate", 0.250, 0.500, 0.750));
-	centrality->addTerm(new fl::Triangle("far", 0.500, 0.750, 1.000));
+	double mc = ClusteringSimModel::CLUSTER_RADIUS / (ClusteringSimModel::AREA_SIZE_X + ClusteringSimModel::AREA_SIZE_Y) * 2;
+	double ac = mc*2/3;
+	double lc = ac/2;
+	centrality->addTerm(new fl::Trapezoid("close", 0.000, 0.000, lc, ac));
+	centrality->addTerm(new fl::Triangle("adequate", lc, ac, mc));
+	centrality->addTerm(new fl::Trapezoid("far", ac, mc, 1.000, 1.000));
 	this->engine->addInputVariable(centrality);
 	
 	this->cost = new fl::OutputVariable;
 	cost->setName("cost");
-	cost->setRange(0.000, 1.000);
+	cost->setRange(0.000, 100.0);
 	cost->fuzzyOutput()->setAccumulation(new fl::Maximum);
-	cost->setDefuzzifier(new fl::Centroid(200));
+	cost->setDefuzzifier(new fl::Centroid(100));
 	cost->setDefaultValue(fl::nan);
 	cost->setLockValidOutput(false);
 	cost->setLockOutputRange(false);
 
-	cost->addTerm(new fl::Triangle("vl", 0.000, 0.250, 0.500));
-	cost->addTerm(new fl::Triangle("l", 0.250, 0.500, 0.750));
-	cost->addTerm(new fl::Triangle("rl", 0.500, 0.750, 1.000));
-	cost->addTerm(new fl::Triangle("ml", 0.000, 0.250, 0.500));
-	cost->addTerm(new fl::Triangle("m", 0.250, 0.500, 0.750));
-	cost->addTerm(new fl::Triangle("mh", 0.500, 0.750, 1.000));
-	cost->addTerm(new fl::Triangle("rh", 0.000, 0.250, 0.500));
-	cost->addTerm(new fl::Triangle("h", 0.250, 0.500, 0.750));
-	cost->addTerm(new fl::Triangle("vh", 0.500, 0.750, 1.000));
+	cost->addTerm(new fl::Trapezoid("vl", 0.000, 0.000, 5.000, 10.00));
+	cost->addTerm(new fl::Triangle("l", 0.000, 10.00, 20.00));
+	cost->addTerm(new fl::Triangle("rl", 10.00, 22.50, 35.00));
+	cost->addTerm(new fl::Triangle("ml", 20.00, 35.00, 45.00));
+	cost->addTerm(new fl::Triangle("m", 20.00, 45.00, 70.00));
+	cost->addTerm(new fl::Triangle("mh", 45.00, 55.00, 70.00));
+	cost->addTerm(new fl::Triangle("rh", 55.00, 70.00, 80.00));
+	cost->addTerm(new fl::Triangle("h", 70.00, 80.00, 100.0));
+	cost->addTerm(new fl::Trapezoid("vh", 80.00, 95.00, 100.0, 100.0));
 	this->engine->addOutputVariable(cost);
 	
 	this->rules = new fl::RuleBlock;

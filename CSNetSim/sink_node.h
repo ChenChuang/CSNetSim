@@ -6,6 +6,7 @@
 #include "sink_comm_proxy.h"
 #include "test_proc.h"
 #include "sink_data_proc.h"
+#include "sink_ecpf_proc.h"
 
 class SinkNode : public Node
 {
@@ -19,6 +20,7 @@ public:
 public:
 	TestProc* testproc;
 	SinkDataProc* dataproc;
+	SinkEcpfProc* ecpfproc;
 };
 
 #endif // SINKNODE_H

@@ -11,7 +11,13 @@ SinkNode::SinkNode(Network* anetwork, int aaddr, double ax, double ay):
 	this->dataproc = new SinkDataProc();
 	this->procs_manager->add(this->dataproc);
 	
+	this->ecpfproc = new SinkEcpfProc(this);
+	this->procs_manager->add(this->ecpfproc);
+	
 	this->dataproc->turn_on();
+#ifdef _ECPF_
+	this->ecpfproc->turn_on();
+#endif
 }
 
 SinkNode::~SinkNode()
@@ -22,4 +28,6 @@ SinkNode::~SinkNode()
 	this->testproc = NULL;
 	delete this->dataproc;
 	this->dataproc = NULL;
+	delete this->ecpfproc;
+	this->ecpfproc = NULL;
 }
