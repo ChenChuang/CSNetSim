@@ -57,6 +57,7 @@ void SensorRouteProc::ticktock(double time)
 				ClusteringSimModel::CTRL_PACKET_SIZE, 
 				SensorRouteProc::CMD_CH, 
 				sizeof(double), (char*)data);
+			delete[] data;
 		}
 		this->inode->set_next_hop(-1);
 		this->proc_state = SensorRouteProc::PROC_CHOOSE;

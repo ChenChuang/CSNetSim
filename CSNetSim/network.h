@@ -22,7 +22,7 @@
 class Network
 {
 public:
-	Network(double* x, double* y, int num, double max_time, double default_tick);
+	Network(double* x, double* y, int num, double amax_time, double default_tick, double min_tick);
 	virtual ~Network();
 public:
 	virtual bool check();

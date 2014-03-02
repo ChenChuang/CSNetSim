@@ -172,7 +172,7 @@ int SensorEcpfProc::proc_clustering()
 		this->ch_type = SensorEcpfProc::NOT_CH;
 		this->wait_timer->set_after(this->calDelay());
 		this->proc_state = SensorEcpfProc::PROC_WAIT;
-		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
+		this->clock->try_set_tick(this->wait_timer->get_time() - this->clock->get_time());
 		break;
 	}
 	case SensorEcpfProc::PROC_WAIT:
@@ -183,6 +183,7 @@ int SensorEcpfProc::proc_clustering()
 		}else{
 			this->clock->try_set_tick(this->wait_timer->get_time() - this->clock->get_time());
 		}
+		break;
 	}
 	case SensorEcpfProc::PROC_MAIN:
 	{
@@ -199,10 +200,6 @@ int SensorEcpfProc::proc_clustering()
 						this->add_tent(this->node->get_addr(), this->ch_type, this->fuzzycost);
 						this->broadcast_ch_msg();
 					}
-				}
-				else
-				{
-					
 				}
 			}
 			else
@@ -292,8 +289,8 @@ void SensorEcpfProc::add_tent(int addr, char type, double cost)
 double SensorEcpfProc::calDelay()
 {
 	//return 1 / std::max(this->node->energy / ClusteringSimModel::E_INIT, 0.01) / 100;
-	//return (1 - this->node->energy / ClusteringSimModel::E_INIT);
-	return (1 - this->node->energy / ClusteringSimModel::E_INIT) * this->max_wait_self_time * rand() / (RAND_MAX + 1.0);
+	return (1 - this->node->energy / ClusteringSimModel::E_INIT);
+	//return (1 - this->node->energy / ClusteringSimModel::E_INIT * rand() / (RAND_MAX + 1.0)) * this->max_wait_self_time;
 }
 
 double SensorEcpfProc::calFuzzyCost()
@@ -310,9 +307,11 @@ double SensorEcpfProc::calFuzzyCost()
 			s += pow(d, 2);
 		}
 	}
-	//double centrality = sqrt(s / c)/ (ClusteringSimModel::AREA_SIZE_X + ClusteringSimModel::AREA_SIZE_Y) * 2.0;
-	//double degree = c / ClusteringSimModel::NODE_NUM;
-	this->fuzzycost = 0;
+	double centrality = sqrt(s / c)/ (ClusteringSimModel::AREA_SIZE_X + ClusteringSimModel::AREA_SIZE_Y) * 2.0;
+	double degree = c / ClusteringSimModel::NODE_NUM;
+	//this->fuzzycost = centrality / degree;
+	//this->fuzzycost = rand() / (RAND_MAX + 1.0);
+	this->fuzzycost = ecpf::fcc->cal(centrality, degree);
 	return this->fuzzycost;
 }
 
@@ -328,6 +327,7 @@ void SensorEcpfProc::broadcast_ch_msg()
 			ClusteringSimModel::CTRL_PACKET_SIZE, 
 			SensorEcpfProc::CMD_CH, 
 			data_l, data);
+		delete[] data;
 	}
 }
 
@@ -402,7 +402,7 @@ ecpf::FuzzyCostComputor::FuzzyCostComputor()
 	this->engine = new fl::Engine;
 	this->engine->setName("FuzzyCostComputor");
 	
-	fl::InputVariable* degree = new fl::InputVariable;
+	this->degree = new fl::InputVariable;
 	degree->setEnabled(true);
 	degree->setName("degree");
 	degree->setRange(0.000, 1.000);
@@ -412,7 +412,7 @@ ecpf::FuzzyCostComputor::FuzzyCostComputor()
 	degree->addTerm(new fl::Trapezoid("high", 0.300, 0.450, 1.000, 1.000));
 	this->engine->addInputVariable(degree);
 	
-	fl::InputVariable* centrality = new fl::InputVariable;
+	this->centrality = new fl::InputVariable;
 	centrality->setEnabled(true);
 	centrality->setName("centrality");
 	centrality->setRange(0.000, 1.000);
@@ -422,7 +422,7 @@ ecpf::FuzzyCostComputor::FuzzyCostComputor()
 	centrality->addTerm(new fl::Triangle("far", 0.500, 0.750, 1.000));
 	this->engine->addInputVariable(centrality);
 	
-	fl::OutputVariable* cost = new fl::OutputVariable;
+	this->cost = new fl::OutputVariable;
 	cost->setName("cost");
 	cost->setRange(0.000, 1.000);
 	cost->fuzzyOutput()->setAccumulation(new fl::Maximum);
@@ -440,28 +440,59 @@ ecpf::FuzzyCostComputor::FuzzyCostComputor()
 	cost->addTerm(new fl::Triangle("rh", 0.000, 0.250, 0.500));
 	cost->addTerm(new fl::Triangle("h", 0.250, 0.500, 0.750));
 	cost->addTerm(new fl::Triangle("vh", 0.500, 0.750, 1.000));
-	engine->addOutputVariable(cost);
+	this->engine->addOutputVariable(cost);
 	
-	fl::RuleBlock* ruleblock1 = new fl::RuleBlock;
-	ruleblock1->setEnabled(true);
-	ruleblock1->setName("");
-	ruleblock1->setConjunction(NULL);
-	ruleblock1->setDisjunction(NULL);
-	ruleblock1->setActivation(new fl::Minimum);
+	this->rules = new fl::RuleBlock;
+	this->rules->setEnabled(true);
+	this->rules->setName("");
+	this->rules->setConjunction(NULL);
+	this->rules->setDisjunction(NULL);
+	this->rules->setActivation(new fl::Minimum);
 
-	ruleblock1->addRule(fl::Rule::parse("if centrality is close and degree is high then cost is vl", engine));
-	ruleblock1->addRule(fl::Rule::parse("if centrality is close and degree is med then cost is l", engine));
-	ruleblock1->addRule(fl::Rule::parse("if centrality is close and degree is low then cost is rl", engine));
-	ruleblock1->addRule(fl::Rule::parse("if centrality is adequate and degree is high then cost is ml", engine));
-	ruleblock1->addRule(fl::Rule::parse("if centrality is adequate and degree is med then cost is m", engine));
-	ruleblock1->addRule(fl::Rule::parse("if centrality is adequate and degree is low then cost is mh", engine));
-	ruleblock1->addRule(fl::Rule::parse("if centrality is far and degree is high then cost is rh", engine));
-	ruleblock1->addRule(fl::Rule::parse("if centrality is far and degree is med then cost is h", engine));
-	ruleblock1->addRule(fl::Rule::parse("if centrality is far and degree is low then cost is vh", engine));
-	engine->addRuleBlock(ruleblock1);
+	this->rules->addRule(fl::Rule::parse("if centrality is close and degree is high then cost is vl", this->engine));
+	this->rules->addRule(fl::Rule::parse("if centrality is close and degree is med then cost is l", this->engine));
+	this->rules->addRule(fl::Rule::parse("if centrality is close and degree is low then cost is rl", this->engine));
+	this->rules->addRule(fl::Rule::parse("if centrality is adequate and degree is high then cost is ml", this->engine));
+	this->rules->addRule(fl::Rule::parse("if centrality is adequate and degree is med then cost is m", this->engine));
+	this->rules->addRule(fl::Rule::parse("if centrality is adequate and degree is low then cost is mh", this->engine));
+	this->rules->addRule(fl::Rule::parse("if centrality is far and degree is high then cost is rh", this->engine));
+	this->rules->addRule(fl::Rule::parse("if centrality is far and degree is med then cost is h", this->engine));
+	this->rules->addRule(fl::Rule::parse("if centrality is far and degree is low then cost is vh", this->engine));
+	this->engine->addRuleBlock(this->rules);
+	
+	this->engine->configure();
+	
+	std::string status;
+	if (not engine->isReady(&status)){
+		throw fl::Exception("Engine not ready. "
+            "The following errors were encountered:\n" + status, FL_AT);
+	}
 }
 
 ecpf::FuzzyCostComputor::~FuzzyCostComputor()
 {
 	delete this->engine;
+	this->engine = NULL;
+	delete this->centrality;
+	this->centrality = NULL;
+	delete this->degree;
+	this->degree = NULL;
+	delete this->rules;
+	this->rules = NULL;
+}
+
+double ecpf::FuzzyCostComputor::cal(double centrality, double degree)
+{ 
+	fl::scalar c = centrality;
+	fl::scalar d = degree;
+	this->centrality->setInputValue(c);
+	this->degree->setInputValue(d);
+	this->engine->process();
+	double res = this->cost->defuzzify();
+	return res;
+}
+
+namespace ecpf
+{
+	FuzzyCostComputor* fcc = new FuzzyCostComputor();
 }

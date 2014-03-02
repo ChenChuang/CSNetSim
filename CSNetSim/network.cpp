@@ -1,8 +1,8 @@
 #include "network.h"
 
-Network::Network(double* x, double* y, int num, double amax_time, double default_tick): nodes_num(num), max_time(amax_time)
+Network::Network(double* x, double* y, int num, double amax_time, double default_tick, double min_tick): nodes_num(num), max_time(amax_time)
 {
-	this->clock = new Clock(0, default_tick);
+	this->clock = new Clock(0, default_tick, min_tick);
 	
 	this->nodes = new Node* [num];
 	for(int i = 0; i < num; i ++){

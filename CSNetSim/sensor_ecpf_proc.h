@@ -153,10 +153,16 @@ namespace ecpf
 	{
 	public:
 		fl::Engine* engine;
+		fl::InputVariable* degree;
+		fl::InputVariable* centrality;
+		fl::OutputVariable* cost;
+		fl::RuleBlock* rules;
 	public:
 		FuzzyCostComputor();
 		~FuzzyCostComputor();
+		double cal(double centrality, double degree);
 	};
+	extern FuzzyCostComputor* fcc;
 };
 
 #endif // SENSORECPFPROC_H

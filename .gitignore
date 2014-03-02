@@ -38,7 +38,8 @@ CSNetSim/UnitTest/Debug/
 
 fuzzylite-4.0/
 hdf5-1.8.12/
-results/
+*.dat
+*.pyc
 
 # Matlab
 *.mat

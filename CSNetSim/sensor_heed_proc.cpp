@@ -132,6 +132,7 @@ void SensorHeedProc::cal_broadcast_cost()
 		ClusteringSimModel::CTRL_PACKET_SIZE, 
 		SensorHeedProc::CMD_COST, 
 		sizeof(double), (char*)data);
+	delete[] data;
 }
 
 void SensorHeedProc::cluster_head_msg()
@@ -144,6 +145,7 @@ void SensorHeedProc::cluster_head_msg()
 			ClusteringSimModel::CTRL_PACKET_SIZE, 
 			SensorHeedProc::CMD_CH, 
 			1, data);
+		delete[] data;
 	}
 }
 

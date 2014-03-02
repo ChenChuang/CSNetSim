@@ -1,7 +1,8 @@
 #include "clustering_network.h"
 
 ClusteringNetwork::ClusteringNetwork(double* x, double* y): 
-	Network(x, y, ClusteringSimModel::NODE_NUM, ClusteringSimModel::MAX_SIM_TIME, ClusteringSimModel::DEFAULT_TICK)
+	Network(x, y, ClusteringSimModel::NODE_NUM, ClusteringSimModel::MAX_SIM_TIME, 
+		ClusteringSimModel::DEFAULT_TICK, ClusteringSimModel::MIN_TICK)
 {
 	this->sensor_nodes_num = ClusteringSimModel::NODE_NUM - 1;
 	this->nodes[0] = new SinkNode(this, 0, ClusteringSimModel::SINK_X, ClusteringSimModel::SINK_Y);

@@ -6,7 +6,7 @@
 class Clock
 {
 public:
-	Clock(double atime, double atick);
+	Clock(double time, double default_tick, double min_tick);
 	~Clock();
 public:
 	double get_time() {return this->time;}
@@ -23,6 +23,7 @@ private:
 	double time;
 	double tick;
 	double default_tick;
+	double min_tick;
 
 friend class Network;
 };

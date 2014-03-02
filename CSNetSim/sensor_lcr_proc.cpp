@@ -315,6 +315,7 @@ void SensorLcrProc::mn_receive_query(int addr)
 	*((double*)(data) + 2) = this->cal_fcd();
 	*((NgbManager**)(data + sizeof(double)*3)) = this->inode->get_neighbors();
 	this->comm_proxy->unicast(this->node->get_addr(), addr, 0, SensorLcrProc::CMD_MN_RESP, data_l, data);
+	delete[] data;
 	
 	this->newch = -1;
 	this->wait_newch_timer->set_after(this->mn_wait_newch_time);
@@ -333,6 +334,7 @@ void SensorLcrProc::ch_send_assign(int addr)
 {
 	int* data = new int(addr);
 	this->comm_proxy->inclustercast(this->node->get_addr(), 0, SensorLcrProc::CMD_CH_ASSIGN, sizeof(int), (char*)data);
+	delete data;
 }
 
 void SensorLcrProc::mn_receive_assign(int addr, int newch)
@@ -363,6 +365,7 @@ void SensorLcrProc::newch_send_anc()
 		ClusteringSimModel::CTRL_PACKET_SIZE, 
 		SensorLcrProc::CMD_NEWCH_ANC, 
 		sizeof(double)*2, (char*)data);
+	delete[] data;
 }
 
 void SensorLcrProc::receive_newch_anc(int addr, double* params)

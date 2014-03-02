@@ -27,6 +27,7 @@ namespace ClusteringSimModel
 	extern double MAX_SIM_TIME;    //second
 	extern double RECORD_PERIOD;   //second	
 	extern double DEFAULT_TICK;   //second
+	extern double MIN_TICK;    //second
 };
 
 #endif // CLUSTERINGSIMMODEL_H

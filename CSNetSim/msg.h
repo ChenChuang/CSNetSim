@@ -50,12 +50,14 @@ struct Msg
 		if (adata_l > 0 && adata != NULL) {
 			this->data = new char[adata_l];
 			memcpy(this->data, adata, adata_l);	
+		}else{
+			this->data = NULL;
 		}
 	}
 
 	
 	~Msg() {
-		delete this->data;
+		delete[] this->data;
 		this->data = NULL;
 	}
 	
@@ -73,7 +75,8 @@ struct MsgNode
 	}
 	MsgNode(): body(NULL), next(NULL) {}
 	~MsgNode() {
-		if(--(this->body->rc) <= 0){
+		this->body->rc--;
+		if(this->body->rc <= 0){
 			delete this->body;
 		}
 		this->body = NULL;
