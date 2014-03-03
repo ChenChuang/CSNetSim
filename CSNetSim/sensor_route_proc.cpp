@@ -40,10 +40,10 @@ void SensorRouteProc::ticktock(double time)
 	case SensorRouteProc::PROC_SLEEP:
 	{
 		int h = this->inode->get_next_hop();
-		if(h >= 0 && !this->inetwork->is_alive(h)){
+		while(h >= 0 && !this->inetwork->is_alive(h)){
 			h = this->get_best_ch();
-			this->inode->set_next_hop(h);
 		}
+		this->inode->set_next_hop(h);
 		return;
 	}
 	case SensorRouteProc::PROC_GETREADY:
@@ -74,6 +74,9 @@ void SensorRouteProc::ticktock(double time)
 		{
 			this->inode->set_next_hop(this->inode->get_ch_addr());
 		}
+		if(this->inode->get_next_hop() < 0 || !this->inetwork->is_alive(this->inode->get_next_hop())){
+			this->inode->set_next_hop(ClusteringSimModel::SINK_ADDR);
+		}
 		this->proc_state = SensorRouteProc::PROC_SLEEP;
 		break;
 	}
@@ -101,5 +104,5 @@ int SensorRouteProc::get_best_ch()
 			return sc->addr;
 		}
 	}
-	return ClusteringSimModel::SINK_ADDR;
+	return -1;
 }

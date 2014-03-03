@@ -6,27 +6,33 @@
 #include "broadcast_channel.h"
 #include "unicast_channel.h"
 
+class INode_SensorDataProc;
+
 class SensorDataProc : public Processor
 {
 public:
-	SensorDataProc(Node* anode, double aperiod, double amax_wait, double aunit_l, double abuf_l);
+	SensorDataProc(Node* anode, double aperiod, double amax_wait, double aunit);
 	~SensorDataProc();
 public:
 	virtual void init();
 	virtual int process(Msg* msg);
 	virtual void ticktock(double time);
-	void send(char cmd);
-	void sense();
+	bool send(double size, double l, char cmd);
+	void send_fused();
+	void send_unfused();
 public:
 	double period;
 	double max_wait;
-	double unit_l;
-	double buf_l;
+	double unit;
 	static const char CMD_SENSE_DATA_FUSED = 0x01;
 	static const char CMD_SENSE_DATA_UNFUSED = 0x02;
 private:
-	double data_l;
+	double comp;
+	double fused;
+	double unfused;
 	Node* node;
+	INode_SensorDataProc* inode;
+	ECommProxy_UnicastChannel* comm;
 	Timer* sense_timer;
 	Timer* wait_timer;
 };

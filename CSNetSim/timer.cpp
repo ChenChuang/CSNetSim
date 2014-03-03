@@ -22,6 +22,11 @@ bool Timer::is_timeout()
 	return result;
 }
 
+bool Timer::is_timing()
+{
+	return this->time >= 0;
+}
+
 void Timer::reset()
 {
 	this->time = -1;

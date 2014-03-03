@@ -16,8 +16,7 @@ SensorNode::SensorNode(Network* anetwork, int aaddr, double ax, double ay, doubl
 	this->dataproc = new SensorDataProc(this, 
 		ClusteringSimModel::SENSE_DATA_PERIOD, 
 		ClusteringSimModel::SENSE_DATA_PERIOD, 
-		ClusteringSimModel::DATA_PACKET_SIZE, 
-		ClusteringSimModel::DATA_PACKET_SIZE * 20);
+		ClusteringSimModel::DATA_PACKET_SIZE);
 	this->procs_manager->add(this->dataproc);
 	
 	this->routeproc = new SensorRouteProc(this);

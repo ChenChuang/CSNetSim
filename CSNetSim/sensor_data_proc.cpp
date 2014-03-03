@@ -1,15 +1,18 @@
 #include "sensor_data_proc.h"
 
-SensorDataProc::SensorDataProc(Node* anode, double aperiod, double amax_wait, double aunit_l, double abuf_l): 
+SensorDataProc::SensorDataProc(Node* anode, double aperiod, double amax_wait, double aunit): 
 	period(aperiod), 
 	max_wait(amax_wait),
-	unit_l(aunit_l),
-	buf_l(abuf_l),
-	data_l(0),
+	unit(aunit),
+	fused(0),
+	unfused(0),
 	node(anode),
+	inode(dynamic_cast<INode_SensorDataProc*>(anode)),
+	comm(dynamic_cast<ECommProxy_UnicastChannel*>(anode->get_commproxy())),
 	sense_timer(new Timer(anode->get_network()->get_clock())),
 	wait_timer(new Timer(anode->get_network()->get_clock()))
 {
+	this->comp = 0.1;
 }
 
 SensorDataProc::~SensorDataProc()
@@ -22,17 +25,17 @@ SensorDataProc::~SensorDataProc()
 
 void SensorDataProc::init()
 {
-	this->sense_timer->set_after(0);
+	this->sense_timer->set_after(this->period);
 	this->wait_timer->set_after(this->max_wait);
 }
 
 int SensorDataProc::process(Msg* msg)
 {
 	if(msg->cmd == SensorDataProc::CMD_SENSE_DATA_FUSED){
-		dynamic_cast<ECommProxy_UnicastChannel*>(this->node->get_commproxy())->repost(msg, dynamic_cast<INode_SensorDataProc*>(this->node)->get_next_hop());
+		this->fused += *(int*)msg->data;
 		return 1;
 	}else if(msg->cmd == SensorDataProc::CMD_SENSE_DATA_UNFUSED){
-		this->data_l += *(int*)msg->data;
+		this->unfused += *(int*)msg->data;
 		return 1;
 	}
 	return -1;
@@ -40,48 +43,57 @@ int SensorDataProc::process(Msg* msg)
 
 void SensorDataProc::ticktock(double time)
 {
-	this->sense();
-	if(dynamic_cast<INode_SensorDataProc*>(this->node)->is_ch()){
-		if(this->data_l >= this->buf_l || this->wait_timer->is_timeout()){
-			this->node->consume(EnergyModel::calFusion(this->data_l));
-			this->send(SensorDataProc::CMD_SENSE_DATA_FUSED);
-			this->wait_timer->set_after(this->max_wait);
+	if(this->fused > 0){
+		this->send_fused();
+	}
+	if(this->sense_timer->is_timeout()){
+		this->unfused += this->unit;
+		this->sense_timer->set_after(this->period);
+	}
+	if(this->wait_timer->is_timeout()){
+		if(this->inode->is_ch()){
+			this->node->consume(EnergyModel::calFusion(this->unfused));
+			this->fused += this->unfused;
+			this->unfused = 0;
+			this->send_fused();
+		}else{
+			this->send_unfused();
+			this->send_fused();
 		}
-	}else{
-		if(this->data_l > 0){
-			this->send(SensorDataProc::CMD_SENSE_DATA_UNFUSED);
-		}
+		this->wait_timer->set_after(this->max_wait);
 	}
 	this->node->get_network()->get_clock()->try_set_tick(
 		std::min(this->wait_timer->get_time(), this->sense_timer->get_time()) - this->node->get_network()->get_clock()->get_time());
 }
 
-void SensorDataProc::send(char cmd){
-	int next_hop = dynamic_cast<INode_SensorDataProc*>(this->node)->get_next_hop();
-	if(next_hop < 0){
-		//return;
-		next_hop = ClusteringSimModel::SINK_ADDR;
+void SensorDataProc::send_fused()
+{
+	if(this->send(this->fused * this->comp, this->fused, SensorDataProc::CMD_SENSE_DATA_FUSED)){
+		this->fused = 0;
 	}
-	int* data = new int[1];
-	data[0] = this->data_l;
-	double size = ClusteringSimModel::DATA_PACKET_SIZE;
-	if(cmd == SensorDataProc::CMD_SENSE_DATA_UNFUSED){
-		size = size * this->data_l / this->unit_l;
-	}
-	dynamic_cast<ECommProxy_UnicastChannel*>(this->node->get_commproxy())->unicast(
-		this->node->get_addr(), 
-		next_hop, 
-		size, 
-		cmd, 
-		sizeof(int), (char*)data);
-	this->data_l = 0;
-	delete[] data;
 }
 
-void SensorDataProc::sense()
+void SensorDataProc::send_unfused()
 {
-	if(this->sense_timer->is_timeout()){
-		this->sense_timer->set_after(this->period);
-		this->data_l += this->unit_l;
+	if(this->send(this->unfused, this->unfused, SensorDataProc::CMD_SENSE_DATA_UNFUSED)){
+		this->unfused = 0;
 	}
+}
+
+bool SensorDataProc::send(double size, double data_l, char cmd){
+	int next_hop = this->inode->get_next_hop();
+	if(next_hop < 0){
+		return false;
+		//next_hop = ClusteringSimModel::SINK_ADDR;
+	}
+	int* data = new int[1];
+	data[0] = (int)data_l;
+	this->comm->unicast(
+		this->node->get_addr(), 
+		next_hop, 
+		(int)size, 
+		cmd, 
+		sizeof(double), (char*)data);
+	delete[] data;
+	return true;
 }

@@ -3,36 +3,40 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 rn = 10;
-nn = 2000;
+nn = 4000;
 
 # es = np.fromfile(alg + 'energy_snapshot.dat')[nn*snap : nn*(snap+1)]
 
-def plot_time_alive(alg):
-    times = np.fromfile(alg + '/time.dat')
-    alives = np.fromfile(alg + '/alive_sum.dat')
+def plot_time_alive(*algs):
     fig, ax = plt.subplots()
-    ax.plot(times, alives)
+    for alg in algs:
+        times = np.fromfile(alg + '/time.dat')
+        alives = np.fromfile(alg + '/alive_sum.dat')
+        ax.plot(times, alives)
     plt.show()
 
-def plot_time_energy(alg):
-    times = np.fromfile(alg + '/time.dat')
-    energys = np.fromfile(alg + '/energy_sum.dat')
+def plot_time_energy(*algs):
     fig, ax = plt.subplots()
-    ax.plot(times, energys)
+    for alg in algs:
+        times = np.fromfile(alg + '/time.dat')
+        energys = np.fromfile(alg + '/energy_sum.dat')
+        ax.plot(times, energys)
     plt.show()
 
-def plot_time_output(alg):
-    times = np.fromfile(alg + '/time.dat')
-    outputs = np.fromfile(alg + '/output_track.dat')
+def plot_time_output(*algs):
     fig, ax = plt.subplots()
-    ax.plot(times, outputs)
+    for alg in algs:
+        times = np.fromfile(alg + '/time.dat')
+        outputs = np.fromfile(alg + '/output_track.dat')
+        ax.plot(times, outputs)
     plt.show()
 
-def plot_output_alive(alg):
-    outputs = np.fromfile(alg + '/output_track.dat')
-    alives = np.fromfile(alg + '/alive_sum.dat')
+def plot_output_alive(*algs):
     fig, ax = plt.subplots()
-    ax.plot(outputs, alives)
+    for alg in algs:
+        outputs = np.fromfile(alg + '/output_track.dat')
+        alives = np.fromfile(alg + '/alive_sum.dat')
+        ax.plot(outputs, alives)
     plt.show()
 
 
@@ -62,11 +66,14 @@ def plot_xy_hops(alg, snap):
     ys = np.fromfile(alg + '/nodes_y.dat')
     chs = np.fromfile(alg + '/ch_snapshot.dat')[nn*snap : nn*(snap+1)]
     hops = np.fromfile(alg + '/hop_snapshot.dat')[nn*snap : nn*(snap+1)]
-    
+    hops[hops < 0] = 0
+
+    print min(chs)
+
     chxs = [xs[i] for i,c in enumerate(chs) if c == i]
     chys = [ys[i] for i,c in enumerate(chs) if c == i]
-    mnxs = [xs[i] for i,c in enumerate(chs) if c != i and c > 0]
-    mnys = [ys[i] for i,c in enumerate(chs) if c != i and c > 0]
+    mnxs = [xs[i] for i,c in enumerate(chs) if c != i and c >= 0]
+    mnys = [ys[i] for i,c in enumerate(chs) if c != i and c >= 0]
 
     fig, ax = plt.subplots()
 
@@ -75,6 +82,8 @@ def plot_xy_hops(alg, snap):
     ax.scatter(mnxs, mnys, s = 10, alpha = 0.5, color="blue")
 
     for i in xrange(1,nn):
+        if hops[i] < 0:
+            continue
         if i != chs[i]:
             ax.plot([xs[i],xs[hops[i]]], [ys[i],ys[hops[i]]], alpha = 0.3, color="black")
         else:

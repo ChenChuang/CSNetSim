@@ -12,7 +12,7 @@ SensorLcrProc::SensorLcrProc(Node* anode) : node(anode)
 	this->max_wait_self_time = 0.7;
 	this->energy_thrd = 0.7;
 	this->energy_thrd_2 = 0;
-	this->energy_thrd_3 = 50;
+	this->energy_thrd_3 = 20;
 	
 	this->inode = dynamic_cast<INode_SensorLcrProc*>(anode);
 	this->comm_proxy = dynamic_cast<ClusteringCommProxy*>(anode->get_commproxy());

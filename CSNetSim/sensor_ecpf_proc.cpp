@@ -8,13 +8,13 @@ SensorEcpfProc::SensorEcpfProc(Node* anode) : node(anode)
 	this->comm = dynamic_cast<ClusteringCommProxy*>(this->node->get_commproxy());
 	
 	this->energy_thrd = 0.7;
-	this->max_main_iter = 5;
+	this->max_main_iter = 3;
 	this->max_wait_self_time = 0.7;
 
-	this->ecpf_time = 2;
-	this->route_time = 1;
+	this->ecpf_time = 1;
+	this->route_time = 0.5;
 	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 5;
-	this->check_time = 1;
+	this->check_time = 0.5;
 	
 	this->min_tick = 0.01;
 	this->main_iter_tick = 0.01;
@@ -63,14 +63,16 @@ void SensorEcpfProc::exit_clustering()
 
 bool SensorEcpfProc::check_energy()
 {
-	return this->node->energy/this->energy_pre < this->energy_thrd;
+	return this->node->energy/this->energy_pre < this->energy_thrd ||
+		this->inode->get_ch_addr() < 0 ||
+		this->inode->get_next_hop() < 0;
 }
 
 void SensorEcpfProc::start_check()
 {
 	bool f = false;
 	int toaddr = this->inode->get_next_hop();
-	if(this->inode->get_next_hop() < 0 || !this->inetwork->is_alive(this->inode->get_next_hop())){
+	if(toaddr < 0 || !this->inetwork->is_alive(toaddr)){
 		f = true;
 		toaddr = ClusteringSimModel::SINK_ADDR;
 	}else if(this->inode->is_ch() && this->check_energy()){
@@ -123,6 +125,9 @@ void SensorEcpfProc::ticktock(double time)
 		if(this->proc_state != SensorEcpfProc::PROC_SLEEP && this->proc_state != SensorEcpfProc::PROC_CHECK){
 			this->proc_clustering();
 		}
+	}
+	if(!this->check_ch_alive()){
+		//this->inode->set_next_hop(-1);
 	}
 }
 
@@ -201,6 +206,7 @@ int SensorEcpfProc::proc_clustering()
 						//this->node->energy = 800;
 						this->add_tent(this->node->get_addr(), this->ch_type, this->fuzzycost);
 						this->broadcast_ch_msg();
+						this->inode->set_ch_addr(this->node->get_addr());
 					}
 				}
 				else
@@ -213,6 +219,7 @@ int SensorEcpfProc::proc_clustering()
 				this->ch_type = SensorEcpfProc::TENT_CH;
 				this->add_tent(this->node->get_addr(), this->ch_type, this->fuzzycost);
 				this->broadcast_ch_msg();
+				this->inode->set_ch_addr(this->node->get_addr());
 			}
 			this->main_iter++;
 		}
@@ -267,7 +274,7 @@ void SensorEcpfProc::receive_join_msg(Msg* msg)
 void SensorEcpfProc::receive_need_msg()
 {
 	int toaddr = this->inode->get_next_hop();
-	if(this->inode->get_next_hop() < 0 || !this->inetwork->is_alive(this->inode->get_next_hop())){
+	if(toaddr < 0 || !this->inetwork->is_alive(toaddr)){
 		toaddr = ClusteringSimModel::SINK_ADDR;
 	}
 	this->comm->unicast(
@@ -403,6 +410,14 @@ bool SensorEcpfProc::has_sch()
 	return false;
 }
 
+bool SensorEcpfProc::check_ch_alive()
+{
+	if(this->inode->get_ch_addr() < 0){
+		return false;
+	}
+	return this->inetwork->is_alive(this->inode->get_ch_addr());	
+}
+	
 ecpf::FuzzyCostComputor::FuzzyCostComputor()
 {
 	this->engine = new fl::Engine;

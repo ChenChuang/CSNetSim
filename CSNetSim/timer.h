@@ -11,6 +11,7 @@ public:
 	~Timer();
 	void set_after(double after);
 	bool is_timeout();
+	bool is_timing();
 	void reset();
 	double get_time() {return this->time;}
 private:
