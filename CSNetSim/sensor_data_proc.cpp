@@ -10,9 +10,11 @@ SensorDataProc::SensorDataProc(Node* anode, double aperiod, double amax_wait, do
 	inode(dynamic_cast<INode_SensorDataProc*>(anode)),
 	comm(dynamic_cast<ECommProxy_UnicastChannel*>(anode->get_commproxy())),
 	sense_timer(new Timer(anode->get_network()->get_clock())),
-	wait_timer(new Timer(anode->get_network()->get_clock()))
+	wait_timer(new Timer(anode->get_network()->get_clock())),
+	wait_hop_timer(new Timer(anode->get_network()->get_clock()))
 {
 	this->comp = 0.1;
+	this->max_wait_hop = 10;
 }
 
 SensorDataProc::~SensorDataProc()
@@ -21,6 +23,8 @@ SensorDataProc::~SensorDataProc()
 	this->sense_timer = NULL;
 	delete this->wait_timer;
 	this->wait_timer = NULL;
+	delete this->wait_hop_timer;
+	this->wait_hop_timer = NULL;
 }
 
 void SensorDataProc::init()
@@ -43,6 +47,9 @@ int SensorDataProc::process(Msg* msg)
 
 void SensorDataProc::ticktock(double time)
 {
+	if(this->wait_hop_timer->is_timeout()){
+		this->force_send();
+	}
 	if(this->fused > 0){
 		this->send_fused();
 	}
@@ -83,8 +90,10 @@ void SensorDataProc::send_unfused()
 bool SensorDataProc::send(double size, double data_l, char cmd){
 	int next_hop = this->inode->get_next_hop();
 	if(next_hop < 0){
+		if(!this->wait_hop_timer->is_timing()){
+			this->wait_hop_timer->set_after(this->max_wait_hop);
+		}
 		return false;
-		//next_hop = ClusteringSimModel::SINK_ADDR;
 	}
 	int* data = new int[1];
 	data[0] = (int)data_l;
@@ -95,5 +104,36 @@ bool SensorDataProc::send(double size, double data_l, char cmd){
 		cmd, 
 		sizeof(double), (char*)data);
 	delete[] data;
+	this->wait_hop_timer->reset();
 	return true;
+}
+
+void SensorDataProc::force_send(){
+	int next_hop = this->inode->get_next_hop();
+	if(next_hop < 0){
+		next_hop = ClusteringSimModel::SINK_ADDR;
+	}
+	int* data = new int[1];
+	data[0] = (int)(this->fused);
+	this->comm->unicast(
+		this->node->get_addr(), 
+		next_hop, 
+		(int)(this->fused * this->comp), 
+		SensorDataProc::CMD_SENSE_DATA_FUSED, 
+		sizeof(double), (char*)data);
+	delete[] data;
+	data = new int[1];
+	data[0] = (int)(this->unfused);
+	this->comm->unicast(
+		this->node->get_addr(), 
+		next_hop, 
+		(int)(this->unfused * this->comp), 
+		SensorDataProc::CMD_SENSE_DATA_FUSED, 
+		sizeof(double), (char*)data);
+	delete[] data;
+	
+	this->fused = 0;
+	this->unfused = 0;
+	
+	this->wait_hop_timer->reset();
 }

@@ -20,13 +20,15 @@ public:
 	bool send(double size, double l, char cmd);
 	void send_fused();
 	void send_unfused();
+	void force_send();
 public:
 	double period;
 	double max_wait;
+	double max_wait_hop;
 	double unit;
 	static const char CMD_SENSE_DATA_FUSED = 0x01;
 	static const char CMD_SENSE_DATA_UNFUSED = 0x02;
-private:
+public:
 	double comp;
 	double fused;
 	double unfused;
@@ -35,6 +37,7 @@ private:
 	ECommProxy_UnicastChannel* comm;
 	Timer* sense_timer;
 	Timer* wait_timer;
+	Timer* wait_hop_timer;
 };
 
 class INode_SensorDataProc

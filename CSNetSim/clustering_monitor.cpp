@@ -157,7 +157,7 @@ void ClusteringMonitor::record_after_run()
 #endif
 #endif
 	printf("done\n");
-	printf("\nFND = %f\nLND = %f\n", this->fnd, this->lnd);
+	printf("\nFND = %f\nLND = %f\nOutput = %f\n", this->fnd, this->lnd, this->output);
 	printf("\nsizeof(double) = %d\n", sizeof(double));
 	printf("record_num = %d\n", this->record_count);
 	printf("node_num = %d\n", this->network->nodes_num);

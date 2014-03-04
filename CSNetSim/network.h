@@ -36,6 +36,7 @@ public:
 	
 public:
 	Clock* clock;
+	Timer* print_timer;
 	Node** nodes;
 	int nodes_num;
 	ChannelsManager* channels;

@@ -7,6 +7,13 @@ nn = 4000;
 
 # es = np.fromfile(alg + 'energy_snapshot.dat')[nn*snap : nn*(snap+1)]
 
+def summary(*algs):
+    for alg in algs:
+        times = np.fromfile(alg + '/time.dat')
+        alives = np.fromfile(alg + '/alive_sum.dat')
+        times = [times[i] for i,a in enumerate(alives) if 0 < a < nn-1]
+        print 'FND =', times[0], 'LND =', times[-1]
+
 def plot_time_alive(*algs):
     fig, ax = plt.subplots()
     for alg in algs:
@@ -66,14 +73,15 @@ def plot_xy_hops(alg, snap):
     ys = np.fromfile(alg + '/nodes_y.dat')
     chs = np.fromfile(alg + '/ch_snapshot.dat')[nn*snap : nn*(snap+1)]
     hops = np.fromfile(alg + '/hop_snapshot.dat')[nn*snap : nn*(snap+1)]
+    es = np.fromfile(alg + '/energy_snapshot.dat')[nn*snap : nn*(snap+1)]
     hops[hops < 0] = 0
 
     print min(chs)
 
-    chxs = [xs[i] for i,c in enumerate(chs) if c == i]
-    chys = [ys[i] for i,c in enumerate(chs) if c == i]
-    mnxs = [xs[i] for i,c in enumerate(chs) if c != i and c >= 0]
-    mnys = [ys[i] for i,c in enumerate(chs) if c != i and c >= 0]
+    chxs = [xs[i] for i,c in enumerate(chs) if c == i and es[i] > 0]
+    chys = [ys[i] for i,c in enumerate(chs) if c == i and es[i] > 0]
+    mnxs = [xs[i] for i,c in enumerate(chs) if c != i and c >= 0 and es[i] > 0]
+    mnys = [ys[i] for i,c in enumerate(chs) if c != i and c >= 0 and es[i] > 0]
 
     fig, ax = plt.subplots()
 
@@ -82,7 +90,7 @@ def plot_xy_hops(alg, snap):
     ax.scatter(mnxs, mnys, s = 10, alpha = 0.5, color="blue")
 
     for i in xrange(1,nn):
-        if hops[i] < 0:
+        if hops[i] < 0 or es[i] <= 0:
             continue
         if i != chs[i]:
             ax.plot([xs[i],xs[hops[i]]], [ys[i],ys[hops[i]]], alpha = 0.3, color="black")

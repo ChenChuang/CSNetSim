@@ -98,9 +98,12 @@ public:
 	double ch_wait_newch_time;
 	double newch_wait_mn_time;
 	double max_wait_self_time;
+	double max_wait_hop_time;
+	double min_wait_hop_time;
 	double energy_thrd;
 	double energy_thrd_2;
 	double energy_thrd_3;
+	double energy_thrd_4;
 	
 private:
 	Node* node;
@@ -118,6 +121,7 @@ private:
 	Timer* wait_newch_timer;
 	Timer* wait_mn_timer;
 	Timer* wait_self_timer;
+	Timer* wait_hop_timer;
 	
 	double energy_pre;
 	int newch;
@@ -217,6 +221,8 @@ public:
 	virtual void start_route() = 0;
 	virtual NgbManager* get_neighbors() = 0;
 	virtual double get_d_tosink() = 0;
+	virtual double get_data() = 0;
+	virtual void force_send_data() = 0;
 };
 
 class INet_SensorLcrProc

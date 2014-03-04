@@ -3,6 +3,7 @@
 Network::Network(double* x, double* y, int num, double amax_time, double default_tick, double min_tick): nodes_num(num), max_time(amax_time)
 {
 	this->clock = new Clock(0, default_tick, min_tick);
+	this->print_timer = new Timer(this->clock);
 	
 	this->nodes = new Node* [num];
 	for(int i = 0; i < num; i ++){
@@ -18,6 +19,8 @@ Network::~Network()
 {
 	delete this->clock;
 	this->clock = NULL;
+	delete this->print_timer;
+	this->print_timer = NULL;
 	delete[] this->nodes;
 	this->nodes = NULL;
 	delete this->monitor;
@@ -75,9 +78,13 @@ void Network::run()
 	printf("WSN simulation running...\n");
 	// main loop starts
 	int addr;
+	this->print_timer->set_after(0);
 	while(this->clock->get_time() < this->max_time){
-		printf("-----------------------time: %f------------------------\n", this->clock->get_time());
-		fflush(stdout);
+		if(this->print_timer->is_timeout()){
+			printf("--------------------   time: %f   ---------------------\n", this->clock->get_time());
+			fflush(stdout);
+			this->print_timer->set_after(10);
+		}
 		
 		this->clock->tick_setter_init();
 		for(addr = 0; addr < this->nodes_num; addr ++){

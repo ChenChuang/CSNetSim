@@ -41,6 +41,8 @@ public:
 	void set_next_hop(int addr) {this->next_hop = addr;}
 	bool is_ch() {return this->ch_addr == this->addr;}
 	double get_d_tosink() {return this->d_tosink;}
+	double get_data() {return this->dataproc->fused * this->dataproc->comp + this->dataproc->unfused;}
+	void force_send_data() {this->dataproc->force_send();}
 	double get_neighbor_d(int addr);
 	void start_route();
 	void stop_route();
