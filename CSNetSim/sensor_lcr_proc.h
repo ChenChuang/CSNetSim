@@ -37,6 +37,7 @@ private:
 	void add_tent_param(int addr, double d, double e, double fcd, NgbManager* ngbs);
 	void add_ch(int addr, double d_tosink, double anc_energy);
 	void remove_ch(int addr);
+	void check_chs();
 	
 	double cal_fcd();
 	void cal_tent_costs();

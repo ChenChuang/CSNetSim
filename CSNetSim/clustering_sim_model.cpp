@@ -22,6 +22,6 @@ namespace ClusteringSimModel
 	//double MAX_SIM_TIME = 300;    //second
 	double RECORD_PERIOD = 10;   //second
 	double DEFAULT_TICK = 1;    //second
-	double MIN_TICK = 0.0001;    //second
+	double MIN_TICK = 0.01;    //second
 	double E_INIT = 2000;  //J
 };

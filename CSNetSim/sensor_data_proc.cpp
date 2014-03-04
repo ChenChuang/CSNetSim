@@ -48,7 +48,7 @@ int SensorDataProc::process(Msg* msg)
 void SensorDataProc::ticktock(double time)
 {
 	if(this->wait_hop_timer->is_timeout()){
-		this->force_send();
+		//this->force_send();
 	}
 	if(this->fused > 0){
 		this->send_fused();

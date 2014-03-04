@@ -15,7 +15,7 @@ void Clock::try_set_tick(double atick)
 		this->tick = atick;
 	}
 	if(this->tick > 0 && this->tick < this->min_tick){
-		//this->tick = this->min_tick;
+		this->tick = this->min_tick;
 	}
 }
 

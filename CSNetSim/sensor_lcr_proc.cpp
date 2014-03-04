@@ -142,6 +142,13 @@ void SensorLcrProc::ticktock(double time)
 {
 	//double tick = ClusteringSimModel::DEFAULT_TICK;
 	double tick = 0.01;
+	
+	//this->check_chs();
+	if(!this->check_nexthop_alive())
+	{
+		this->inode->set_next_hop(-1);
+	}
+	
 	switch(this->proc_state)
 	{
 	case SensorLcrProc::PROC_SLEEP:
@@ -395,6 +402,7 @@ void SensorLcrProc::receive_newch_anc(int addr, double* params)
 
 void SensorLcrProc::newmn_send_anc()
 {
+	this->inode->force_send_data();
 	this->comm_proxy->broadcast(
 		this->node->get_addr(), ClusteringSimModel::MAX_RADIUS, 
 		ClusteringSimModel::CTRL_PACKET_SIZE, 
@@ -434,6 +442,9 @@ double SensorLcrProc::cal_fcd()
 	this->chs->seek(0);
 	while(this->chs->has_more()){
 		sc = this->chs->next();
+		if(!this->inetwork->is_alive(sc->addr)){
+			continue;
+		}
 		if(sc->d <= ClusteringSimModel::CLUSTER_RADIUS){
 			c++;
 		}
@@ -526,6 +537,19 @@ bool SensorLcrProc::check_energy()
 		this->node->energy < this->energy_thrd_2;
 }
 
+void SensorLcrProc::check_chs()
+{
+	lcr::Sch* sc;
+	this->chs->seek(0);
+	while(this->chs->has_more()){
+		sc = this->chs->next();
+		if(!this->inetwork->is_alive(sc->addr)){
+			this->remove_ch(sc->addr);
+			this->chs->seek(0);
+		}
+	}
+}
+
 void SensorLcrProc::reset_next_hop()
 {
 	if(this->inode->get_d_tosink() < ClusteringSimModel::MAX_RADIUS){
@@ -590,7 +614,10 @@ int SensorLcrProc::get_least_cost_nexthop()
 	this->chs->seek(0);
 	while(this->chs->has_more()){
 		sc = this->chs->next();
-		if(sc->d_tosink < this->inode->get_d_tosink()){
+		if(!this->inetwork->is_alive(sc->addr)){
+			continue;
+		}
+		if(sc->d_tosink < this->inode->get_d_tosink() && this->inetwork->is_alive(sc->addr)){
 			return sc->addr;
 		}
 	}
@@ -611,6 +638,9 @@ int SensorLcrProc::get_best_ch()
 	this->chs->seek(0);
 	while(this->chs->has_more()){
 		sc = this->chs->next();
+		if(!this->inetwork->is_alive(sc->addr)){
+			continue;
+		}
 		if(sc->d > ClusteringSimModel::CLUSTER_RADIUS){
 			continue;
 		}

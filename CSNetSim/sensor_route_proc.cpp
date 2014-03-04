@@ -40,9 +40,13 @@ void SensorRouteProc::ticktock(double time)
 	case SensorRouteProc::PROC_SLEEP:
 	{
 		int h = this->inode->get_next_hop();
+		if(h >= 0 && !this->inetwork->is_alive(h)){
+			h = -1;
+		}
+		/*
 		while(h >= 0 && !this->inetwork->is_alive(h)){
 			h = this->get_best_ch();
-		}
+		}*/
 		this->inode->set_next_hop(h);
 		return;
 	}

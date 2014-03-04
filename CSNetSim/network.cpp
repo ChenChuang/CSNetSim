@@ -80,11 +80,11 @@ void Network::run()
 	int addr;
 	this->print_timer->set_after(0);
 	while(this->clock->get_time() < this->max_time){
-		if(this->print_timer->is_timeout()){
+		//if(this->print_timer->is_timeout()){
 			printf("--------------------   time: %f   ---------------------\n", this->clock->get_time());
 			fflush(stdout);
-			this->print_timer->set_after(10);
-		}
+			//this->print_timer->set_after(10);
+		//}
 		
 		this->clock->tick_setter_init();
 		for(addr = 0; addr < this->nodes_num; addr ++){
