@@ -7,6 +7,8 @@
 #include "clustering_comm_proxy.h"
 #include "broadcast_channel.h"
 
+#include <fl/Headers.h>
+
 namespace ifucm
 {
 struct Tent
@@ -50,6 +52,7 @@ public:
 };
 
 class INode_SensorIfucmProc;
+class INet_SensorIfucmProc;
 
 class SensorIfucmProc : public Processor
 {
@@ -126,6 +129,7 @@ public:
 	virtual int get_ch_addr() = 0;
 	virtual void set_ch_addr(int addr) = 0;
 	virtual void set_next_hop(int addr) = 0;
+	virtual double get_d_tosink() = 0;
 	virtual bool is_ch() = 0;
 	virtual void start_route() = 0;
 	virtual void stop_route() = 0;
@@ -136,7 +140,7 @@ class INet_SensorIfucmProc
 {
 public:
     virtual double d_between(int a, int b) = 0;
-}
+};
 
 namespace ifucm
 {

@@ -1,4 +1,4 @@
-#include "sensor_heed_proc.h"
+#include "sensor_ifucm_proc.h"
 
 SensorIfucmProc::SensorIfucmProc(Node* anode) : node(anode)
 {
@@ -119,7 +119,7 @@ void SensorIfucmProc::cal_radius_cost()
     double chance = 0;
     double radius = 0;
     double dens = 0;
-    ifucm::fcc->cal(this->node->energy, this->inode->d_tosink(), dens, chance, radius);
+    ifucm::fcc->cal(this->node->energy, this->inode->get_d_tosink(), dens, chance, radius);
 }
 
 void SensorIfucmProc::broadcast_compete_msg()
@@ -142,7 +142,6 @@ void SensorIfucmProc::broadcast_ch_msg()
 		ClusteringSimModel::CTRL_PACKET_SIZE, 
 		SensorIfucmProc::CMD_CH, 
 		0, NULL);
-	delete[] data;
 }
 
 int SensorIfucmProc::get_least_cost_tent()
@@ -196,7 +195,7 @@ int SensorIfucmProc::proc_clustering()
         this->radius = -1;
         this->is_tent = false;     
 	
-        if(rand() / (RAND_MAX + 1) < this->tent_p){    
+        if((double)rand() / (RAND_MAX+1.0) < this->tent_p){    
 		    this->proc_state = SensorIfucmProc::PROC_TENT;
             this->cal_radius_cost();
             this->is_tent = true;
@@ -259,10 +258,18 @@ void SensorIfucmProc::receive_compete_msg(Msg* msg)
 	this->add_tent(msg->fromaddr, ((double*)(msg->data))[0]);
 }
 
-void SensorHeedProc::receive_join_msg(Msg* msg)
+void SensorIfucmProc::receive_join_msg(Msg* msg)
 {
 	this->inode->set_ch_addr(this->node->get_addr());
 	this->add_member(msg->fromaddr);
+}
+
+void SensorIfucmProc::broadcast_quit_msg()
+{
+}
+
+void SensorIfucmProc::receive_quit_msg(Msg* msg)
+{
 }
 
 ifucm::FuzzyCostComputor::FuzzyCostComputor()
@@ -273,7 +280,7 @@ ifucm::FuzzyCostComputor::FuzzyCostComputor()
 	this->energy = new fl::InputVariable;
 	this->energy->setEnabled(true);
 	this->energy->setName("ener");
-	degree->setRange(0.000, ClusteringSimModel::E_INIT);
+	this->energy->setRange(0.000, ClusteringSimModel::E_INIT);
 
     double le = 0.100 * ClusteringSimModel::E_INIT;
     double ae = 0.500 * ClusteringSimModel::E_INIT;
@@ -318,8 +325,8 @@ ifucm::FuzzyCostComputor::FuzzyCostComputor()
 	this->chan->fuzzyOutput()->setAccumulation(new fl::Maximum);
 	this->chan->setDefuzzifier(new fl::Centroid(100));
 	this->chan->setDefaultValue(fl::nan);
-	this->setLockValidOutput(false);
-	this->setLockOutputRange(false);
+	this->chan->setLockValidOutput(false);
+	this->chan->setLockOutputRange(false);
 
 	this->chan->addTerm(new fl::Trapezoid("ll", 0.0, 0.0, 0.1, 0.3));
 	this->chan->addTerm(new fl::Triangle("ml", 0.1, 0.3, 0.5));
@@ -334,8 +341,8 @@ ifucm::FuzzyCostComputor::FuzzyCostComputor()
 	this->rad->fuzzyOutput()->setAccumulation(new fl::Maximum);
 	this->rad->setDefuzzifier(new fl::Centroid(100));
 	this->rad->setDefaultValue(fl::nan);
-	this->setLockValidOutput(false);
-	this->setLockOutputRange(false);
+	this->rad->setLockValidOutput(false);
+	this->rad->setLockOutputRange(false);
 
 	this->rad->addTerm(new fl::Trapezoid("ll", 0.0, 0.0, 0.1, 0.3));
 	this->rad->addTerm(new fl::Triangle("ml", 0.1, 0.3, 0.5));
