@@ -9,7 +9,7 @@ SensorHeedProc::SensorHeedProc(Node* anode) : node(anode)
 	//this->heed_time = log(1/0.0001) / log(2) * this->min_tick;
 	this->heed_time = 1;
 	this->route_time = 1;
-	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 5;
+	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 15;
 	
 	this->tents = new SortedList<heed::Tent>();
 	this->timer = new Timer(this->node->get_network()->get_clock());

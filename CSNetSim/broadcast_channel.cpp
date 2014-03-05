@@ -13,7 +13,7 @@ BroadcastChannel::~BroadcastChannel()
 
 int BroadcastChannel::communicate(Msg* msg)
 {
-	if(msg->type == BroadcastChannel::MSG_TYPE_BROADCAST && msg->radius == this->radius){
+	if(msg->type == BroadcastChannel::MSG_TYPE_BROADCAST && msg->radius <= this->radius){
 		double d = msg->radius;
 		double k = msg->size;
 		Adjv* vp = this->adjg->v[msg->fromaddr]->next;
@@ -23,12 +23,14 @@ int BroadcastChannel::communicate(Msg* msg)
 		double r_energy = EnergyModel::calReceive(k);
 		int r_count = 0;
 		while(vp != NULL){
-			r = this->network->node(vp->addr);
-			if(r->is_alive()){
-				r->get_commproxy()->receive(msg);
-				r->consume(r_energy);
-				r_count++;
-			}
+            if(vp->d <= msg->radius){
+			    r = this->network->node(vp->addr);
+			    if(r->is_alive()){
+				    r->get_commproxy()->receive(msg);
+				    r->consume(r_energy);
+				    r_count++;
+			    }
+            }
 			vp = vp->next;
 		}
 		t->consume(t_energy);

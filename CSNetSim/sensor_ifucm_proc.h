@@ -28,7 +28,26 @@ public:
 		return addr == a.addr;
 	} 
 };
-}
+struct Sch
+{
+public:
+	int addr;
+	double d;
+public:
+	Sch(int addr, double d) : addr(addr), d(d) {}
+	~Sch() {}
+public:
+	bool operator <(const Sch& a) const{
+		return d < a.d;
+	}
+	bool operator ==(const Sch& a) const{
+		return d == a.d;
+	}
+	bool is(const Sch& a) const{
+		return addr == a.addr;
+	}
+};
+};
 
 class INode_SensorIfucmProc;
 
@@ -53,11 +72,13 @@ public:
     void receive_quit_msg(struct Msg* msg);
     void broadcast_ch_msg();
 	void receive_ch_msg(struct Msg* msg);
-    void join_cluster(int ch_addr);
+    void unicast_join_msg(int ch_addr);
 	void receive_join_msg(struct Msg* msg);
 	
 	int get_least_cost_tent();
-	
+    int get_closest_ch();
+
+    void add_ch(int addr);    
 	void add_tent(int addr, double cost);
 	void add_member(int addr);
 
@@ -84,13 +105,16 @@ public:
 	
 private:
 	Node* node;
-	INode_SensorIfucmProc* inode;	
+    ClusteringCommProxy* comm;
+	INode_SensorIfucmProc* inode;
+    INet_SensorIfucmProc* inetwork;
 	SortedList<ifucm::Tent>* tents;
+    SortedList<ifucm::Sch>* chs;
 
 	char proc_state;
 	double cost;
     double radius;
-    bool is_quit;    
+    bool is_tent;    
 
 	Timer* timer;
 };
@@ -107,5 +131,32 @@ public:
 	virtual void stop_route() = 0;
 	virtual NgbManager* get_neighbors() = 0;
 };
+
+class INet_SensorIfucmProc
+{
+public:
+    virtual double d_between(int a, int b) = 0;
+}
+
+namespace ifucm
+{
+	class FuzzyCostComputor
+	{
+	public:
+		fl::Engine* engine;
+		fl::InputVariable* energy;
+		fl::InputVariable* dist;
+		fl::InputVariable* dens;
+		fl::OutputVariable* rad;
+		fl::OutputVariable* chan;
+		fl::RuleBlock* rules;
+	public:
+		FuzzyCostComputor();
+		~FuzzyCostComputor();
+		void cal(double energy, double dist, double dens, double& chance, double& radius);
+	};
+	extern FuzzyCostComputor* fcc;
+};
+
 
 #endif // SENSORIFUCMPROC_H

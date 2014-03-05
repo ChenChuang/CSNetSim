@@ -5,6 +5,7 @@
 #include "clustering_neighbor.h"
 #include "clustering_member.h"
 #include "clustering_comm_proxy.h"
+#include "clustering_monitor.h"
 
 namespace lcr
 {

@@ -13,7 +13,7 @@ SensorEcpfProc::SensorEcpfProc(Node* anode) : node(anode)
 
 	this->ecpf_time = 1;
 	this->route_time = 0.5;
-	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 5;
+	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 8;
 	this->check_time = 0.5;
 	
 	this->min_tick = 0.01;
@@ -302,8 +302,9 @@ void SensorEcpfProc::add_tent(int addr, char type, double cost)
 double SensorEcpfProc::calDelay()
 {
 	//return 1 / std::max(this->node->energy / ClusteringSimModel::E_INIT, 0.01) / 100;
-	return (1 - this->node->energy / ClusteringSimModel::E_INIT)  * this->max_wait_self_time + this->min_tick;
+	//return (1 - this->node->energy / ClusteringSimModel::E_INIT)  * this->max_wait_self_time + this->min_tick;
 	//return (1 - this->node->energy / ClusteringSimModel::E_INIT * rand() / (RAND_MAX + 1.0)) * this->max_wait_self_time;
+	return std::min(0.07 / (this->node->energy / ClusteringSimModel::E_INIT), this->max_wait_self_time);
 }
 
 double SensorEcpfProc::calFuzzyCost()

@@ -32,9 +32,19 @@ void crunsim()
 	y[0] = ClusteringSimModel::SINK_Y;
 	double xmax = ClusteringSimModel::AREA_SIZE_X;
 	double ymax = ClusteringSimModel::AREA_SIZE_Y;
+	double xmin = 0;
+	double ymin = 0;
+	double dmin = 7;
+	bool r;
 	for(int i=1;i<n;i++){
-		x[i] = (double)rand() / RAND_MAX * xmax;
-		y[i] = (double)rand() / RAND_MAX * ymax;
+		r = true;
+		while(r){
+			x[i] = (double)rand() / RAND_MAX * (xmax - xmin) + xmin;
+			y[i] = (double)rand() / RAND_MAX * (ymax - ymin) + ymin;
+			if(sqrt(pow(x[i]-x[0], 2) + pow(y[i]-y[0], 2)) > dmin){
+				r = false;
+			}
+		}
 	}
 	crunsim(x, y);
 	delete[] x;

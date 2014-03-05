@@ -16,8 +16,8 @@ ClusteringNetwork::ClusteringNetwork(double* x, double* y):
 	this->unicast_channel = new UnicastChannel(this);
 	this->incluster_channel = new InclusterChannel(this);
 	
-	this->channels->add(this->max_radius_channel);
 	this->channels->add(this->cluster_radius_channel);
+	this->channels->add(this->max_radius_channel);
 	this->channels->add(this->netcast_channel);
 	this->channels->add(this->unicast_channel);
 	this->channels->add(this->incluster_channel);
