@@ -14,7 +14,12 @@
 #include "incluster_channel.h"
 #include "netcast_channel.h"
 
-class ClusteringNetwork : public Network, public INet_SensorLcrProc, public INet_SensorEcpfProc, public INet_SensorRouteProc
+class ClusteringNetwork : 
+	public Network, 
+	public INet_SensorLcrProc, 
+	public INet_SensorEcpfProc, 
+	public INet_SensorRouteProc,
+	public INet_SensorIfucmProc
 {
 public:
 	ClusteringNetwork(double* x, double* y);

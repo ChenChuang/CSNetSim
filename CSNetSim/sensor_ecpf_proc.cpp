@@ -452,6 +452,7 @@ ecpf::FuzzyCostComputor::FuzzyCostComputor()
 	this->engine->addInputVariable(centrality);
 	
 	this->cost = new fl::OutputVariable;
+	cost->setEnabled(true);
 	cost->setName("cost");
 	cost->setRange(0.000, 100.0);
 	cost->fuzzyOutput()->setAccumulation(new fl::Maximum);

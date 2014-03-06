@@ -6,7 +6,7 @@ SensorIfucmProc::SensorIfucmProc(Node* anode) : node(anode)
     this->inetwork = dynamic_cast<INet_SensorIfucmProc*>(this->node->get_network());
     this->comm = dynamic_cast<ClusteringCommProxy*>(this->node->get_commproxy());
 	this->min_tick = 0.01;
-	this->tent_p = 0.25;
+	this->tent_p = 0.27;
 	//this->heed_time = log(1/0.0001) / log(2) * this->min_tick;
 	this->ifucm_time = 1;
 	this->route_time = 1;
@@ -48,6 +48,7 @@ void SensorIfucmProc::exit_clustering()
 	}
 	this->proc_state = SensorIfucmProc::PROC_SLEEP;
 	this->timer->set_after(this->route_time + this->stable_time);
+	this->inode->start_route();
 }
 
 void SensorIfucmProc::ticktock(double time)
@@ -58,7 +59,6 @@ void SensorIfucmProc::ticktock(double time)
 			this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
 		}else{
 			this->exit_clustering();
-			this->inode->start_route();
 		}
 	}else{
 		if(this->proc_state == SensorIfucmProc::PROC_SLEEP){
@@ -114,14 +114,6 @@ void SensorIfucmProc::add_tent(int addr, double cost)
 	this->tents->add(new ifucm::Tent(addr, cost));
 }
 
-void SensorIfucmProc::cal_radius_cost()
-{
-    double chance = 0;
-    double radius = 0;
-    double dens = 0;
-    ifucm::fcc->cal(this->node->energy, this->inode->get_d_tosink(), dens, chance, radius);
-}
-
 void SensorIfucmProc::broadcast_compete_msg()
 {
 	double* data = new double[1];
@@ -138,7 +130,7 @@ void SensorIfucmProc::broadcast_compete_msg()
 void SensorIfucmProc::broadcast_ch_msg()
 {
 	this->comm->broadcast(
-		this->node->get_addr(), ClusteringSimModel::CLUSTER_RADIUS, 
+		this->node->get_addr(), ClusteringSimModel::MAX_RADIUS, 
 		ClusteringSimModel::CTRL_PACKET_SIZE, 
 		SensorIfucmProc::CMD_CH, 
 		0, NULL);
@@ -272,6 +264,25 @@ void SensorIfucmProc::receive_quit_msg(Msg* msg)
 {
 }
 
+void SensorIfucmProc::cal_radius_cost()
+{
+    double chance = 0;
+    double radius = 0;
+    double dens = 0;
+	NgbManager* ngbs = this->inode->get_neighbors();
+	Ngb* ngb;
+	ngbs->seek(0);
+	while(ngbs->has_more()){
+		ngb = ngbs->next();
+		if(ngb->d <= ClusteringSimModel::CLUSTER_RADIUS){
+			dens++;
+		}
+	}
+    ifucm::fcc->cal(this->node->energy, this->inode->get_d_tosink(), dens, chance, radius);
+	this->cost = 1.0 - chance;
+	this->radius = radius;
+}
+
 ifucm::FuzzyCostComputor::FuzzyCostComputor()
 {
 	this->engine = new fl::Engine;
@@ -280,26 +291,26 @@ ifucm::FuzzyCostComputor::FuzzyCostComputor()
 	this->energy = new fl::InputVariable;
 	this->energy->setEnabled(true);
 	this->energy->setName("ener");
-	this->energy->setRange(0.000, ClusteringSimModel::E_INIT);
+	this->energy->setRange(0.000, ClusteringSimModel::E_INIT+1.0);
 
     double le = 0.100 * ClusteringSimModel::E_INIT;
     double ae = 0.500 * ClusteringSimModel::E_INIT;
     double me = 0.900 * ClusteringSimModel::E_INIT;
 	this->energy->addTerm(new fl::Trapezoid("l", 0.000, 0.000, le, ae));
 	this->energy->addTerm(new fl::Triangle("m", le, ae, me));
-	this->energy->addTerm(new fl::Trapezoid("h", ae, me, ClusteringSimModel::E_INIT, ClusteringSimModel::E_INIT));
+	this->energy->addTerm(new fl::Trapezoid("h", ae, me, ClusteringSimModel::E_INIT+1.0, ClusteringSimModel::E_INIT+1.0));
 	this->engine->addInputVariable(this->energy);
 	
 	this->dist = new fl::InputVariable;
 	this->dist->setEnabled(true);
 	this->dist->setName("dist");
     
-    double maxd = sqrt(pow(ClusteringSimModel::AREA_SIZE_X,2) + pow(ClusteringSimModel::AREA_SIZE_Y,2));
+    double maxd = sqrt(pow(ClusteringSimModel::AREA_SIZE_X,2) + pow(ClusteringSimModel::AREA_SIZE_Y,2))+1.0;
 	this->dist->setRange(0.000, maxd);
 
-	double ld = 0.1000 * maxd;
+	double ld = 0.2000 * maxd;
 	double ad = 0.5000 * maxd;
-	double md = 0.9000 * maxd;
+	double md = 0.8000 * maxd;
 	this->dist->addTerm(new fl::Trapezoid("s", 0.000, 0.000, ld, ad));
 	this->dist->addTerm(new fl::Triangle("m", ld, ad, md));
 	this->dist->addTerm(new fl::Trapezoid("f", ad, md, maxd, maxd));
@@ -312,11 +323,11 @@ ifucm::FuzzyCostComputor::FuzzyCostComputor()
     double an = ClusteringSimModel::NODE_NUM / 
 		(ClusteringSimModel::AREA_SIZE_X * ClusteringSimModel::AREA_SIZE_Y / pow(ClusteringSimModel::CLUSTER_RADIUS, 2) / 3.14);
 	double mn = an*2;
-	this->dens->setRange(0.000, an);
+	this->dens->setRange(0.000, ClusteringSimModel::NODE_NUM+1.0);
 
 	this->dens->addTerm(new fl::Trapezoid("l", 0.000, 0.000, mn/12, mn/3));
 	this->dens->addTerm(new fl::Triangle("m", mn/12, mn*5/12, mn*5/6));
-	this->dens->addTerm(new fl::Trapezoid("h", mn/2, mn*5/6, mn, mn));
+	this->dens->addTerm(new fl::Trapezoid("h", mn/2, mn*5/6, ClusteringSimModel::NODE_NUM+1.0, ClusteringSimModel::NODE_NUM+1.0));
 	this->engine->addInputVariable(this->dens);
 	
 	this->chan = new fl::OutputVariable;
@@ -344,11 +355,11 @@ ifucm::FuzzyCostComputor::FuzzyCostComputor()
 	this->rad->setLockValidOutput(false);
 	this->rad->setLockOutputRange(false);
 
-	this->rad->addTerm(new fl::Trapezoid("ll", 0.0, 0.0, 0.1, 0.3));
-	this->rad->addTerm(new fl::Triangle("ml", 0.1, 0.3, 0.5));
+	this->rad->addTerm(new fl::Trapezoid("ss", 0.0, 0.0, 0.1, 0.3));
+	this->rad->addTerm(new fl::Triangle("ms", 0.1, 0.3, 0.5));
 	this->rad->addTerm(new fl::Triangle("mm", 0.3, 0.5, 0.7));
-	this->rad->addTerm(new fl::Triangle("mh", 0.5, 0.7, 0.9));
-	this->rad->addTerm(new fl::Trapezoid("hh", 0.7, 0.9, 1.0, 1.0));
+	this->rad->addTerm(new fl::Triangle("mf", 0.5, 0.7, 0.9));
+	this->rad->addTerm(new fl::Trapezoid("ff", 0.7, 0.9, 1.0, 1.0));
 	this->engine->addOutputVariable(this->rad);
 
 	this->rules = new fl::RuleBlock;
@@ -371,33 +382,32 @@ ifucm::FuzzyCostComputor::FuzzyCostComputor()
 	this->rules->addRule(fl::Rule::parse("if ener is h and dist is s and dens is l then chan is mm and rad is ss", this->engine));
 
 
-    this->rules->addRule(fl::Rule::parse("if ener is m and dist is f and dens is h then chan is hm and rad is mf", this->engine));
+    this->rules->addRule(fl::Rule::parse("if ener is m and dist is f and dens is h then chan is mh and rad is mf", this->engine));
 	this->rules->addRule(fl::Rule::parse("if ener is m and dist is f and dens is m then chan is mm and rad is ff", this->engine));
 	this->rules->addRule(fl::Rule::parse("if ener is m and dist is f and dens is l then chan is ml and rad is ff", this->engine));
 
-	this->rules->addRule(fl::Rule::parse("if ener is m and dist is m and dens is h then chan is hm and rad is mf", this->engine));
+	this->rules->addRule(fl::Rule::parse("if ener is m and dist is m and dens is h then chan is mh and rad is mf", this->engine));
 	this->rules->addRule(fl::Rule::parse("if ener is m and dist is m and dens is m then chan is mm and rad is mm", this->engine));
 	this->rules->addRule(fl::Rule::parse("if ener is m and dist is m and dens is l then chan is ml and rad is mm", this->engine));
 
-	this->rules->addRule(fl::Rule::parse("if ener is m and dist is s and dens is h then chan is ms and rad is ms", this->engine));
-	this->rules->addRule(fl::Rule::parse("if ener is m and dist is s and dens is m then chan is ms and rad is ss", this->engine));
-	this->rules->addRule(fl::Rule::parse("if ener is m and dist is s and dens is l then chan is ss and rad is ss", this->engine));
+	this->rules->addRule(fl::Rule::parse("if ener is m and dist is s and dens is h then chan is ml and rad is ms", this->engine));
+	this->rules->addRule(fl::Rule::parse("if ener is m and dist is s and dens is m then chan is ml and rad is ss", this->engine));
+	this->rules->addRule(fl::Rule::parse("if ener is m and dist is s and dens is l then chan is ll and rad is ss", this->engine));
 
 
     this->rules->addRule(fl::Rule::parse("if ener is l and dist is f and dens is h then chan is mm and rad is mf", this->engine));
 	this->rules->addRule(fl::Rule::parse("if ener is l and dist is f and dens is m then chan is mm and rad is ff", this->engine));
-	this->rules->addRule(fl::Rule::parse("if ener is l and dist is f and dens is l then chan is ms and rad is ff", this->engine));
+	this->rules->addRule(fl::Rule::parse("if ener is l and dist is f and dens is l then chan is ml and rad is ff", this->engine));
 
-	this->rules->addRule(fl::Rule::parse("if ener is l and dist is m and dens is h then chan is ms and rad is mf", this->engine));
-	this->rules->addRule(fl::Rule::parse("if ener is l and dist is m and dens is m then chan is ms and rad is mm", this->engine));
-	this->rules->addRule(fl::Rule::parse("if ener is l and dist is m and dens is l then chan is ms and rad is mm", this->engine));
+	this->rules->addRule(fl::Rule::parse("if ener is l and dist is m and dens is h then chan is ml and rad is mf", this->engine));
+	this->rules->addRule(fl::Rule::parse("if ener is l and dist is m and dens is m then chan is ml and rad is mm", this->engine));
+	this->rules->addRule(fl::Rule::parse("if ener is l and dist is m and dens is l then chan is ml and rad is mm", this->engine));
 
-	this->rules->addRule(fl::Rule::parse("if ener is l and dist is s and dens is h then chan is ms and rad is ms", this->engine));
-	this->rules->addRule(fl::Rule::parse("if ener is l and dist is s and dens is m then chan is ms and rad is ss", this->engine));
-	this->rules->addRule(fl::Rule::parse("if ener is l and dist is s and dens is l then chan is ms and rad is ss", this->engine));
+	this->rules->addRule(fl::Rule::parse("if ener is l and dist is s and dens is h then chan is ml and rad is ms", this->engine));
+	this->rules->addRule(fl::Rule::parse("if ener is l and dist is s and dens is m then chan is ml and rad is ss", this->engine));
+	this->rules->addRule(fl::Rule::parse("if ener is l and dist is s and dens is l then chan is ml and rad is ss", this->engine));
 
-
-	this->engine->addRuleBlock(this->rules);
+	this->engine->addRuleBlock(this->rules);	this->engine->addRuleBlock(this->rules);
 	
 	this->engine->configure();
 	

@@ -173,47 +173,6 @@ void ClusteringMonitor::record_after_run()
 		ys[i] = this->network->nodes[i]->y;
 	}
 	printf("Monitor is writing ... ");
-#ifdef _WRITE_MAT_
-#ifdef _HEED_
-	this->write_to_mat("../../../mfiles/heed/nodes_x.mat","nodes_x", xs, 1, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/heed/nodes_y.mat","nodes_y", ys, 1, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/heed/time.mat","time", this->time, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/heed/energy_sum.mat","energy_sum", this->energy_sum, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/heed/alive_sum.mat","alive_sum", this->alive_sum, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/heed/energy_snapshot.mat","energy_snapshot", this->energy_snapshot, this->record_count, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/heed/ch_snapshot.mat","ch_snapshot", this->ch_snapshot, this->record_count, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/heed/hop_snapshot.mat","hop_snapshot", this->hop_snapshot, this->record_count, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/heed/output_track.mat","output_track", this->output_track, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/heed/rotate_overhead_track.mat","rotate_overhead_track", this->rotate_overhead_track, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/heed/rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_count);
-#endif
-#ifdef _LCR_
-	this->write_to_mat("../../../mfiles/lcr/nodes_x.mat","nodes_x", xs, 1, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/lcr/nodes_y.mat","nodes_y", ys, 1, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/lcr/time.mat","time", this->time, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/lcr/energy_sum.mat","energy_sum", this->energy_sum, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/lcr/alive_sum.mat","alive_sum", this->alive_sum, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/lcr/energy_snapshot.mat","energy_snapshot", this->energy_snapshot, this->record_count, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/lcr/ch_snapshot.mat","ch_snapshot", this->ch_snapshot, this->record_count, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/lcr/hop_snapshot.mat","hop_snapshot", this->hop_snapshot, this->record_count, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/lcr/output_track.mat","output_track", this->output_track, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/lcr/rotate_overhead_track.mat","rotate_overhead_track", this->rotate_overhead_track, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/lcr/rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_count);
-#endif
-#ifdef _ECPF_
-	this->write_to_mat("../../../mfiles/ecpf/nodes_x.mat","nodes_x", xs, 1, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/ecpf/nodes_y.mat","nodes_y", ys, 1, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/ecpf/time.mat","time", this->time, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/ecpf/energy_sum.mat","energy_sum", this->energy_sum, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/ecpf/alive_sum.mat","alive_sum", this->alive_sum, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/ecpf/energy_snapshot.mat","energy_snapshot", this->energy_snapshot, this->record_count, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/ecpf/ch_snapshot.mat","ch_snapshot", this->ch_snapshot, this->record_count, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/ecpf/hop_snapshot.mat","hop_snapshot", this->hop_snapshot, this->record_count, this->network->nodes_num);
-	this->write_to_mat("../../../mfiles/ecpf/output_track.mat","output_track", this->output_track, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/ecpf/rotate_overhead_track.mat","rotate_overhead_track", this->rotate_overhead_track, 1, this->record_count);
-	this->write_to_mat("../../../mfiles/ecpf/rotate_times_track.mat","rotate_times_track", this->rotate_times_track, 1, this->record_count);
-#endif
-#endif
 #ifdef _WRITE_DAT_
 #ifdef _HEED_
 	this->write_to_dat("../../results/heed/nodes_x.dat", xs, this->network->nodes_num);
@@ -253,6 +212,19 @@ void ClusteringMonitor::record_after_run()
 	this->write_to_dat("../../results/ecpf/output_track.dat", this->output_track, this->record_count);
 	this->write_to_dat("../../results/ecpf/rotate_overhead_track.dat", this->rotate_overhead_track, this->record_count);
 	this->write_to_dat("../../results/ecpf/rotate_times_track.dat", this->rotate_times_track, this->record_count);
+#endif
+#ifdef _IFUCM_
+	this->write_to_dat("../../results/ifucm/nodes_x.dat", xs, this->network->nodes_num);
+	this->write_to_dat("../../results/ifucm/nodes_y.dat", ys, this->network->nodes_num);
+	this->write_to_dat("../../results/ifucm/time.dat", this->time, this->record_count);
+	this->write_to_dat("../../results/ifucm/energy_sum.dat", this->energy_sum, this->record_count);
+	this->write_to_dat("../../results/ifucm/alive_sum.dat", this->alive_sum, this->record_count);
+	this->write_to_dat("../../results/ifucm/energy_snapshot.dat", this->energy_snapshot, this->record_count*this->network->nodes_num);
+	this->write_to_dat("../../results/ifucm/ch_snapshot.dat", this->ch_snapshot, this->record_count*this->network->nodes_num);
+	this->write_to_dat("../../results/ifucm/hop_snapshot.dat", this->hop_snapshot, this->record_count*this->network->nodes_num);
+	this->write_to_dat("../../results/ifucm/output_track.dat", this->output_track, this->record_count);
+	this->write_to_dat("../../results/ifucm/rotate_overhead_track.dat", this->rotate_overhead_track, this->record_count);
+	this->write_to_dat("../../results/ifucm/rotate_times_track.dat", this->rotate_times_track, this->record_count);
 #endif
 #endif
 	printf("done\n");

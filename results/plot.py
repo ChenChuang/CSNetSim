@@ -6,8 +6,6 @@ from mpl_toolkits.mplot3d import Axes3D
 rn = 10;
 nn = 4000;
 
-# es = np.fromfile(alg + 'energy_snapshot.dat')[nn*snap : nn*(snap+1)]
-
 def summary(*algs):
     for alg in algs:
         times = np.fromfile(alg + '/time.dat')

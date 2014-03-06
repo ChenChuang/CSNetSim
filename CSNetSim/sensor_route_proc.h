@@ -66,10 +66,18 @@ public:
 	~Sch() {}
 public:
 	bool operator <(const Sch& a) const{
+#ifndef _IFUCM_
 		return d_tosink + d < a.d_tosink + a.d;
+#else
+		return d < a.d;
+#endif
 	}
 	bool operator ==(const Sch& a) const{
+#ifndef _IFUCM_
 		return d_tosink + d == a.d_tosink + a.d;
+#else
+		return d < a.d;
+#endif
 	}
 	bool is(const Sch& a) const{
 		return addr == a.addr;

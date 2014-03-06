@@ -12,6 +12,7 @@
 #include "sensor_heed_proc.h"
 #include "sensor_lcr_proc.h"
 #include "sensor_ecpf_proc.h"
+#include "sensor_ifucm_proc.h"
 #include "test_proc.h"
 
 
@@ -21,7 +22,8 @@ class SensorNode : public Node,
 	public INode_SensorRouteProc, 
 	public INode_SensorHeedProc, 
 	public INode_SensorLcrProc,
-	public INode_SensorEcpfProc
+	public INode_SensorEcpfProc,
+	public INode_SensorIfucmProc
 {
 public:
 	SensorNode(Network* anetwork, int aaddr, double ax, double ay, double aenergy);
@@ -62,6 +64,7 @@ public:
 	SensorRouteProc* routeproc;
 	SensorLcrProc* lcrproc;
 	SensorEcpfProc* ecpfproc;
+	SensorIfucmProc* ifucmproc;
 	
 friend class Monitor;
 friend class ClusteringMonitor;

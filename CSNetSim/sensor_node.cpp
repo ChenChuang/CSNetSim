@@ -30,6 +30,9 @@ SensorNode::SensorNode(Network* anetwork, int aaddr, double ax, double ay, doubl
 	
 	this->ecpfproc = new SensorEcpfProc(this);
 	this->procs_manager->add(this->ecpfproc);
+	
+	this->ifucmproc = new SensorIfucmProc(this);
+	this->procs_manager->add(this->ifucmproc);
 }
 
 SensorNode::~SensorNode()
@@ -60,6 +63,9 @@ SensorNode::~SensorNode()
 	
 	delete this->ecpfproc;
 	this->ecpfproc = NULL;
+	
+	delete this->ifucmproc;
+	this->ifucmproc = NULL;
 }
 
 void SensorNode::print()
@@ -80,6 +86,9 @@ void SensorNode::init()
 #endif
 #ifdef _ECPF_
 	this->ecpfproc->turn_on(); this->ecpfproc->start_clustering();
+#endif
+#ifdef _IFUCM_
+	this->ifucmproc->turn_on(); this->ifucmproc->start_clustering();
 #endif
 }
 
