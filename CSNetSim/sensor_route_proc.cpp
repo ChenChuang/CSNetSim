@@ -6,6 +6,7 @@ SensorRouteProc::SensorRouteProc(Node* anode) : node(anode)
 	this->inode = dynamic_cast<INode_SensorRouteProc*>(this->node);
 	this->inetwork = dynamic_cast<INet_SensorRouteProc*>(this->node->get_network());
 	this->chs = new SortedList<Sch>();
+	this->radius = -1;
 }
 
 SensorRouteProc::~SensorRouteProc()
@@ -104,7 +105,7 @@ int SensorRouteProc::get_best_ch()
 	Sch* sc;
 	while(this->chs->has_more()){
 		sc = this->chs->next();
-		if(this->inetwork->is_alive(sc->addr) && sc->d_tosink < this->inode->get_d_tosink()){
+		if((this->radius < 0 || sc->d < this->radius) && this->inetwork->is_alive(sc->addr) && sc->d_tosink < this->inode->get_d_tosink()){
 			return sc->addr;
 		}
 	}

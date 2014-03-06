@@ -98,6 +98,13 @@ void SensorNode::start_route()
 	this->routeproc->start_route();
 }
 
+void SensorNode::start_route(double radius)
+{
+	this->routeproc->turn_on();
+	this->routeproc->radius = radius;
+	this->routeproc->start_route();
+}
+
 void SensorNode::stop_route()
 {
 	this->routeproc->turn_off();

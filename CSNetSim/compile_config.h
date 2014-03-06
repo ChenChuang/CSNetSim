@@ -8,4 +8,6 @@
 //#define _ECPF_
 #define _IFUCM_
 
+#define _LCR_TRACK_
+
 #include <cstring>

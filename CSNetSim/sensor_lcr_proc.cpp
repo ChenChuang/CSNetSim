@@ -210,7 +210,9 @@ void SensorLcrProc::ticktock(double time)
 			int newch = this->get_least_cost_newch();
 			if(newch >= 0)
 			{
-				dynamic_cast<ClusteringMonitor*>(this->node->get_network()->get_monitor())->record_rotate(this->node->get_addr(), newch);
+				#ifdef _LCR_TRACK_
+					dynamic_cast<ClusteringMonitor*>(this->node->get_network()->get_monitor())->record_rotate(this->node->get_addr(), newch);
+				#endif
 				this->ch_send_assign(newch);
 				this->proc_state = SensorLcrProc::PROC_CH_WAIT_NEWCH;
 				this->wait_newch_timer->set_after(this->ch_wait_newch_time);

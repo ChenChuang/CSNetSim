@@ -29,13 +29,14 @@ public:
 	static const char CMD_CH = 0x11;
 public:
 	double min_tick;
-private:
+public:
 	Node* node;
 	INode_SensorRouteProc* inode;
 	INet_SensorRouteProc* inetwork;
 	SortedList<Sch>* chs;
 	
 	char proc_state;
+	double radius;
 };
 
 class INode_SensorRouteProc
@@ -69,14 +70,16 @@ public:
 #ifndef _IFUCM_
 		return d_tosink + d < a.d_tosink + a.d;
 #else
-		return d < a.d;
+		return d_tosink + d < a.d_tosink + a.d;
+		//return d < a.d;
 #endif
 	}
 	bool operator ==(const Sch& a) const{
 #ifndef _IFUCM_
 		return d_tosink + d == a.d_tosink + a.d;
 #else
-		return d < a.d;
+		return d_tosink + d < a.d_tosink + a.d;
+		//return d < a.d;
 #endif
 	}
 	bool is(const Sch& a) const{

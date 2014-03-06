@@ -88,8 +88,8 @@ public:
 public:
 	static const char PROC_SLEEP = 0x01;
 	static const char PROC_GETREADY = 0x02;
-	static const char PROC_TENT = 0x03;
-    static const char PROC_NOTTENT = 0x04;
+	static const char PROC_COMPETE = 0x03;
+    static const char PROC_NOTCOMPETE = 0x04;
 	static const char PROC_FINAL = 0x05;
 	static const char PROC_DONE = 0x06;
 	
@@ -103,6 +103,7 @@ public:
 	double ifucm_time;
 	double route_time;
 	double stable_time;
+	int max_ifucm_count;
 	
 	double min_tick;
 	
@@ -117,7 +118,8 @@ private:
 	char proc_state;
 	double cost;
     double radius;
-    bool is_tent;    
+    bool is_final;
+	int ifucm_count;
 
 	Timer* timer;
 };
@@ -131,7 +133,7 @@ public:
 	virtual void set_next_hop(int addr) = 0;
 	virtual double get_d_tosink() = 0;
 	virtual bool is_ch() = 0;
-	virtual void start_route() = 0;
+	virtual void start_route(double radius) = 0;
 	virtual void stop_route() = 0;
 	virtual NgbManager* get_neighbors() = 0;
 };

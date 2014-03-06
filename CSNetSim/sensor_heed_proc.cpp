@@ -292,8 +292,7 @@ int SensorHeedProc::proc_clustering()
 				}else{
 					this->heed_count ++;
 					this->proc_state = SensorHeedProc::PROC_FINAL;
-				}
-				
+				}		
 			}
 		}else{
 			this->inode->set_ch_addr(this->node->get_addr());

@@ -6,11 +6,11 @@ SensorIfucmProc::SensorIfucmProc(Node* anode) : node(anode)
     this->inetwork = dynamic_cast<INet_SensorIfucmProc*>(this->node->get_network());
     this->comm = dynamic_cast<ClusteringCommProxy*>(this->node->get_commproxy());
 	this->min_tick = 0.01;
-	this->tent_p = 0.27;
-	//this->heed_time = log(1/0.0001) / log(2) * this->min_tick;
+	this->tent_p = 0.1;
 	this->ifucm_time = 1;
 	this->route_time = 1;
-	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 5;
+	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 10;
+	this->max_ifucm_count = 10;
 	
 	this->tents = new SortedList<ifucm::Tent>();
     this->chs = new SortedList<ifucm::Sch>();
@@ -48,7 +48,7 @@ void SensorIfucmProc::exit_clustering()
 	}
 	this->proc_state = SensorIfucmProc::PROC_SLEEP;
 	this->timer->set_after(this->route_time + this->stable_time);
-	this->inode->start_route();
+	this->inode->start_route(this->radius * 2);
 }
 
 void SensorIfucmProc::ticktock(double time)
@@ -98,6 +98,145 @@ int SensorIfucmProc::process(Msg* msg)
 	return -1;
 }
 
+int SensorIfucmProc::proc_clustering()
+{	
+	switch(this->proc_state)
+	{
+	case SensorIfucmProc::PROC_SLEEP:
+	{
+		break;
+	}
+	case SensorIfucmProc::PROC_DONE:
+	{
+		break;
+	}
+	case SensorIfucmProc::PROC_GETREADY:
+	{
+		this->tents->clear();
+        this->chs->clear();
+	    this->cost = -1;
+        this->radius = -1;
+        this->is_final = false;
+		this->ifucm_count = 0;
+	
+        if((double)rand() / (RAND_MAX+1.0) < this->tent_p){    
+		    this->proc_state = SensorIfucmProc::PROC_COMPETE;
+            this->cal_radius_cost();
+            this->add_tent(this->node->get_addr(), this->cost);
+            this->broadcast_compete_msg(); 
+        }else{
+		    this->proc_state = SensorIfucmProc::PROC_NOTCOMPETE;
+        }
+		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
+		break;
+	}
+	case SensorIfucmProc::PROC_COMPETE:
+	{
+		if(this->ifucm_count < this->max_ifucm_count-1){
+			bool is_receive_final = false;
+			this->chs->seek(0);
+			ifucm::Sch* sc = NULL;
+			while(this->chs->has_more()){
+				sc = this->chs->next();
+				if(this->tents->find(ifucm::Tent(sc->addr, 0)) != NULL){
+					is_receive_final = true;
+					break;
+				}
+			}
+			if(is_receive_final){
+				this->broadcast_quit_msg();
+				this->is_final = false;
+				this->proc_state = SensorIfucmProc::PROC_NOTCOMPETE;
+			}
+			int best = this->get_least_cost_tent();
+			if(best >= 0 && this->node->get_addr() == best){
+				this->broadcast_ch_msg();
+				this->is_final = true;
+				this->proc_state = SensorIfucmProc::PROC_NOTCOMPETE;
+			}
+			this->ifucm_count++;
+		}else if(this->ifucm_count < this->max_ifucm_count){
+			this->broadcast_ch_msg();
+			this->is_final = true;
+			this->proc_state = SensorIfucmProc::PROC_NOTCOMPETE;
+		}else{
+			this->proc_state = SensorIfucmProc::PROC_FINAL;
+		}
+		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
+		break;
+	}
+	case SensorIfucmProc::PROC_NOTCOMPETE:
+	{
+		if(this->ifucm_count < this->max_ifucm_count){
+			this->ifucm_count++;
+		}else{
+			this->proc_state = SensorIfucmProc::PROC_FINAL;
+		}
+		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
+        break;
+    }
+	case SensorIfucmProc::PROC_FINAL:
+	{
+        int best;
+	    if(this->is_final){
+            best = this->node->get_addr();
+        }else{
+            best = this->get_closest_ch();
+            if(best < 0){
+                best = this->node->get_addr();
+            }else{
+                this->unicast_join_msg(best);
+            }
+        }
+        this->inode->set_ch_addr(best);
+        this->proc_state = SensorIfucmProc::PROC_DONE;
+		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
+		break;
+	}
+	}
+	return 1;
+}
+
+void SensorIfucmProc::broadcast_ch_msg()
+{
+	this->comm->broadcast(
+		this->node->get_addr(), ClusteringSimModel::CLUSTER_RADIUS, 
+		ClusteringSimModel::CTRL_PACKET_SIZE, 
+		SensorIfucmProc::CMD_CH, 
+		0, NULL);
+}
+
+void SensorIfucmProc::receive_ch_msg(Msg* msg)
+{
+    this->add_ch(msg->fromaddr);
+}
+
+void SensorIfucmProc::receive_compete_msg(Msg* msg)
+{
+	this->add_tent(msg->fromaddr, ((double*)(msg->data))[0]);
+}
+
+void SensorIfucmProc::receive_join_msg(Msg* msg)
+{
+	this->inode->set_ch_addr(this->node->get_addr());
+	this->add_member(msg->fromaddr);
+}
+
+void SensorIfucmProc::broadcast_quit_msg()
+{
+	this->comm->broadcast(
+		this->node->get_addr(), ClusteringSimModel::CLUSTER_RADIUS, 
+		ClusteringSimModel::CTRL_PACKET_SIZE, 
+		SensorIfucmProc::CMD_QUIT, 
+		0, NULL);
+}
+
+void SensorIfucmProc::receive_quit_msg(Msg* msg)
+{
+	this->tents->remove(ifucm::Tent(msg->fromaddr, 0));
+	this->chs->remove(ifucm::Sch(msg->fromaddr, 0));
+}
+
 void SensorIfucmProc::add_ch(int addr)
 {
     double d = this->inetwork->d_between(this->node->get_addr(), addr);
@@ -125,15 +264,6 @@ void SensorIfucmProc::broadcast_compete_msg()
 		SensorIfucmProc::CMD_COMPETE, 
 		sizeof(double), (char*)data);
 	delete[] data;
-}
-
-void SensorIfucmProc::broadcast_ch_msg()
-{
-	this->comm->broadcast(
-		this->node->get_addr(), ClusteringSimModel::MAX_RADIUS, 
-		ClusteringSimModel::CTRL_PACKET_SIZE, 
-		SensorIfucmProc::CMD_CH, 
-		0, NULL);
 }
 
 int SensorIfucmProc::get_least_cost_tent()
@@ -165,103 +295,6 @@ void SensorIfucmProc::unicast_join_msg(int addr)
 		ClusteringSimModel::CTRL_PACKET_SIZE, 
 		SensorIfucmProc::CMD_JOIN, 
 		0, NULL);
-}
-
-int SensorIfucmProc::proc_clustering()
-{	
-	switch(this->proc_state)
-	{
-	case SensorIfucmProc::PROC_SLEEP:
-	{
-		break;
-	}
-	case SensorIfucmProc::PROC_DONE:
-	{
-		break;
-	}
-	case SensorIfucmProc::PROC_GETREADY:
-	{
-		this->tents->clear();
-        this->chs->clear();
-	    this->cost = -1;
-        this->radius = -1;
-        this->is_tent = false;     
-	
-        if((double)rand() / (RAND_MAX+1.0) < this->tent_p){    
-		    this->proc_state = SensorIfucmProc::PROC_TENT;
-            this->cal_radius_cost();
-            this->is_tent = true;
-            this->add_tent(this->node->get_addr(), this->cost);
-            this->broadcast_compete_msg(); 
-        }else{
-		    this->proc_state = SensorIfucmProc::PROC_NOTTENT;
-        }
-		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
-		break;
-	}
-	case SensorIfucmProc::PROC_TENT:
-	{
-        int best = this->get_least_cost_tent();
-        if(best >= 0 && this->node->get_addr() != best){
-            this->is_tent = false;
-            //this->broadcast_quit_msg();
-        }else{
-            this->broadcast_ch_msg();
-        }
-        this->proc_state = SensorIfucmProc::PROC_FINAL;
-		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
-		break;
-	}
-	case SensorIfucmProc::PROC_NOTTENT:
-	{
-        this->proc_state = SensorIfucmProc::PROC_FINAL;
-		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
-        break;
-    }
-	case SensorIfucmProc::PROC_FINAL:
-	{
-        int best;
-	    if(this->is_tent){
-            best = this->node->get_addr();
-        }else{
-            best = this->get_closest_ch();
-            if(best < 0){
-                best = this->node->get_addr();
-            }else{
-                this->unicast_join_msg(best);
-            }
-        }
-        this->inode->set_ch_addr(best);
-        this->proc_state = SensorIfucmProc::PROC_DONE;
-		this->node->get_network()->get_clock()->try_set_tick(this->min_tick);
-		break;
-	}
-	}
-	return 1;
-}
-
-void SensorIfucmProc::receive_ch_msg(Msg* msg)
-{
-    this->add_ch(msg->fromaddr); 
-}
-
-void SensorIfucmProc::receive_compete_msg(Msg* msg)
-{
-	this->add_tent(msg->fromaddr, ((double*)(msg->data))[0]);
-}
-
-void SensorIfucmProc::receive_join_msg(Msg* msg)
-{
-	this->inode->set_ch_addr(this->node->get_addr());
-	this->add_member(msg->fromaddr);
-}
-
-void SensorIfucmProc::broadcast_quit_msg()
-{
-}
-
-void SensorIfucmProc::receive_quit_msg(Msg* msg)
-{
 }
 
 void SensorIfucmProc::cal_radius_cost()
@@ -446,7 +479,9 @@ void ifucm::FuzzyCostComputor::cal(double aenergy, double adist, double adens, d
     this->dens->setInputValue(dens);
 	this->engine->process();
 	chance = this->chan->defuzzify();
-    radius = this->rad->defuzzify() * ClusteringSimModel::CLUSTER_RADIUS;
+    double rp = this->rad->defuzzify();
+	double k = 0.7;
+	radius = ClusteringSimModel::CLUSTER_RADIUS * (1-k) + ClusteringSimModel::CLUSTER_RADIUS * k * rp;
 }
 
 namespace ifucm

@@ -47,6 +47,7 @@ public:
 	void force_send_data() {this->dataproc->force_send();}
 	double get_neighbor_d(int addr);
 	void start_route();
+	void start_route(double radius);
 	void stop_route();
 	void start_cluster_route();
 	void exit_cluster_route();
