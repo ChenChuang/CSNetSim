@@ -9,7 +9,7 @@ SensorIfucmProc::SensorIfucmProc(Node* anode) : node(anode)
 	this->tent_p = 0.1;
 	this->ifucm_time = 1;
 	this->route_time = 1;
-	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 10;
+	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 65;
 	this->max_ifucm_count = 10;
 	
 	this->tents = new SortedList<ifucm::Tent>();

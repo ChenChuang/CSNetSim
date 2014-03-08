@@ -3,54 +3,75 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.mplot3d import Axes3D
 
-rn = 10;
-nn = 4000;
+rn = 10
+nn = 4000
+
+pdir = '../results/'
+#pdir = '../results_4000_300_300/'
+#pdir = '../results_3000_300_300/'
+#pdir = '../results_2083_250_250/'
+#pdir = '../results_1333_200_200/'
 
 def summary(*algs):
     for alg in algs:
-        times = np.fromfile(alg + '/time.dat')
-        alives = np.fromfile(alg + '/alive_sum.dat')
-        outputs = np.fromfile(alg + '/output_track.dat')
+        times = np.fromfile(pdir + alg + '/time.dat')
+        alives = np.fromfile(pdir + alg + '/alive_sum.dat')
+        outputs = np.fromfile(pdir + alg + '/output_track.dat')
+        overheads = np.fromfile(pdir + alg + '/rotate_overhead_track.dat')
+        hnd = 0
+        for i,x in enumerate(alives):
+            if x < nn/2:
+                hnd = times[i]
+                break
         times = [times[i] for i,a in enumerate(alives) if 0 < a < nn-1]
-        print alg, ':', 'FND =', times[0], 'LND =', times[-1], 'OUTPUT =', outputs[-1]
+        #print alg, ':', 'FND =', times[0], 'HND =', hnd, 'LND =', times[-1], 'OVERHEAD =', overheads[-1], 'OUTPUT =', outputs[-1]
+        print alg, ':', '%0.2f %0.2f %0.2f %0.2f %0.2f' % (times[0], hnd, times[-1], overheads[-1], outputs[-1])
 
 def plot_time_alive(*algs):
     fig, ax = plt.subplots()
     for alg in algs:
-        times = np.fromfile(alg + '/time.dat')
-        alives = np.fromfile(alg + '/alive_sum.dat')
+        times = np.fromfile(pdir + alg + '/time.dat')
+        alives = np.fromfile(pdir + alg + '/alive_sum.dat')
+        ax.plot(times, alives)
+    plt.show()
+
+def plot_time_overhead(*algs):
+    fig, ax = plt.subplots()
+    for alg in algs:
+        times = np.fromfile(pdir + alg + '/time.dat')
+        alives = np.fromfile(pdir + alg + '/rotate_overhead_track.dat')
         ax.plot(times, alives)
     plt.show()
 
 def plot_time_energy(*algs):
     fig, ax = plt.subplots()
     for alg in algs:
-        times = np.fromfile(alg + '/time.dat')
-        energys = np.fromfile(alg + '/energy_sum.dat')
+        times = np.fromfile(pdir + alg + '/time.dat')
+        energys = np.fromfile(pdir + alg + '/energy_sum.dat')
         ax.plot(times, energys)
     plt.show()
 
 def plot_time_output(*algs):
     fig, ax = plt.subplots()
     for alg in algs:
-        times = np.fromfile(alg + '/time.dat')
-        outputs = np.fromfile(alg + '/output_track.dat')
+        times = np.fromfile(pdir + alg + '/time.dat')
+        outputs = np.fromfile(pdir + alg + '/output_track.dat')
         ax.plot(times, outputs)
     plt.show()
 
 def plot_output_alive(*algs):
     fig, ax = plt.subplots()
     for alg in algs:
-        outputs = np.fromfile(alg + '/output_track.dat')
-        alives = np.fromfile(alg + '/alive_sum.dat')
+        outputs = np.fromfile(pdir + alg + '/output_track.dat')
+        alives = np.fromfile(pdir + alg + '/alive_sum.dat')
         ax.plot(outputs, alives)
     plt.show()
 
 
 def plot_xy_chs(alg, snap):
-    xs = np.fromfile(alg + '/nodes_x.dat')
-    ys = np.fromfile(alg + '/nodes_y.dat')
-    chs = np.fromfile(alg + '/ch_snapshot.dat')[nn*snap : nn*(snap+1)]
+    xs = np.fromfile(pdir + alg + '/nodes_x.dat')
+    ys = np.fromfile(pdir + alg + '/nodes_y.dat')
+    chs = np.fromfile(pdir + alg + '/ch_snapshot.dat')[nn*snap : nn*(snap+1)]
     
     chxs = [xs[i] for i,c in enumerate(chs) if c == i]
     chys = [ys[i] for i,c in enumerate(chs) if c == i]
@@ -69,11 +90,11 @@ def plot_xy_chs(alg, snap):
     plt.show()
 
 def plot_xy_hops(alg, snap):
-    xs = np.fromfile(alg + '/nodes_x.dat')
-    ys = np.fromfile(alg + '/nodes_y.dat')
-    chs = np.fromfile(alg + '/ch_snapshot.dat')[nn*snap : nn*(snap+1)]
-    hops = np.fromfile(alg + '/hop_snapshot.dat')[nn*snap : nn*(snap+1)]
-    es = np.fromfile(alg + '/energy_snapshot.dat')[nn*snap : nn*(snap+1)]
+    xs = np.fromfile(pdir + alg + '/nodes_x.dat')
+    ys = np.fromfile(pdir + alg + '/nodes_y.dat')
+    chs = np.fromfile(pdir + alg + '/ch_snapshot.dat')[nn*snap : nn*(snap+1)]
+    hops = np.fromfile(pdir + alg + '/hop_snapshot.dat')[nn*snap : nn*(snap+1)]
+    es = np.fromfile(pdir + alg + '/energy_snapshot.dat')[nn*snap : nn*(snap+1)]
     hops[hops < 0] = 0
 
     chxs = [xs[i] for i,c in enumerate(chs) if c == i and es[i] > 0]
@@ -97,9 +118,9 @@ def plot_xy_hops(alg, snap):
     plt.show()
 
 def plot_xy_es(alg, snap):
-    xs = np.fromfile(alg + '/nodes_x.dat')
-    ys = np.fromfile(alg + '/nodes_y.dat')
-    es = np.fromfile(alg + '/energy_snapshot.dat')[nn*snap : nn*(snap+1)]
+    xs = np.fromfile(pdir + alg + '/nodes_x.dat')
+    ys = np.fromfile(pdir + alg + '/nodes_y.dat')
+    es = np.fromfile(pdir + alg + '/energy_snapshot.dat')[nn*snap : nn*(snap+1)]
     
     fig, ax = plt.subplots()
     
@@ -126,9 +147,9 @@ def plot_xy_es(alg, snap):
     plt.show()
 
 def plot_xy_es_rainbow(alg, snap):
-    xs = np.fromfile(alg + '/nodes_x.dat')
-    ys = np.fromfile(alg + '/nodes_y.dat')
-    es = np.fromfile(alg + '/energy_snapshot.dat')[nn*snap : nn*(snap+1)]
+    xs = np.fromfile(pdir + alg + '/nodes_x.dat')
+    ys = np.fromfile(pdir + alg + '/nodes_y.dat')
+    es = np.fromfile(pdir + alg + '/energy_snapshot.dat')[nn*snap : nn*(snap+1)]
     es[es<0] = 0
 
     fig, ax = plt.subplots()
@@ -140,7 +161,7 @@ def plot_xy_es_rainbow(alg, snap):
     plt.show()
 
 def plot_xyt_rotate(ta, tb):
-    xyts = np.fromfile('lcr/rotate.dat')
+    xyts = np.fromfile(pdir + 'lcr/rotate.dat')
     
     ads = xyts[0::7]
     xs = xyts[1::7]
@@ -165,7 +186,7 @@ def plot_xyt_rotate(ta, tb):
     plt.show()
 
 def plot_xyt_rotate(s):
-    xyts = np.fromfile('lcr/rotate_backup.dat')
+    xyts = np.fromfile(pdir + 'lcr/rotate_backup.dat')
     xs = xyts[1::7][::s]
     ys = xyts[2::7][::s]
     ts = xyts[6::7][::s]
@@ -181,12 +202,12 @@ def plot_xyt_rotate(s):
     plt.show()
 
 def plot_xyt_track_all(s):
-    chs = np.fromfile('lcr/ch_snapshot.dat')[nn : nn*2]
+    chs = np.fromfile(pdir + 'lcr/ch_snapshot.dat')[nn : nn*2]
     chas = [c for i,c in enumerate(chs) if c == i][::s]
     plot_xyt_track(chas, 0, 30000)
 
 def plot_xyt_track(iads, ta, tb):
-    xyts = np.fromfile('lcr/rotate.dat')
+    xyts = np.fromfile(pdir + 'lcr/rotate_backup.dat')
     
     ads = xyts[0::7]
     xs = xyts[1::7]
@@ -245,16 +266,51 @@ def plot_inds(*algs):
     fig, ax = plt.subplots()
     for alg in algs:
         if alg == 'lcr':
-            inds = np.loadtxt('lcr/inds.txt', skiprows=1, usecols=[3,4,5])
+            inds = np.loadtxt(pdir + 'lcr/inds.txt', skiprows=1, usecols=range(2,7))
             c = 'red'
         if alg == 'heed':
-            inds = np.loadtxt('heed/inds.txt', skiprows=1, usecols=[1,2,3])
+            inds = np.loadtxt(pdir + 'heed/inds.txt', skiprows=1, usecols=range(1,6))
             c = 'green'
         if alg == 'ecpf':
-            inds = np.loadtxt('ecpf/inds.txt', skiprows=1, usecols=[1,2,3])
+            inds = np.loadtxt(pdir + 'ecpf/inds.txt', skiprows=1, usecols=range(1,6))
             c = 'blue'
+        if alg == 'ifucm':
+            inds = np.loadtxt(pdir + 'ifucm/inds.txt', skiprows=1, usecols=range(1,6))
+            c = 'orange'
+        
+
+        for i,[fnd,hnd,lnd,overhead,output] in enumerate(inds):
+            #ax.scatter(fnd, lnd, s = 10**(output / 1e9) * 0.5, alpha = 0.2, color=c)
+            #ax.scatter(fnd, lnd, s = (30 * (output - 2.0e9) / 1e9)**2, alpha = 0.2, color=c)
+            ax.scatter(fnd, lnd, s = overhead/3.0e3, alpha = 0.47, color=c)
+            ax.scatter(fnd, lnd, s = 10, alpha = 1, color='black')
+            if i > 0:
+                ax.plot([inds[i-1][0],fnd], [inds[i-1][2],lnd], alpha = 0.7, color=c)
+    plt.show()
+
+def plot_inds_3d(*algs):
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+ 
+    for alg in algs:
+        if alg == 'lcr':
+            inds = np.loadtxt(pdir + 'lcr/inds.txt', skiprows=1, usecols=[2,3,4])
+            c = 'red'
+        if alg == 'heed':
+            inds = np.loadtxt(pdir + 'heed/inds.txt', skiprows=1, usecols=[1,2,3])
+            c = 'green'
+        if alg == 'ecpf':
+            inds = np.loadtxt(pdir + 'ecpf/inds.txt', skiprows=1, usecols=[1,2,3])
+            c = 'blue'
+        if alg == 'ifucm':
+            inds = np.loadtxt(pdir + 'ifucm/inds.txt', skiprows=1, usecols=[1,2,3])
+            c = 'yellow'
         
         for fnd,lnd,output in inds:
-            ax.scatter(fnd, lnd, s = (output / 1e9)**10/150, alpha = 0.5, color=c)
-            ax.scatter(fnd, lnd, s = 10, alpha = 1, color='black')
+            ax.scatter(fnd, lnd, 2.3e9, alpha = 0.2, color=c)
+            ax.scatter(fnd, lnd, output, alpha = 0.8, color=c)
+            ax.plot([fnd,fnd],[lnd,lnd],[2.3e9,output], alpha = 0.5, color=c)
     plt.show()
+
+def plot_fnd(*algs):
+    pass 

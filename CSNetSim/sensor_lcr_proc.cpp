@@ -12,7 +12,7 @@ SensorLcrProc::SensorLcrProc(Node* anode) : node(anode)
 	this->max_wait_self_time = 5;
 	this->max_wait_hop_time = 5;
 	this->min_wait_hop_time = 0;
-	this->energy_thrd = 0.7;
+	this->energy_thrd = 0.8;
 	this->energy_thrd_2 = 0;
 	this->energy_thrd_3 = 70;
 	this->energy_thrd_4 = EnergyModel::calTransmit(ClusteringSimModel::CTRL_PACKET_SIZE, ClusteringSimModel::MAX_RADIUS);
@@ -458,6 +458,8 @@ double SensorLcrProc::cal_fcd()
 void SensorLcrProc::cal_tent_costs()
 {
 	double sum_fcd = 0;
+	double sum_e = 0;
+	double n = 0;
 	double max_fc = 0;
 	double fe = 0;
 	double fd = 0;
@@ -471,6 +473,8 @@ void SensorLcrProc::cal_tent_costs()
 	SortedListIter<lcr::TentParam>* iter = new SortedListIter<lcr::TentParam>(this->tent_params);
 	while(this->tent_params->has_more()){
 		ctp = this->tent_params->next();
+		sum_e += ctp->e;
+		n++;
 		sum_fcd = 0;
 		ngbs = ctp->ngbs;
 		iter->reset();
@@ -489,7 +493,7 @@ void SensorLcrProc::cal_tent_costs()
 	this->tents->clear();
 	
 	this->tent_params->seek(0);
-	double lam = 5.0;
+	double lam = 10.0 + 77.0*(1 - sum_e/n/ClusteringSimModel::E_INIT);
 	while(this->tent_params->has_more()){
 		ctp = this->tent_params->next();
 		//if(ctp->e <= this->energy_thrd_2){

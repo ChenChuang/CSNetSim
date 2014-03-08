@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 void crunsim(void);
+void crunsim_h(void);
 
 int main(int argc, char **argv)
 {
@@ -14,6 +15,7 @@ int main(int argc, char **argv)
 	std::cout << "Hello, CSNetSim\n" << std::endl << std::endl;
 	int t0 = std::time(NULL);
 	crunsim();
+	//crunsim_h();
 	int t1 = std::time(NULL);
 	std::cout << std::endl << "Elapsed time = " << (t1-t0) << " seconds" << std::endl; 
 	std::cout << "Goodbye, CSNetSim\n" << std::endl;

@@ -53,6 +53,9 @@ void ClusteringMonitor::record_periodically(Node** nodes)
 	if(this->lnd < 0 && al_sum == 0){
 		this->lnd = this->network->get_clock()->get_time();
 	}
+	if(this->hnd < 0 && al_sum < (this->network->nodes_num - 1)/2){
+		this->hnd = this->network->get_clock()->get_time();
+	}
 	for(int i = 1; i < this->network->nodes_num; i ++){
 		this->energy_snapshot[ this->record_count * this->network->nodes_num + i ] = nodes[i]->energy;
 		this->ch_snapshot[ this->record_count * this->network->nodes_num + i ] = dynamic_cast<SensorNode*>(nodes[i])->ch_addr;
@@ -153,6 +156,7 @@ void ClusteringMonitor::record_before_run()
 	}
 	this->fnd = -1;
 	this->lnd = -1;
+	this->hnd = -1;
 #ifdef _LCR_
 	std::remove("../../results/lcr/rotate.dat");
 #endif
@@ -228,7 +232,8 @@ void ClusteringMonitor::record_after_run()
 #endif
 #endif
 	printf("done\n");
-	printf("\nFND = %f\nLND = %f\nOutput = %f\n", this->fnd, this->lnd, this->output);
+	//printf("\nFND = %f\nLND = %f\nOVERHEAD = %f\nOUTPUT = %f\n", this->fnd, this->lnd, this->rotate_overhead, this->output);
+	printf("\n%.2f %.2f %.2f %.2f %.2f\n", this->fnd, this->hnd, this->lnd, this->rotate_overhead, this->output);
 	printf("\nsizeof(double) = %d\n", sizeof(double));
 	printf("record_num = %d\n", this->record_count);
 	printf("node_num = %d\n", this->network->nodes_num);

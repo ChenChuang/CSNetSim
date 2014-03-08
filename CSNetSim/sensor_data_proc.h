@@ -45,6 +45,7 @@ class INode_SensorDataProc
 public:
 	virtual int get_next_hop() = 0;
 	virtual bool is_ch() = 0;
+	virtual double get_d_tosink() = 0;
 };
 
 #endif // SensorDataProc_H

@@ -14,7 +14,7 @@ SensorDataProc::SensorDataProc(Node* anode, double aperiod, double amax_wait, do
 	wait_hop_timer(new Timer(anode->get_network()->get_clock()))
 {
 	this->comp = 0.1;
-	this->max_wait_hop = 10;
+	this->max_wait_hop = 5;
 }
 
 SensorDataProc::~SensorDataProc()
@@ -47,6 +47,12 @@ int SensorDataProc::process(Msg* msg)
 
 void SensorDataProc::ticktock(double time)
 {
+	if(this->node->energy < EnergyModel::calTransmit(this->unfused + this->fused / this->comp, this->inode->get_d_tosink())){
+		#ifndef _LCR_
+		this->force_send();
+		return;
+		#endif
+	}
 	if(this->wait_hop_timer->is_timeout()){
 		//this->force_send();
 	}

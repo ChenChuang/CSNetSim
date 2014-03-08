@@ -13,7 +13,7 @@ SensorEcpfProc::SensorEcpfProc(Node* anode) : node(anode)
 
 	this->ecpf_time = 1;
 	this->route_time = 0.5;
-	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 8;
+	this->stable_time = ClusteringSimModel::SENSE_DATA_PERIOD * 5;
 	this->check_time = 0.5;
 	
 	this->min_tick = 0.01;

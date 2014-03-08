@@ -51,6 +51,36 @@ void crunsim()
 	delete[] y;
 }
 
+void crunsim_h()
+{
+	int n = ClusteringSimModel::NODE_NUM;
+	double* x = new double[n];
+	double* y = new double[n];
+	x[0] = ClusteringSimModel::SINK_X;
+	y[0] = ClusteringSimModel::SINK_Y;
+	double xmax = ClusteringSimModel::AREA_SIZE_X;
+	double ymax = ClusteringSimModel::AREA_SIZE_Y;
+	double xmin = 0;
+	double ymin = 0;
+	double dmin = 7;
+	bool r;
+	for(int i=1;i<n;i++){
+		r = true;
+		while(r){
+			x[i] = (double)rand() / RAND_MAX * (xmax - xmin) + xmin;
+			y[i] = (double)rand() / RAND_MAX * (ymax - ymin) + ymin;
+			if(sqrt(pow(x[i]-x[0], 2) + pow(y[i]-y[0], 2)) > dmin && !(
+			   (x[i] >= 0.333*xmax && x[i] <= 0.666*xmax && y[i] >= 0 && y[i] <= 0.333*ymax) ||
+			   (x[i] >= 0 && x[i] <= 0.666*xmax && y[i] >= 0.666*ymax && y[i] <= ymax))){
+				r = false;
+			}
+		}
+	}
+	crunsim(x, y);
+	delete[] x;
+	delete[] y;
+}
+
 #ifdef _MATLAB_
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {

@@ -4,10 +4,10 @@
 #define _WRITE_DAT_
 
 //#define _HEED_
-//#define _LCR_
+#define _LCR_
 //#define _ECPF_
-#define _IFUCM_
+//#define _IFUCM_
 
-#define _LCR_TRACK_
+//#define _LCR_TRACK_
 
 #include <cstring>
