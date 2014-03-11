@@ -1,7 +1,7 @@
 // #define _MATLAB_
 // #define _DEBUG_
 
-//#define _PRINT_
+#define _PRINT_
 //#define _WRITE_DAT_
 
 //#define _HEED_

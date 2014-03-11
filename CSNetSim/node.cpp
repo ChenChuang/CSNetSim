@@ -26,8 +26,10 @@ void Node::init()
 
 void Node::clear()
 {
-	this->commproxy->clear_t_buf();
-	this->commproxy->clear_r_buf();
+	if(this->commproxy != NULL){
+		this->commproxy->clear_t_buf();
+		this->commproxy->clear_r_buf();
+	}
 }
 
 void Node::print()
