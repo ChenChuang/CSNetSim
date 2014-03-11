@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -6,11 +7,198 @@ from mpl_toolkits.mplot3d import Axes3D
 rn = 10
 nn = 4000
 
-pdir = '../results/'
-#pdir = '../results_4000_300_300/'
-#pdir = '../results_3000_300_300/'
-#pdir = '../results_2083_250_250/'
-#pdir = '../results_1333_200_200/'
+pdir = '../results_tmp/'
+pdirs = ['../results_5000_300_300/',\
+         '../results_4000_300_300/',\
+         '../results_3000_300_300/',\
+         '../results_2083_250_250/',\
+         '../results_1333_200_200/']
+pdirs = pdirs[::-1]
+#pdir = pdirs[0]
+
+colors = {'lcr':'red','ifucm':'green','ecpf':'blue','heed':'orange'}
+
+def plot_es(alg, snap):
+    es = np.fromfile(pdir + alg + '/energy_snapshot.dat')[nn*snap : nn*(snap+1)]
+    es[es<0] = 0
+    fig, ax = plt.subplots()
+    for i,e in enumerate(es):
+        ax.scatter(i, e, s=10, alpha=0.5, color=colors[alg])
+    plt.show()
+
+def plot_xyt_rotate_between(ta, tb):
+    xyts = np.fromfile(pdir + 'lcr/rotate_backup.dat')
+    
+    ads = xyts[0::7]
+    xs = xyts[1::7]
+    ys = xyts[2::7]
+
+    nads = xyts[3::7]
+    nxs = xyts[4::7]
+    nys = xyts[5::7]
+
+    ts = xyts[6::7]
+    xs = [xs[i] for i,t in enumerate(ts) if ta < t < tb]
+    ys = [ys[i] for i,t in enumerate(ts) if ta < t < tb]
+    ts = [ts[i] for i,t in enumerate(ts) if ta < t < tb]
+    ds = [1-((x/350)**2 + (y/350)**2)**0.5 for x,y in zip(xs,ys)]
+    cs = cm.rainbow(ds)
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.scatter(xs, ys, ts, color=cs)
+    ax.set_xlim3d(0, 350)
+    ax.set_ylim3d(0, 350)
+    plt.show()
+
+def plot_xyt_rotate(s):
+    xyts = np.fromfile(pdir + 'lcr/rotate_backup.dat')
+    xs = xyts[1::7][::s]
+    ys = xyts[2::7][::s]
+    ts = xyts[6::7][::s]
+    ds = [1-((x/350)**2 + (y/350)**2)**0.5 for x,y in zip(xs,ys)]
+    cs = cm.rainbow(ds)
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.scatter(xs, ys, ts, color=cs, cmap=cm.hsv)
+    ax.set_xlim3d(0, 350)
+    ax.set_ylim3d(0, 350)
+    
+    plt.show()
+
+def plot_xyt_track_all(s):
+    chs = np.fromfile(pdir + 'lcr/ch_snapshot.dat')[nn : nn*2]
+    chas = [c for i,c in enumerate(chs) if c == i][::s]
+    plot_xyt_track(chas, 0, 30000)
+
+def plot_inds(*algs):
+    fig, ax = plt.subplots()
+    for alg in algs:
+        dirs = [x[0] for x in os.walk('../results/'+alg)][1:]
+        pas = [int(x.split('/')[-1]) for x in dirs]
+        dirs = [x[1] for x in sorted(zip(pas, dirs))]
+        fnds = []
+        lnds = []
+        ohds = []
+        for d in dirs:
+            try:
+                inds = np.fromfile(d + '/inds_4.dat')
+            except:
+                continue
+            
+            fnd = inds[::5]
+            lnd = inds[2::5]
+            ohd = inds[3::5]
+            fnds.append(np.average(fnd))
+            lnds.append(np.median(lnd))
+            ohds.append(np.average(ohd))
+        
+        for i,(fnd,lnd,ohd) in enumerate(zip(fnds, lnds, ohds)):
+            #ax.scatter(fnd, lnd, s = 10**(output / 1e9) * 0.5, alpha = 0.2, color=c)
+            #ax.scatter(fnd, lnd, s = (30 * (output - 2.0e9) / 1e9)**2, alpha = 0.2, color=c)
+            ax.scatter(fnd, lnd, s = ohd/3.0e3, alpha = 0.47, color=colors[alg])
+            ax.scatter(fnd, lnd, s = 10, alpha = 1, color='black')
+            if i > 0:
+                ax.plot([fnds[i-1],fnd], [lnds[i-1],lnd], alpha = 0.7, color=colors[alg])
+    plt.show()
+
+def plot_ind_avg(col, *algs):
+    n = {'fnd':0, 'hnd':1, 'lnd':2, 'ohd':3}[col]
+    fig, ax = plt.subplots()
+    for alg in algs:
+        inds = []
+        if alg in ('ifucm','heed'):
+            fname = '/inds_4.dat'
+        else:
+            fname = '/inds_2.dat'
+        for pdir in pdirs:
+            ind = np.fromfile(pdir + alg + fname)[n::5]
+            inds.append(sum(ind)/len(ind))
+            # inds.append(np.median(ind))
+        ax.plot(range(0,len(pdirs)), inds, alpha=0.47, color=colors[alg])
+        ax.scatter(range(0,len(pdirs)), inds, alpha=1.00, color=colors[alg])
+    plt.show()
+
+################################################################################################################
+
+def plot_inds_txt(*algs):
+    fig, ax = plt.subplots()
+    for alg in algs:
+        if alg == 'lcr':
+            inds = np.loadtxt(pdir + 'lcr/inds.txt', skiprows=1, usecols=range(2,7))
+        if alg == 'heed':
+            inds = np.loadtxt(pdir + 'heed/inds.txt', skiprows=1, usecols=range(1,6))
+        if alg == 'ecpf':
+            inds = np.loadtxt(pdir + 'ecpf/inds.txt', skiprows=1, usecols=range(1,6))
+        if alg == 'ifucm':
+            inds = np.loadtxt(pdir + 'ifucm/inds.txt', skiprows=1, usecols=range(1,6))
+        
+        for i,[fnd,hnd,lnd,overhead,output] in enumerate(inds):
+            #ax.scatter(fnd, lnd, s = 10**(output / 1e9) * 0.5, alpha = 0.2, color=c)
+            #ax.scatter(fnd, lnd, s = (30 * (output - 2.0e9) / 1e9)**2, alpha = 0.2, color=c)
+            ax.scatter(fnd, lnd, s = overhead/3.0e3, alpha = 0.47, color=colors[alg])
+            ax.scatter(fnd, lnd, s = 10, alpha = 1, color='black')
+            if i > 0:
+                ax.plot([inds[i-1][0],fnd], [inds[i-1][2],lnd], alpha = 0.7, color=colors[alg])
+    plt.show()
+
+def plot_xyt_track(iads, ta, tb):
+    xyts = np.fromfile(pdir + 'lcr/rotate_backup.dat')
+    
+    ads = xyts[0::7]
+    xs = xyts[1::7]
+    ys = xyts[2::7]
+
+    nads = xyts[3::7]
+    nxs = xyts[4::7]
+    nys = xyts[5::7]
+
+    ts = xyts[6::7]
+
+    ads = [ads[i] for i,t in enumerate(ts) if ta < t < tb]
+    nads = [nads[i] for i,t in enumerate(ts) if ta < t < tb]
+    xs = [xs[i] for i,t in enumerate(ts) if ta < t < tb]
+    ys = [ys[i] for i,t in enumerate(ts) if ta < t < tb]
+    nxs = [nxs[i] for i,t in enumerate(ts) if ta < t < tb]
+    nys = [nys[i] for i,t in enumerate(ts) if ta < t < tb]
+    ts = [ts[i] for i,t in enumerate(ts) if ta < t < tb]
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    
+    tracks = dict();
+    for iad in iads:
+        tracks[iad] = dict()
+        tracks[iad]['ads'] = list()
+        tracks[iad]['xs'] = list()
+        tracks[iad]['ys'] = list()
+        tracks[iad]['ts'] = list()
+        tmpa = iad
+        for i,a in enumerate(ads):
+            if a == tmpa:
+                tracks[iad]['ads'].append(ads[i])
+                tracks[iad]['xs'].append(xs[i])
+                tracks[iad]['ys'].append(ys[i])
+                tracks[iad]['ts'].append(ts[i])
+                #tracks[iad]['xs'].append(nxs[i])
+                #tracks[iad]['ys'].append(nys[i])
+                tmpa = nads[i]
+
+
+        ds = [1-((x/350)**2 + (y/350)**2)**0.5 for x,y in zip(tracks[iad]['xs'], tracks[iad]['ys'])]
+        maxt = max(tracks[iad]['ts'])
+        mint = min(tracks[iad]['ts'])
+        cts = [(x-mint)/(maxt-mint) for x in tracks[iad]['ts']]
+        cs = cm.rainbow(cts)
+
+        ax.scatter(tracks[iad]['xs'], tracks[iad]['ys'], tracks[iad]['ts'], color=cs, cmap=cm.hsv)
+        ax.plot(tracks[iad]['xs'], tracks[iad]['ys'], tracks[iad]['ts'])
+    
+    ax.set_xlim3d(0, 350)
+    ax.set_ylim3d(0, 350)
+    plt.show()
+
 
 def summary(*algs):
     for alg in algs:
@@ -121,196 +309,14 @@ def plot_xy_es(alg, snap):
     xs = np.fromfile(pdir + alg + '/nodes_x.dat')
     ys = np.fromfile(pdir + alg + '/nodes_y.dat')
     es = np.fromfile(pdir + alg + '/energy_snapshot.dat')[nn*snap : nn*(snap+1)]
-    
-    fig, ax = plt.subplots()
-    
-    dxs = [xs[i] for i,c in enumerate(es) if es[i] <= 0 and i > 0]
-    dys = [ys[i] for i,c in enumerate(es) if es[i] <= 0 and i > 0]
-    ax.scatter(dxs, dys, s = 10, alpha = 0.5, color="black")
-    
-    dxs = [xs[i] for i,c in enumerate(es) if 0 < es[i] <= 500]
-    dys = [ys[i] for i,c in enumerate(es) if 0 < es[i] <= 500]
-    ax.scatter(dxs, dys, s = 10, alpha = 0.5, color="red")
-
-    dxs = [xs[i] for i,c in enumerate(es) if 500 < es[i] <= 1000]
-    dys = [ys[i] for i,c in enumerate(es) if 500 < es[i] <= 1000]
-    ax.scatter(dxs, dys, s = 10, alpha = 0.5, color="yellow")
-
-    dxs = [xs[i] for i,c in enumerate(es) if 1000 < es[i] <= 1500]
-    dys = [ys[i] for i,c in enumerate(es) if 1000 < es[i] <= 1500]
-    ax.scatter(dxs, dys, s = 10, alpha = 0.5, color="green")
-
-    dxs = [xs[i] for i,c in enumerate(es) if 1500 < es[i] <= 2000]
-    dys = [ys[i] for i,c in enumerate(es) if 1500 < es[i] <= 2000]
-    ax.scatter(dxs, dys, s = 10, alpha = 0.5, color="blue")
-
-    plt.show()
-
-def plot_xy_es_rainbow(alg, snap):
-    xs = np.fromfile(pdir + alg + '/nodes_x.dat')
-    ys = np.fromfile(pdir + alg + '/nodes_y.dat')
-    es = np.fromfile(pdir + alg + '/energy_snapshot.dat')[nn*snap : nn*(snap+1)]
     es[es<0] = 0
 
     fig, ax = plt.subplots()
-    cs = cm.rainbow(es/2000)
+    cs = cm.rainbow(1-es/2000)
 
     for i,x in enumerate(xs):
         ax.scatter(x, ys[i], s=10, alpha=0.5, color=cs[i])
 
     plt.show()
 
-def plot_xyt_rotate(ta, tb):
-    xyts = np.fromfile(pdir + 'lcr/rotate.dat')
-    
-    ads = xyts[0::7]
-    xs = xyts[1::7]
-    ys = xyts[2::7]
 
-    nads = xyts[3::7]
-    nxs = xyts[4::7]
-    nys = xyts[5::7]
-
-    ts = xyts[6::7]
-    xs = [xs[i] for i,t in enumerate(ts) if ta < t < tb]
-    ys = [ys[i] for i,t in enumerate(ts) if ta < t < tb]
-    ts = [ts[i] for i,t in enumerate(ts) if ta < t < tb]
-    ds = [1-((x/350)**2 + (y/350)**2)**0.5 for x,y in zip(xs,ys)]
-    cs = cm.rainbow(ds)
-
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.scatter(xs, ys, ts, color=cs, cmap=cm.hsv)
-    ax.set_xlim3d(0, 350)
-    ax.set_ylim3d(0, 350)
-    plt.show()
-
-def plot_xyt_rotate(s):
-    xyts = np.fromfile(pdir + 'lcr/rotate_backup.dat')
-    xs = xyts[1::7][::s]
-    ys = xyts[2::7][::s]
-    ts = xyts[6::7][::s]
-    ds = [1-((x/350)**2 + (y/350)**2)**0.5 for x,y in zip(xs,ys)]
-    cs = cm.rainbow(ds)
-
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.scatter(xs, ys, ts, color=cs, cmap=cm.hsv)
-    ax.set_xlim3d(0, 350)
-    ax.set_ylim3d(0, 350)
-    
-    plt.show()
-
-def plot_xyt_track_all(s):
-    chs = np.fromfile(pdir + 'lcr/ch_snapshot.dat')[nn : nn*2]
-    chas = [c for i,c in enumerate(chs) if c == i][::s]
-    plot_xyt_track(chas, 0, 30000)
-
-def plot_xyt_track(iads, ta, tb):
-    xyts = np.fromfile(pdir + 'lcr/rotate_backup.dat')
-    
-    ads = xyts[0::7]
-    xs = xyts[1::7]
-    ys = xyts[2::7]
-
-    nads = xyts[3::7]
-    nxs = xyts[4::7]
-    nys = xyts[5::7]
-
-    ts = xyts[6::7]
-
-    ads = [ads[i] for i,t in enumerate(ts) if ta < t < tb]
-    nads = [nads[i] for i,t in enumerate(ts) if ta < t < tb]
-    xs = [xs[i] for i,t in enumerate(ts) if ta < t < tb]
-    ys = [ys[i] for i,t in enumerate(ts) if ta < t < tb]
-    nxs = [nxs[i] for i,t in enumerate(ts) if ta < t < tb]
-    nys = [nys[i] for i,t in enumerate(ts) if ta < t < tb]
-    ts = [ts[i] for i,t in enumerate(ts) if ta < t < tb]
-
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    
-    tracks = dict();
-    for iad in iads:
-        tracks[iad] = dict()
-        tracks[iad]['ads'] = list()
-        tracks[iad]['xs'] = list()
-        tracks[iad]['ys'] = list()
-        tracks[iad]['ts'] = list()
-        tmpa = iad
-        for i,a in enumerate(ads):
-            if a == tmpa:
-                tracks[iad]['ads'].append(ads[i])
-                tracks[iad]['xs'].append(xs[i])
-                tracks[iad]['ys'].append(ys[i])
-                tracks[iad]['ts'].append(ts[i])
-                #tracks[iad]['xs'].append(nxs[i])
-                #tracks[iad]['ys'].append(nys[i])
-                tmpa = nads[i]
-
-
-        ds = [1-((x/350)**2 + (y/350)**2)**0.5 for x,y in zip(tracks[iad]['xs'], tracks[iad]['ys'])]
-        maxt = max(tracks[iad]['ts'])
-        mint = min(tracks[iad]['ts'])
-        cts = [(x-mint)/(maxt-mint) for x in tracks[iad]['ts']]
-        cs = cm.rainbow(cts)
-
-        ax.scatter(tracks[iad]['xs'], tracks[iad]['ys'], tracks[iad]['ts'], color=cs, cmap=cm.hsv)
-        ax.plot(tracks[iad]['xs'], tracks[iad]['ys'], tracks[iad]['ts'])
-    
-    ax.set_xlim3d(0, 350)
-    ax.set_ylim3d(0, 350)
-    plt.show()
-
-def plot_inds(*algs):
-    fig, ax = plt.subplots()
-    for alg in algs:
-        if alg == 'lcr':
-            inds = np.loadtxt(pdir + 'lcr/inds.txt', skiprows=1, usecols=range(2,7))
-            c = 'red'
-        if alg == 'heed':
-            inds = np.loadtxt(pdir + 'heed/inds.txt', skiprows=1, usecols=range(1,6))
-            c = 'green'
-        if alg == 'ecpf':
-            inds = np.loadtxt(pdir + 'ecpf/inds.txt', skiprows=1, usecols=range(1,6))
-            c = 'blue'
-        if alg == 'ifucm':
-            inds = np.loadtxt(pdir + 'ifucm/inds.txt', skiprows=1, usecols=range(1,6))
-            c = 'orange'
-        
-
-        for i,[fnd,hnd,lnd,overhead,output] in enumerate(inds):
-            #ax.scatter(fnd, lnd, s = 10**(output / 1e9) * 0.5, alpha = 0.2, color=c)
-            #ax.scatter(fnd, lnd, s = (30 * (output - 2.0e9) / 1e9)**2, alpha = 0.2, color=c)
-            ax.scatter(fnd, lnd, s = overhead/3.0e3, alpha = 0.47, color=c)
-            ax.scatter(fnd, lnd, s = 10, alpha = 1, color='black')
-            if i > 0:
-                ax.plot([inds[i-1][0],fnd], [inds[i-1][2],lnd], alpha = 0.7, color=c)
-    plt.show()
-
-def plot_inds_3d(*algs):
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
- 
-    for alg in algs:
-        if alg == 'lcr':
-            inds = np.loadtxt(pdir + 'lcr/inds.txt', skiprows=1, usecols=[2,3,4])
-            c = 'red'
-        if alg == 'heed':
-            inds = np.loadtxt(pdir + 'heed/inds.txt', skiprows=1, usecols=[1,2,3])
-            c = 'green'
-        if alg == 'ecpf':
-            inds = np.loadtxt(pdir + 'ecpf/inds.txt', skiprows=1, usecols=[1,2,3])
-            c = 'blue'
-        if alg == 'ifucm':
-            inds = np.loadtxt(pdir + 'ifucm/inds.txt', skiprows=1, usecols=[1,2,3])
-            c = 'yellow'
-        
-        for fnd,lnd,output in inds:
-            ax.scatter(fnd, lnd, 2.3e9, alpha = 0.2, color=c)
-            ax.scatter(fnd, lnd, output, alpha = 0.8, color=c)
-            ax.plot([fnd,fnd],[lnd,lnd],[2.3e9,output], alpha = 0.5, color=c)
-    plt.show()
-
-def plot_fnd(*algs):
-    pass 

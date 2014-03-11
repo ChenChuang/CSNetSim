@@ -24,6 +24,12 @@ void Node::init()
 	this->procs_manager->init();
 }
 
+void Node::clear()
+{
+	this->commproxy->clear_t_buf();
+	this->commproxy->clear_r_buf();
+}
+
 void Node::print()
 {
 	printf("node %4d : location = ( %4f, %4f ), energy = %4f\n", this->addr, this->x, this->y, this->energy);

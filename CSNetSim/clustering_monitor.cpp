@@ -50,7 +50,7 @@ void ClusteringMonitor::record_periodically(Node** nodes)
 			this->fnd = this->network->get_clock()->get_time();
 		}
 	}
-	if(this->lnd < 0 && al_sum == 0){
+	if(this->lnd < 0 && al_sum <= 2){
 		this->lnd = this->network->get_clock()->get_time();
 	}
 	if(this->hnd < 0 && al_sum < (this->network->nodes_num - 1)/2){
@@ -231,10 +231,22 @@ void ClusteringMonitor::record_after_run()
 	this->write_to_dat("../../results/ifucm/rotate_times_track.dat", this->rotate_times_track, this->record_count);
 #endif
 #endif
+	std::ofstream f("inds_4.dat", std::ios::binary|std::ios::app);
+	double* array = new double[5];
+	array[0] = this->fnd;
+	array[1] = this->hnd;
+	array[2] = this->lnd;
+	array[3] = this->rotate_overhead;
+	array[4] = this->output;
+	f.write((char*)array, 5*sizeof(double));
+	f.close();
+	delete[] array;
 	printf("done\n");
 	//printf("\nFND = %f\nLND = %f\nOVERHEAD = %f\nOUTPUT = %f\n", this->fnd, this->lnd, this->rotate_overhead, this->output);
+#ifdef _PRINT_
 	printf("\n%.2f %.2f %.2f %.2f %.2f\n", this->fnd, this->hnd, this->lnd, this->rotate_overhead, this->output);
 	printf("\nsizeof(double) = %d\n", sizeof(double));
 	printf("record_num = %d\n", this->record_count);
 	printf("node_num = %d\n", this->network->nodes_num);
+#endif
 }

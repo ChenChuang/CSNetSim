@@ -36,6 +36,9 @@ CSNetSim/.codelite/
 CSNetSim/Makefile
 CSNetSim/UnitTest/Debug/
 
+results*/
+*.sh
+
 fuzzylite-4.0/
 hdf5-1.8.12/
 *.dat

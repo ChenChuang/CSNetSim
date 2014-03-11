@@ -12,7 +12,7 @@ SensorLcrProc::SensorLcrProc(Node* anode) : node(anode)
 	this->max_wait_self_time = 5;
 	this->max_wait_hop_time = 5;
 	this->min_wait_hop_time = 0;
-	this->energy_thrd = 0.8;
+	this->energy_thrd = 0.7;
 	this->energy_thrd_2 = 0;
 	this->energy_thrd_3 = 70;
 	this->energy_thrd_4 = EnergyModel::calTransmit(ClusteringSimModel::CTRL_PACKET_SIZE, ClusteringSimModel::MAX_RADIUS);
