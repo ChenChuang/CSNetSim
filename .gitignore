@@ -50,3 +50,5 @@ hdf5-1.8.12/
 *.mat
 *.mexw32
 *.fig
+
+paper/
