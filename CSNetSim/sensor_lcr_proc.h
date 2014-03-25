@@ -5,7 +5,6 @@
 #include "clustering_neighbor.h"
 #include "clustering_member.h"
 #include "clustering_comm_proxy.h"
-#include "clustering_monitor.h"
 
 namespace lcr
 {
@@ -16,6 +15,7 @@ namespace lcr
 
 class INode_SensorLcrProc;
 class INet_SensorLcrProc;
+class IMonitor_SensorLcrProc;
 
 class SensorLcrProc : public Processor
 {
@@ -89,7 +89,13 @@ public:
 	static const char CMD_NEWMN_ANC = 0x75;
 	
 	static const char CMD_JOIN = 0x76;
-
+	
+	static const int ISO_CHDIE = 1;
+	static const int ISO_CHOLD = 2;
+	static const int ISO_NOTENT = 3;
+	static const int ISO_MN_NONEWCH = 4;
+	static const int ISO_CH_NONEWCH = 5;
+	static const int ISO_NEWCH_NOMN = 6;
 	
 public:
 	double clustering_time;
@@ -112,6 +118,7 @@ private:
 	INode_SensorLcrProc* inode;
 	ClusteringCommProxy* comm_proxy;
 	INet_SensorLcrProc* inetwork;
+	IMonitor_SensorLcrProc* imonitor;
 	
 	SortedList<lcr::Sch>* chs;
 	SortedList<lcr::TentParam>* tent_params;
@@ -129,6 +136,7 @@ private:
 	int newch;
 
 	char proc_state;
+	int iso_type;
 
 };
 
@@ -232,6 +240,13 @@ class INet_SensorLcrProc
 public:
 	virtual double d_between(int addr1, int addr2) = 0;
 	virtual bool is_alive(int addr) = 0;
+};
+
+class IMonitor_SensorLcrProc
+{
+public:
+	virtual void record_newch_type(int a, int t) = 0;
+	virtual void record_rotate(int a, int na) = 0;
 };
 
 #endif // SENSORLCRPROC_H

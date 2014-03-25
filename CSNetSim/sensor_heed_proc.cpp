@@ -3,6 +3,8 @@
 SensorHeedProc::SensorHeedProc(Node* anode) : node(anode)
 {
 	this->inode = dynamic_cast<INode_SensorHeedProc*>(this->node);
+	this->imonitor = dynamic_cast<IMonitor_SensorHeedProc*>(this->node->get_network()->get_monitor());
+	
 	this->min_tick = 0.01;
 	this->c_prob = 0.07;
 	this->p_min = 0.0001;
@@ -41,6 +43,11 @@ void SensorHeedProc::exit_clustering()
 {
 	if(this->inode->get_ch_addr() < 0){
 		this->inode->set_ch_addr(this->node->get_addr());
+	}
+	if(this->inode->is_ch()){
+		#ifdef _NEWCH_TRACK_
+			this->imonitor->record_newch(this->node->get_addr());
+		#endif
 	}
 	this->proc_state = SensorHeedProc::PROC_SLEEP;
 	this->timer->set_after(this->route_time + this->stable_time);
@@ -91,7 +98,8 @@ int SensorHeedProc::process(Msg* msg)
 
 void SensorHeedProc::add_member(int addr)
 {
-	this->inode->get_mnmanager()->add(addr);
+	if(this->node->get_addr() == 1280)
+		this->inode->get_mnmanager()->add(addr);
 }
 
 void SensorHeedProc::set_tent_type(int addr, char ch_type)

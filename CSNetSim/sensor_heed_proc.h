@@ -32,6 +32,7 @@ public:
 }
 
 class INode_SensorHeedProc;
+class IMonitor_SensorHeedProc;
 
 class SensorHeedProc : public Processor
 {
@@ -91,7 +92,9 @@ public:
 	
 private:
 	Node* node;
-	INode_SensorHeedProc* inode;	
+	INode_SensorHeedProc* inode;
+	IMonitor_SensorHeedProc* imonitor;
+	
 	SortedList<heed::Tent>* tents;
 
 	char proc_state;
@@ -114,6 +117,12 @@ public:
 	virtual void start_route() = 0;
 	virtual void stop_route() = 0;
 	virtual NgbManager* get_neighbors() = 0;
+};
+
+class IMonitor_SensorHeedProc
+{
+public:
+	virtual void record_newch(int a) = 0;
 };
 
 #endif // SENSORHEEDPROC_H

@@ -7,3 +7,8 @@ p.plot_fnd_avg()
 p.plot_hnd_avg()
 p.plot_lnd_avg()
 p.plot_ohd_avg()
+p.plot_time_fcd(1,'heed','lcr')
+p.plot_move_1(None)
+p.plot_move_2(None)
+p.plot_move_3(None)
+

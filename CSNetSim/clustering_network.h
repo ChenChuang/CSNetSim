@@ -27,6 +27,7 @@ public:
 public:
 	double d_between(int addr1, int addr2);
 	bool is_alive(int addr);
+	ClusteringMonitor* get_monitor();
 	
 public:
 	int sensor_nodes_num;

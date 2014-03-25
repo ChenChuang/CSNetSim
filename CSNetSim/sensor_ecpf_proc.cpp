@@ -4,6 +4,7 @@ SensorEcpfProc::SensorEcpfProc(Node* anode) : node(anode)
 {
 	this->inode = dynamic_cast<INode_SensorEcpfProc*>(this->node);
 	this->inetwork = dynamic_cast<INet_SensorEcpfProc*>(this->node->get_network());
+	this->imonitor = dynamic_cast<IMonitor_SensorEcpfProc*>(this->node->get_network()->get_monitor());
 	this->clock = this->node->get_network()->get_clock();
 	this->comm = dynamic_cast<ClusteringCommProxy*>(this->node->get_commproxy());
 	
@@ -55,6 +56,11 @@ void SensorEcpfProc::exit_clustering()
 {
 	if(this->inode->get_ch_addr() < 0){
 		this->inode->set_ch_addr(this->node->get_addr());
+	}
+	if(this->inode->is_ch()){
+		#ifdef _NEWCH_TRACK_
+			this->imonitor->record_newch(this->node->get_addr());
+		#endif
 	}
 	this->energy_pre = this->node->energy;
 	this->proc_state = SensorEcpfProc::PROC_SLEEP;

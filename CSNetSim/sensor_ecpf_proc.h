@@ -35,6 +35,7 @@ public:
 
 class INode_SensorEcpfProc;
 class INet_SensorEcpfProc;
+class IMonitor_SensorEcpfProc;
 
 class SensorEcpfProc : public Processor
 {
@@ -108,6 +109,7 @@ private:
 	Node* node;
 	INode_SensorEcpfProc* inode;
 	INet_SensorEcpfProc* inetwork;
+	IMonitor_SensorEcpfProc* imonitor;
 	Clock* clock;
 	ClusteringCommProxy* comm;
 
@@ -147,6 +149,12 @@ class INet_SensorEcpfProc
 public:
 	virtual double d_between(int addr1, int addr2) = 0;
 	virtual bool is_alive(int addr) = 0;
+};
+
+class IMonitor_SensorEcpfProc
+{
+public:
+	virtual void record_newch(int a) = 0;
 };
 
 namespace ecpf

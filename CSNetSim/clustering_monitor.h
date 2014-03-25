@@ -4,6 +4,10 @@
 #include "csnetsim.h"
 #include "clustering_sim_model.h"
 #include "sink_node.h"
+#include "sensor_heed_proc.h"
+#include "sensor_lcr_proc.h"
+#include "sensor_ecpf_proc.h"
+#include "sensor_ifucm_proc.h"
 
 #include <string>
 #include <cmath>
@@ -11,7 +15,11 @@
 
 class ClusteringNetwork;
 
-class ClusteringMonitor : public Monitor, public IMonitor_Channel
+class ClusteringMonitor : public Monitor, public IMonitor_Channel, 
+	public IMonitor_SensorHeedProc, 
+	public IMonitor_SensorLcrProc, 
+	public IMonitor_SensorEcpfProc,
+	public IMonitor_SensorIfucmProc
 {
 public:
 	ClusteringMonitor(ClusteringNetwork* anetwork);
@@ -22,6 +30,8 @@ public:
 	void record_after_run();
 	void record_communicate(Msg* msg, double energy);
 	void record_rotate(int a, int na);
+	void record_newch(int a);
+	void record_newch_type(int a, int t);
 private:
 	void record_adjg(std::string file_path, std::string var_name, AdjG* G);
 	void record_periodically(Node** nodes);

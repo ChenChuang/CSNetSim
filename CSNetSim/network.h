@@ -31,7 +31,7 @@ public:
 	virtual void communicate();
 public:
 	Node* node(int addr) {return this->nodes[addr];}
-	Monitor* get_monitor() {return this->monitor;}
+	virtual Monitor* get_monitor() {return this->monitor;}
 	Clock* get_clock() {return this->clock;}
 	
 public:

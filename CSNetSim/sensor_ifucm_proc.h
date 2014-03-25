@@ -53,6 +53,7 @@ public:
 
 class INode_SensorIfucmProc;
 class INet_SensorIfucmProc;
+class IMonitor_SensorIfucmProc;
 
 class SensorIfucmProc : public Processor
 {
@@ -112,6 +113,8 @@ private:
     ClusteringCommProxy* comm;
 	INode_SensorIfucmProc* inode;
     INet_SensorIfucmProc* inetwork;
+	IMonitor_SensorIfucmProc* imonitor;
+	
 	SortedList<ifucm::Tent>* tents;
     SortedList<ifucm::Sch>* chs;
 
@@ -142,6 +145,12 @@ class INet_SensorIfucmProc
 {
 public:
     virtual double d_between(int a, int b) = 0;
+};
+
+class IMonitor_SensorIfucmProc
+{
+public:
+	virtual void record_newch(int a) = 0;
 };
 
 namespace ifucm

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctime>
 #include <cstdlib>
+#include "compile_config.h"
 
 void crunsim(void);
 void crunsim_h(void);
@@ -18,9 +19,11 @@ const std::string currentDateTime() {
 
 int main(int argc, char **argv)
 {
+#ifdef _RAND_
 	std::srand((unsigned)std::time(0));
+#else
 	//std::srand(1);
-	
+#endif	
 	std::cout << "Hello, CSNetSim\n" << std::endl << std::endl;
 	int t0 = std::time(NULL);
 	crunsim();

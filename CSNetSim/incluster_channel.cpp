@@ -15,6 +15,7 @@ int InclusterChannel::communicate(Msg* msg)
 		double k = msg->size;
 		Node* t = this->network->node(msg->fromaddr);
 		Node* r;
+		//MnManager* mn = dynamic_cast<INode_ClusteringMember*>(this->network->node(msg->fromaddr))->get_mnmanager();
 		MnIterator* mn_iter = dynamic_cast<INode_ClusteringMember*>(this->network->node(msg->fromaddr))->get_mnmanager()->get_mn_iter();
 		double t_energy = 0;
 		double r_energy = EnergyModel::calReceive(k);

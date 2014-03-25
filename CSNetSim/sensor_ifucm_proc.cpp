@@ -4,6 +4,7 @@ SensorIfucmProc::SensorIfucmProc(Node* anode) : node(anode)
 {
 	this->inode = dynamic_cast<INode_SensorIfucmProc*>(this->node);
     this->inetwork = dynamic_cast<INet_SensorIfucmProc*>(this->node->get_network());
+	this->imonitor = dynamic_cast<IMonitor_SensorIfucmProc*>(this->node->get_network()->get_monitor());
     this->comm = dynamic_cast<ClusteringCommProxy*>(this->node->get_commproxy());
 	this->min_tick = 0.01;
 	this->tent_p = 0.1;
@@ -45,6 +46,11 @@ void SensorIfucmProc::exit_clustering()
 {
 	if(this->inode->get_ch_addr() < 0){
 		this->inode->set_ch_addr(this->node->get_addr());
+	}
+	if(this->inode->is_ch()){
+		#ifdef _NEWCH_TRACK_
+			this->imonitor->record_newch(this->node->get_addr());
+		#endif
 	}
 	this->proc_state = SensorIfucmProc::PROC_SLEEP;
 	this->timer->set_after(this->route_time + this->stable_time);

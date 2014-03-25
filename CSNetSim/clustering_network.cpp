@@ -4,6 +4,8 @@ ClusteringNetwork::ClusteringNetwork(double* x, double* y):
 	Network(x, y, ClusteringSimModel::NODE_NUM, ClusteringSimModel::MAX_SIM_TIME, 
 		ClusteringSimModel::DEFAULT_TICK, ClusteringSimModel::MIN_TICK)
 {
+	this->monitor = new ClusteringMonitor(this);
+	
 	this->sensor_nodes_num = ClusteringSimModel::NODE_NUM - 1;
 	this->nodes[0] = new SinkNode(this, 0, ClusteringSimModel::SINK_X, ClusteringSimModel::SINK_Y);
 	for(int i = 1; i < ClusteringSimModel::NODE_NUM; i ++){
@@ -21,8 +23,6 @@ ClusteringNetwork::ClusteringNetwork(double* x, double* y):
 	this->channels->add(this->netcast_channel);
 	this->channels->add(this->unicast_channel);
 	this->channels->add(this->incluster_channel);
-	
-	this->monitor = new ClusteringMonitor(this);
 	
 	for(int i = 1; i < ClusteringSimModel::NODE_NUM; i ++){
 		dynamic_cast<SensorNode*>(this->nodes[i])->init_neighbors(this->cluster_radius_channel->get_ajdv(i));
@@ -63,4 +63,10 @@ double ClusteringNetwork::d_between(int addr1, int addr2)
 bool ClusteringNetwork::is_alive(int addr)
 {
 	return this->nodes[addr]->is_alive();
+}
+
+ClusteringMonitor* ClusteringNetwork::get_monitor()
+{
+	ClusteringMonitor* m = dynamic_cast<ClusteringMonitor*>(this->monitor);
+	return m;
 }
